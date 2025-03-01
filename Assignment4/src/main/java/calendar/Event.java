@@ -1,9 +1,9 @@
 package calendar;
 
 /**
- * Calendar bean class
+ * Event bean class
  */
-public class Calendar {
+public class Event {
 
   private String subject;
   private String location;
@@ -11,5 +11,7 @@ public class Calendar {
   private enum eventType{
     SINGLE, RECURRING;
   }
+  private DateTime startDateTime;
+  private DateTime endDateTime;
 
 }

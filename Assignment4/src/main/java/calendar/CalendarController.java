@@ -13,7 +13,7 @@ public class CalendarController {
     String input;
 
     do {
-      System.out.println("Enter Calendar command (or 'exit' to quit):");
+      System.out.println("Enter calender command (or 'exit' to quit):");
       input = scanner.nextLine();
 
       if (!input.equalsIgnoreCase("exit")) {

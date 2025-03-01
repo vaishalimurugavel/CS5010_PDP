@@ -1,4 +1,4 @@
-package calendar;
+package calendar.controller;
 
 import java.util.Scanner;
 

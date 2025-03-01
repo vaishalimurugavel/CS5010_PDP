@@ -1,8 +1,8 @@
-package calendar;
+package calendar.model;
 
 public class RecurringCalendarEvent extends CalendarEvent{
   @Override
-  public boolean createCalendarEvent() {
+  public boolean addEvent() {
     return false;
   }
 }

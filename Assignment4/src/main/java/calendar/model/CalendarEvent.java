@@ -1,8 +1,9 @@
-package calendar;
+package calendar.model;
 
 import java.util.List;
 
 public abstract class CalendarEvent {
+
   List<Event> eventList;
-  abstract public boolean createCalendarEvent();
+  abstract public boolean addEvent();
 }

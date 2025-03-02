@@ -1,5 +1,7 @@
 package calendar.model;
 
+import java.time.LocalDateTime;
+
 /**
  * Event bean class
  */
@@ -9,10 +11,10 @@ public class Event {
   private String location;
   private String description;
   private int eventType;
-  private DateTime startDateTime;
-  private DateTime endDateTime;
+  private LocalDateTime startDateTime;
+  private LocalDateTime endDateTime;
 
-  public Event(String subject, String location, String description, DateTime startDateTime, DateTime endDateTime, int eventType) {
+  public Event(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType) {
     this.subject = subject;
     this.location = location;
     this.description = description;

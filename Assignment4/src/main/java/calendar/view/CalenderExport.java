@@ -1,9 +1,9 @@
-package calendar.View;
+package calendar.view;
 
 /**
  * Created at 01-03-2025
  * Author Vaishali
  **/
 
-public class CalenderView {
+public class CalenderExport {
 }

@@ -119,6 +119,7 @@ public static void main(String[] args) {
     } while (!input.equalsIgnoreCase("exit"));
 
     System.out.println("Exiting application.");
+    System.out.println("Test");
     scanner.close();
   }
 }

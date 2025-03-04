@@ -23,5 +23,31 @@ public class Event {
     this.eventType = eventType;
 
   }
+  public String getSubject() {
+    return subject;
+  }
+  public String getLocation() {
+    return location;
+  }
+  public String getDescription() {
+    return description;
+  }
+  public LocalDateTime getStartDateTime() {
+    return startDateTime;
+  }
+  public LocalDateTime getEndDateTime() {
+    return endDateTime;
+  }
 
+  public static class EventKeys{
+      public static final String SUBJECT = "subject";
+      public static final String LOCATION = "location";
+      public static final String DESCRIPTION = "description";
+      public static final String EVENT_TYPE = "eventType";
+      public static final String START_DATETIME = "startDateTime";
+      public static final String END_DATETIME = "endDateTime";
+      public static final String AUTO_DECLINE = "autoDecline";
+  }
 }
+
+

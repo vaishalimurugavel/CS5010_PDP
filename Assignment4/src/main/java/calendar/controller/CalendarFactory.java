@@ -9,7 +9,7 @@ import calendar.model.SingleCalenderEvent;
  * Author Vaishali
  **/
 
-public class CalenderFactory {
+public class CalendarFactory {
   private static final CalendarEvent singleCalender  = new SingleCalenderEvent();
   private static final CalendarEvent recurringCalender  = new RecurringCalendarEvent();
 

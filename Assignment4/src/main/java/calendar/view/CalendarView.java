@@ -1,6 +1,6 @@
 package calendar.view;
 
-import calendar.controller.CalenderFactory;
+import calendar.controller.CalendarFactory;
 import calendar.model.Event;
 
 /**
@@ -11,7 +11,7 @@ import calendar.model.Event;
 public class CalendarView {
 
   public void printSingleCalenderEvent(){
-    for (Event e: CalenderFactory.getSingleCalender().getEventList() ){
+    for (Event e: CalendarFactory.getSingleCalender().getEventList() ){
       System.out.println(e);
     }
   }

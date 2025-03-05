@@ -17,8 +17,8 @@ class RecurringEvent extends Event {
   private int[] weekdays;
   private int occurrences;
 
-  public RecurringEvent(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, int[] weekdays, int occurrences) {
-    super(subject, location, description, startDateTime, endDateTime, eventType);
+  public RecurringEvent(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean allDay, int[] weekdays, int occurrences) {
+    super(subject, location, description, startDateTime, endDateTime, eventType, allDay);
     this.weekdays = weekdays;
     this.occurrences = occurrences;
   }

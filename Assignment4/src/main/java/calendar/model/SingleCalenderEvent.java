@@ -1,5 +1,6 @@
 package calendar.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -13,21 +14,33 @@ public class SingleCalenderEvent extends CalendarEvent {
 
   @Override
   public boolean addEvent(Map<String, Object> eventDes) {
-    String subject = (String) eventDes.getOrDefault(Event.EventKeys.SUBJECT, "New Event_" + this.eventList.size());
-    String location = (String) eventDes.getOrDefault(Event.EventKeys.LOCATION, "Online");
-    String description = (String) eventDes.getOrDefault(Event.EventKeys.DESCRIPTION, "New event Description");
-    LocalDateTime start = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.START_DATETIME, LocalDateTime.now());
-    LocalDateTime end = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.END_DATETIME, LocalDateTime.now());
-    int eventType = (int) eventDes.getOrDefault(Event.EventKeys.EVENT_TYPE, 0);
-    boolean allDay = (boolean) eventDes.getOrDefault(RecurringEvent.EventKeys.ALL_DAY, Boolean.FALSE);
-    boolean autoDecline = (boolean) eventDes.getOrDefault(Event.EventKeys.AUTO_DECLINE, false);
+    String subject = (String) eventDes.get(EventKeys.SUBJECT);
+    String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
+    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
+    int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
+
+    LocalDateTime start = null ;
+    LocalDateTime end = null;
+    LocalDate allDAyEnd = null;
+    boolean allDay = false;
+    switch ((EventKeys.EventType)eventDes.get(EventKeys.EVENT_TYPE)){
+      case SINGLE:
+        start = (LocalDateTime) eventDes.getOrDefault(EventKeys.START_DATETIME, LocalDateTime.now());
+        end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME, LocalDateTime.now());
+        break;
+      case ALL_DAY:
+        allDAyEnd = (LocalDate) eventDes.getOrDefault(EventKeys.ALLDAY_DATETIME, LocalDate.now());
+        allDay = true;
+
+    }
+    boolean autoDecline = (boolean) eventDes.getOrDefault(EventKeys.AUTO_DECLINE, false);
     if (autoDecline) {
-      boolean duplicate = checkForDuplicates((LocalDateTime) eventDes.get(Event.EventKeys.START_DATETIME), (LocalDateTime) eventDes.get(Event.EventKeys.END_DATETIME));
+      boolean duplicate = checkForDuplicates((LocalDateTime) eventDes.get(EventKeys.START_DATETIME), (LocalDateTime) eventDes.get(EventKeys.END_DATETIME));
       if (duplicate) {
         throw new IllegalArgumentException("Calender shows busy!");
       }
     }
-    Event single = new Event(subject, location, description, start, end, eventType, allDay);
+    Event single = new Event(subject, location, description, start, end, isPrivate, allDay,allDAyEnd);
     this.eventList.add(single);
     return true;
   }
@@ -36,16 +49,16 @@ public class SingleCalenderEvent extends CalendarEvent {
   public boolean editEvent(Map<String, Object> eventDes) {
     LocalDateTime start;
     LocalDateTime end;
-    String eventName = (String) eventDes.get(Event.EventKeys.SUBJECT);
-    String property = (String) eventDes.get(Event.EventKeys.PROPERTY);
+    String eventName = (String) eventDes.get(EventKeys.SUBJECT);
+    String property = (String) eventDes.get(EventKeys.PROPERTY);
 
-    if (eventDes.containsKey(Event.EventKeys.START_DATETIME)) {
-      start = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.START_DATETIME,null);
+    if (eventDes.containsKey(EventKeys.START_DATETIME)) {
+      start = (LocalDateTime) eventDes.getOrDefault(EventKeys.START_DATETIME,null);
     } else {
       start = null;
     }
-    if (eventDes.containsKey(Event.EventKeys.END_DATETIME)) {
-      end = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.END_DATETIME,null);
+    if (eventDes.containsKey(EventKeys.END_DATETIME)) {
+      end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME,null);
     } else {
       end = null;
     }
@@ -62,28 +75,28 @@ public class SingleCalenderEvent extends CalendarEvent {
     
     for (Event event : filtered) {
       switch (property){
-        case Event.EventKeys.START_DATETIME:
-          LocalDateTime newStart = (LocalDateTime) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.START_DATETIME:
+          LocalDateTime newStart = (LocalDateTime) eventDes.get(EventKeys.NEW_VALUE);
           event.setStartDateTime(newStart);
           break;
-        case Event.EventKeys.END_DATETIME:
-          LocalDateTime newEnd = (LocalDateTime) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.END_DATETIME:
+          LocalDateTime newEnd = (LocalDateTime) eventDes.get(EventKeys.NEW_VALUE);
           event.setEndDateTime(newEnd);
           break;
-        case Event.EventKeys.EVENT_TYPE:
-          int eventType = (int) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.PRIVATE:
+          int eventType = (int) eventDes.get(EventKeys.NEW_VALUE);
           event.setEventType(eventType);
           break;
-        case Event.EventKeys.SUBJECT:
-          String newSubject = (String) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.SUBJECT:
+          String newSubject = (String) eventDes.get(EventKeys.NEW_VALUE);
           event.setSubject(newSubject);
           break;
-        case Event.EventKeys.LOCATION:
-          String newLocation = (String) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.LOCATION:
+          String newLocation = (String) eventDes.get(EventKeys.NEW_VALUE);
           event.setLocation(newLocation);
           break;
-        case Event.EventKeys.DESCRIPTION:
-          String newDescription = (String) eventDes.get(Event.EventKeys.NEW_VALUE);
+        case EventKeys.DESCRIPTION:
+          String newDescription = (String) eventDes.get(EventKeys.NEW_VALUE);
           event.setDescription(newDescription);
           break;
       }

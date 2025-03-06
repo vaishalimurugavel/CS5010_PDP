@@ -1,5 +1,6 @@
 package calendar.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -9,25 +10,45 @@ public class RecurringCalendarEvent extends CalendarEvent{
 
   @Override
   public boolean addEvent(Map<String, Object> eventDes) {
-    String subject = (String)eventDes.get(RecurringEvent.EventKeys.SUBJECT);
-    String location = (String)eventDes.get(RecurringEvent.EventKeys.LOCATION);
-    String description = (String)eventDes.get(RecurringEvent.EventKeys.DESCRIPTION);
-    LocalDateTime start = (LocalDateTime) eventDes.get(RecurringEvent.EventKeys.START_DATETIME);
-    LocalDateTime end = (LocalDateTime) eventDes.get(RecurringEvent.EventKeys.END_DATETIME);
-    int eventType = Integer.parseInt((String)eventDes.get(RecurringEvent.EventKeys.EVENT_TYPE));
-    boolean autoDecline = (boolean) eventDes.get(RecurringEvent.EventKeys.AUTO_DECLINE);
-    int[] rec = (int[]) eventDes.get(RecurringEvent.RecurringEventKeys.WEEKDAYS);
-    int occ = (int) eventDes.get(RecurringEvent.RecurringEventKeys.OCCURRENCES);
-    boolean allDay = (boolean) eventDes.get(RecurringEvent.EventKeys.ALL_DAY);
-
-    if(autoDecline){
-      boolean duplicate = checkForDuplicates((LocalDateTime) eventDes.get(Event.EventKeys.START_DATETIME), (LocalDateTime) eventDes.get(Event.EventKeys.END_DATETIME));
-      if(duplicate){
-        throw new IllegalArgumentException("Calender shows busy!");
-      }
-      Event single = new RecurringEvent(subject,location,description,start,end,eventType,allDay,rec,occ);
-      this.eventList.add(single);
+    String subject = (String) eventDes.get(EventKeys.SUBJECT);
+    String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
+    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
+    int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
+    boolean autoDecline = (boolean) eventDes.getOrDefault(EventKeys.AUTO_DECLINE,false);
+    LocalDateTime start = null;
+    LocalDateTime end = null;
+    LocalDate allDAyEnd = null;
+    LocalDateTime repeatDateTime =null;
+    boolean allDay = false;
+    int occ = 0;
+    String weekDays = null;
+    if (eventDes.containsKey(EventKeys.OCCURRENCES)) {
+      occ = (int) eventDes.get(EventKeys.OCCURRENCES);
     }
+    if (eventDes.containsKey(EventKeys.WEEKDAYS)) {
+      weekDays = (String) eventDes.get(EventKeys.WEEKDAYS);
+    }
+    if (eventDes.containsKey(EventKeys.REPEAT_DATETIME)) {
+      repeatDateTime = (LocalDateTime) eventDes.get(EventKeys.REPEAT_DATETIME);
+    }
+    if(eventDes.containsKey(EventKeys.START_DATETIME)) {
+      start = (LocalDateTime) eventDes.get(EventKeys.START_DATETIME);
+    }
+    if(eventDes.containsKey(EventKeys.END_DATETIME)) {
+      end = (LocalDateTime) eventDes.get(EventKeys.END_DATETIME);
+    }
+    switch ((EventKeys.EventType)eventDes.get(EventKeys.EVENT_TYPE)) {
+      case ALL_DAY_RECURRING:
+        allDAyEnd = (LocalDate) eventDes.get(EventKeys.ALLDAY_DATETIME);
+        allDay = true;
+    }
+
+    if(autoDecline && checkForDuplicates(start,end)){
+      throw new IllegalArgumentException("Calender shows busy!");
+    }
+    Event recurringEvent = new RecurringEvent(subject,location,description,start,end,isPrivate,allDay,weekDays,occ,repeatDateTime,allDAyEnd);
+    this.eventList.add(recurringEvent);
+
     return true;
   }
 
@@ -35,16 +56,16 @@ public class RecurringCalendarEvent extends CalendarEvent{
   public boolean editEvent(Map<String, Object> eventDes) {
     LocalDateTime start;
     LocalDateTime end;
-    String eventName = (String) eventDes.get(Event.EventKeys.SUBJECT);
-    String property = (String) eventDes.get(Event.EventKeys.PROPERTY);
+    String eventName = (String) eventDes.get(EventKeys.SUBJECT);
+    String property = (String) eventDes.get(EventKeys.PROPERTY);
 
-    if (eventDes.containsKey(Event.EventKeys.START_DATETIME)) {
-      start = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.START_DATETIME,null);
+    if (eventDes.containsKey(EventKeys.START_DATETIME)) {
+      start = (LocalDateTime) eventDes.getOrDefault(EventKeys.START_DATETIME,null);
     } else {
       start = null;
     }
-    if (eventDes.containsKey(Event.EventKeys.END_DATETIME)) {
-      end = (LocalDateTime) eventDes.getOrDefault(Event.EventKeys.END_DATETIME,null);
+    if (eventDes.containsKey(EventKeys.END_DATETIME)) {
+      end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME,null);
     } else {
       end = null;
     }
@@ -69,23 +90,23 @@ public class RecurringCalendarEvent extends CalendarEvent{
     }
     for (Event event : filtered) {
       switch (property){
-        case Event.EventKeys.START_DATETIME:
+        case EventKeys.START_DATETIME:
           event.setStartDateTime(start);
           break;
-        case Event.EventKeys.END_DATETIME:
+        case EventKeys.END_DATETIME:
           event.setEndDateTime(end);
           break;
-        case Event.EventKeys.EVENT_TYPE:
-          event.setEventType(Integer.parseInt((String) eventDes.get(Event.EventKeys.EVENT_TYPE)));
+        case EventKeys.PRIVATE:
+          event.setEventType(Integer.parseInt((String) eventDes.get(EventKeys.PRIVATE)));
           break;
-        case Event.EventKeys.SUBJECT:
-          event.setSubject((String) eventDes.get(Event.EventKeys.SUBJECT));
+        case EventKeys.SUBJECT:
+          event.setSubject((String) eventDes.get(EventKeys.SUBJECT));
           break;
-        case Event.EventKeys.LOCATION:
-          event.setLocation((String) eventDes.get(Event.EventKeys.LOCATION));
+        case EventKeys.LOCATION:
+          event.setLocation((String) eventDes.get(EventKeys.LOCATION));
           break;
-        case Event.EventKeys.DESCRIPTION:
-          event.setDescription((String) eventDes.get(Event.EventKeys.DESCRIPTION));
+        case EventKeys.DESCRIPTION:
+          event.setDescription((String) eventDes.get(EventKeys.DESCRIPTION));
           break;
       }
     }

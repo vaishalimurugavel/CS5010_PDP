@@ -1,5 +1,6 @@
 package calendar.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -14,8 +15,9 @@ public class Event {
   private LocalDateTime startDateTime;
   private LocalDateTime endDateTime;
   private boolean isAllDay;
+  private LocalDate allDayEnd;
 
-  public Event(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean isAllDay) {
+  public Event(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean isAllDay, LocalDate allDayEnd) {
     this.subject = subject;
     this.location = location;
     this.description = description;
@@ -23,6 +25,7 @@ public class Event {
     this.endDateTime = endDateTime;
     this.eventType = eventType;
     this.isAllDay = isAllDay;
+    this.allDayEnd = allDayEnd;
 
   }
   public String getSubject() {
@@ -36,6 +39,9 @@ public class Event {
   }
   public boolean isAllDay() {
     return isAllDay;
+  }
+  public LocalDate getAllDayEnd() {
+    return allDayEnd;
   }
   public LocalDateTime getStartDateTime() {
     return startDateTime;
@@ -67,19 +73,10 @@ public class Event {
   public void setAllDay(boolean isAllDay) {
     this.isAllDay = isAllDay;
   }
-
-  public static class EventKeys{
-      public static final String SUBJECT = "subject";
-      public static final String LOCATION = "location";
-      public static final String DESCRIPTION = "description";
-      public static final String EVENT_TYPE = "eventType";
-      public static final String START_DATETIME = "startDateTime";
-      public static final String END_DATETIME = "endDateTime";
-      public static final String AUTO_DECLINE = "autoDecline";
-      public static final String PROPERTY = "property";
-      public static final String NEW_VALUE = "newValue";
-      public static final String ALL_DAY = "allDayEvent";
+  public void setAllDayEnd(LocalDate allDayEnd) {
+    this.allDayEnd = allDayEnd;
   }
+
 }
 
 

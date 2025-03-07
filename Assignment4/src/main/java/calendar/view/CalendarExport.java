@@ -11,6 +11,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import calendar.controller.CalendarFactory;
+import calendar.model.CalendarEvent;
 import calendar.model.Event;
 import calendar.model.RecurringEvent;
 
@@ -21,19 +22,6 @@ import calendar.model.RecurringEvent;
 
 public class CalendarExport {
 
-    private List<RecurringEvent> getEvents(String type){
-      List<RecurringEvent> events = null;
-      switch (type) {
-        case "SINGLE":
-          return CalendarFactory.getSingleCalender().getEventList();
-        case "RECURRING:" :
-          return CalendarFactory.getRecurringCalender().getEventList();
-        default:
-          events = CalendarFactory.getSingleCalender().getEventList();
-          events.addAll(CalendarFactory.getRecurringCalender().getEventList());
-          return events;
-      }
-    }
 
     public void generateCSV(String fileName) {
 
@@ -41,7 +29,7 @@ public class CalendarExport {
       File file = new File(fileName);
       String temp;
       try (FileWriter writer = new FileWriter(file)) {
-        List<RecurringEvent> eventList = getEvents("ALL");
+        List<RecurringEvent> eventList = CalendarEvent.getEventList();
 
         writer.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n");
         for (RecurringEvent event : eventList) {

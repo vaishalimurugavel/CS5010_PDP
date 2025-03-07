@@ -42,8 +42,8 @@ public abstract class CalendarEvent {
     return false;
   }
 
-  public List<RecurringEvent> getEventList(){
-    return this.eventList;
+  public static List<RecurringEvent> getEventList(){
+    return eventList;
   }
 
   public void addEvent(RecurringEvent e){

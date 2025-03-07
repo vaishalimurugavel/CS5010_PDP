@@ -18,12 +18,6 @@ public class CalendarView {
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-
-  public void printSingleCalenderEvent(){
-    for (Event e: CalendarFactory.getSingleCalender().getEventList() ){
-      System.out.println(e);
-    }
-  }
   // Print all events on a specific date
   public void printEventsOn(String dateString) {
     LocalDate date = LocalDate.parse(dateString, DATE_FORMAT);

@@ -40,7 +40,31 @@ public class CalendarController {
         throw new IllegalArgumentException("Unknown command: " + tokens[0]);
     }
   }
-  
+
+  private static boolean checkValidDate(String startDate, String endDate) {
+    String datePattern = "\\d{4}-\\d{2}-\\d{2}";
+    Pattern pattern = Pattern.compile(datePattern);
+    Matcher startmatcher = pattern.matcher(startDate);
+    Matcher endMatcher = pattern.matcher(endDate);
+    String datePattern2 = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}";
+    Pattern pattern2 = Pattern.compile(datePattern2);
+    Matcher startmatcher2 = pattern2.matcher(startDate);
+    Matcher endMatcher2 = pattern2.matcher(endDate);
+
+
+    if(startmatcher.matches() && endMatcher.matches()) {
+      LocalDate startTime = LocalDate.parse(startDate, DATE_FORMATTER);
+      LocalDate endTime = LocalDate.parse(endDate, DATE_FORMATTER);
+      return startTime.isBefore(endTime);
+    }
+    else if(startmatcher2.matches() && endMatcher2.matches()) {
+      LocalDate startTime = LocalDate.parse(startDate, DATE_TIME_FORMATTER);
+      LocalDate endTime = LocalDate.parse(endDate, DATE_TIME_FORMATTER);
+      return startTime.isBefore(endTime);
+    }
+    return false;
+  }
+
   private static void createEvent(String command) {
 
     Map<String, Object> eventDetails = new HashMap<>();
@@ -74,6 +98,9 @@ public class CalendarController {
     Matcher mAllDayRecurringUntil = pAllDayRecurringUntil.matcher(command);
 
     if (mRecurringForN.matches()) {
+      if(!checkValidDate(mRecurringForN.group(3), mRecurringForN.group(4))) {
+        throw new IllegalArgumentException("Invalid date format.");
+      }
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
       eventDetails.put(EventKeys.AUTO_DECLINE, mRecurringForN.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mRecurringForN.group(2));
@@ -83,6 +110,10 @@ public class CalendarController {
       eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mRecurringForN.group(6)));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mRecurringUntil.matches()) {
+
+      if(!checkValidDate(mRecurringUntil.group(3), mRecurringUntil.group(4))) {
+        throw new IllegalArgumentException("Invalid date format.");
+      }
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
       eventDetails.put(EventKeys.AUTO_DECLINE, mRecurringUntil.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mRecurringUntil.group(2));
@@ -92,6 +123,9 @@ public class CalendarController {
       eventDetails.put(EventKeys.REPEAT_DATETIME, LocalDateTime.parse(mRecurringUntil.group(6), DATE_TIME_FORMATTER));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mSingle.matches()) {
+      if(!checkValidDate(mSingle.group(3), mSingle.group(4))) {
+        throw new IllegalArgumentException("Invalid date format.");
+      }
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
       eventDetails.put(EventKeys.AUTO_DECLINE, mSingle.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mSingle.group(2));
@@ -118,6 +152,9 @@ public class CalendarController {
       eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mAllDayRecurringForN.group(5)));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mAllDayRecurringUntil.matches()) {
+      if(!checkValidDate(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
+        throw new IllegalArgumentException("Invalid date format.");
+      }
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
       eventDetails.put(EventKeys.SUBJECT, mAllDayRecurringUntil.group(2));
       eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));

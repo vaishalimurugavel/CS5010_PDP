@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 public abstract class CalendarEvent {
 
-  List<RecurringEvent> eventList;
+  static List<RecurringEvent> eventList;
 
   public CalendarEvent() {
     eventList = new ArrayList<RecurringEvent>();
   }
   protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end, LocalDateTime allDateTime, LocalDate allDate) {
-    for(RecurringEvent e: this.eventList){
+    for(RecurringEvent e: eventList){
       LocalDateTime start2 = e.getStartDateTime();
       LocalDateTime end2 = e.getEndDateTime();
       LocalDateTime allDateTime2 = e.getAllDateTime();

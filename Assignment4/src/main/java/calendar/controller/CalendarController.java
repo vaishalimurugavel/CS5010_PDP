@@ -11,8 +11,6 @@ import java.util.regex.Pattern;
 
 import calendar.model.EventKeys;
 
-
-
 public class CalendarController {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -41,16 +39,15 @@ public class CalendarController {
       default:
         throw new IllegalArgumentException("Unknown command: " + tokens[0]);
     }
-    
   }
   
   private static void createEvent(String command) {
 
     Map<String, Object> eventDetails = new HashMap<>();
-    
-    // Regex patterns for different cases
+
     String basePattern = "create event( --autoDecline)? (.+?)";
     String singleAllDay = basePattern + " on (\\d{4}-\\d{2}-\\d{2})";
+    String singleAllDateTime = basePattern + " on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
     String singleEventPattern = basePattern + " from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
     String recurringForNTimesPattern = singleEventPattern + " repeats ([MTWRFSU]+) for (\\d+) times";
     String recurringUntilPattern = singleEventPattern + " repeats ([MTWRFSU]+) until (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
@@ -60,6 +57,7 @@ public class CalendarController {
 
     Pattern pSingle = Pattern.compile(singleEventPattern);
     Pattern pSingleAllDay = Pattern.compile(singleAllDay);
+    Pattern pSingleAllDateTime = Pattern.compile(singleAllDateTime);
     Pattern pRecurringForN = Pattern.compile(recurringForNTimesPattern);
     Pattern pRecurringUntil = Pattern.compile(recurringUntilPattern);
     Pattern pAllDay = Pattern.compile(allDayEventPattern);
@@ -68,6 +66,7 @@ public class CalendarController {
 
     Matcher mSingle = pSingle.matcher(command);
     Matcher mSingleAllDay = pSingleAllDay.matcher(command);
+    Matcher mSingleAllDateTime = pSingleAllDateTime.matcher(command);
     Matcher mRecurringForN = pRecurringForN.matcher(command);
     Matcher mRecurringUntil = pRecurringUntil.matcher(command);
     Matcher mAllDay = pAllDay.matcher(command);
@@ -101,28 +100,34 @@ public class CalendarController {
       CalendarFactory.getSingleCalender().addEvent(eventDetails);
     } else if (mSingleAllDay.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
-      eventDetails.put(EventKeys.AUTO_DECLINE, mSingle.group(1) != null);
-      eventDetails.put(EventKeys.SUBJECT, mSingle.group(2));
-      eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDateTime.parse(mSingle.group(3), DATE_FORMATTER));
+      eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDay.group(1) != null);
+      eventDetails.put(EventKeys.SUBJECT, mSingleAllDay.group(2));
+      eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mSingleAllDay.group(3), DATE_FORMATTER));
+      CalendarFactory.getSingleCalender().addEvent(eventDetails);
+    } else if (mSingleAllDateTime.matches()) {
+      eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
+      eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDateTime.group(1) != null);
+      eventDetails.put(EventKeys.SUBJECT, mSingleAllDateTime.group(2));
+      eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDateTime.parse(mSingleAllDateTime.group(3), DATE_TIME_FORMATTER));
       CalendarFactory.getSingleCalender().addEvent(eventDetails);
     } else if (mAllDayRecurringForN.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
       eventDetails.put(EventKeys.SUBJECT, mAllDayRecurringForN.group(2));
-      eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDate.parse(mAllDayRecurringForN.group(3), DATE_FORMATTER));
+      eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringForN.group(3), DATE_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringForN.group(4));
       eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mAllDayRecurringForN.group(5)));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mAllDayRecurringUntil.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
       eventDetails.put(EventKeys.SUBJECT, mAllDayRecurringUntil.group(2));
-      eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));
+      eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringUntil.group(4));
-      eventDetails.put(EventKeys.REPEAT_DATETIME, LocalDate.parse(mAllDayRecurringUntil.group(5), DATE_FORMATTER));
+      eventDetails.put(EventKeys.REPEAT_DATE, LocalDate.parse(mAllDayRecurringUntil.group(5), DATE_FORMATTER));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mAllDay.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
       eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
-      eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDate.parse(mAllDay.group(3), DATE_FORMATTER));
+      eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDay.group(3), DATE_FORMATTER));
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else {
       throw new IllegalArgumentException("Invalid create event syntax.");
@@ -191,7 +196,7 @@ public class CalendarController {
     String pattern1 = "print events on (\\d{4}-\\d{2}-\\d{2})";
     Pattern p1 = Pattern.compile(pattern1);
     Matcher m1 = p1.matcher(command);
-    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) ";
+    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
     Pattern p2 = Pattern.compile(pattern2);
     Matcher m2 = p2.matcher(command);
     if(m1.matches()){

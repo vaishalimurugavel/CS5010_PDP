@@ -18,11 +18,13 @@ public class RecurringEvent extends Event {
   private String weekdays;
   private int occurrences;
   private LocalDateTime repeatDateTime;
+  private LocalDate repeatDate;
 
-  public RecurringEvent(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean allDay, String  weekdays, int occurrences, LocalDateTime repeatDateTime, LocalDate allDate) {
-    super(subject, location, description, startDateTime, endDateTime, eventType, allDay, allDate);
+  public RecurringEvent(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean allDay, String  weekdays, int occurrences, LocalDateTime repeatDateTime, LocalDate repeatDate, LocalDate allDate, LocalDateTime allDateTime) {
+    super(subject, location, description, startDateTime, endDateTime, eventType, allDay, allDate, allDateTime);
     this.weekdays = weekdays;
     this.occurrences = occurrences;
     this.repeatDateTime = repeatDateTime;
+    this.repeatDate = repeatDate;
   }
 }

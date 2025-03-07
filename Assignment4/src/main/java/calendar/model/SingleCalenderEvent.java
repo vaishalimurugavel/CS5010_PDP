@@ -16,6 +16,7 @@ public class SingleCalenderEvent extends CalendarEvent {
     LocalDateTime start = null ;
     LocalDateTime end = null;
     LocalDate allDAyEnd = null;
+    LocalDateTime allDateTime =null;
     boolean allDay = false;
     switch ((EventKeys.EventType)eventDes.get(EventKeys.EVENT_TYPE)){
       case SINGLE:
@@ -23,7 +24,11 @@ public class SingleCalenderEvent extends CalendarEvent {
         end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME, LocalDateTime.now());
         break;
       case ALL_DAY:
-        allDAyEnd = (LocalDate) eventDes.getOrDefault(EventKeys.ALLDAY_DATETIME, LocalDate.now());
+        if (eventDes.containsKey(EventKeys.ALLDAY_DATE)) {
+          allDAyEnd = (LocalDate) eventDes.getOrDefault(EventKeys.ALLDAY_DATETIME, LocalDate.now());
+        } else if (eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
+          allDateTime = (LocalDateTime) eventDes.getOrDefault(EventKeys.ALLDAY_DATETIME, LocalDateTime.now());
+        }
         allDay = true;
 
     }
@@ -34,7 +39,7 @@ public class SingleCalenderEvent extends CalendarEvent {
         throw new IllegalArgumentException("Calender shows busy!");
       }
     }
-    Event single = new Event(subject, location, description, start, end, isPrivate, allDay,allDAyEnd);
+    Event single = new Event(subject, location, description, start, end, isPrivate, allDay,allDAyEnd, allDateTime);
     this.eventList.add(single);
   }
 }

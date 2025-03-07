@@ -15,9 +15,10 @@ public class Event {
   private LocalDateTime startDateTime;
   private LocalDateTime endDateTime;
   private boolean isAllDay;
-  private LocalDate allDayEnd;
+  private LocalDate allDate;
+  private LocalDateTime allDateTime;
 
-  public Event(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean isAllDay, LocalDate allDayEnd) {
+  public Event(String subject, String location, String description, LocalDateTime startDateTime, LocalDateTime endDateTime, int eventType, boolean isAllDay, LocalDate allDate, LocalDateTime allDateTime) {
     this.subject = subject;
     this.location = location;
     this.description = description;
@@ -25,7 +26,8 @@ public class Event {
     this.endDateTime = endDateTime;
     this.eventType = eventType;
     this.isAllDay = isAllDay;
-    this.allDayEnd = allDayEnd;
+    this.allDate = allDate;
+    this.allDateTime = allDateTime;
 
   }
   public String getSubject() {
@@ -41,7 +43,7 @@ public class Event {
     return isAllDay;
   }
   public LocalDate getAllDayEnd() {
-    return allDayEnd;
+    return allDate;
   }
   public LocalDateTime getStartDateTime() {
     return startDateTime;
@@ -51,6 +53,9 @@ public class Event {
   }
   public int getEventType() {
     return eventType;
+  }
+  public LocalDate getAllDate() {
+    return allDate;
   }
   public void setSubject(String subject) {
     this.subject = subject;
@@ -73,8 +78,11 @@ public class Event {
   public void setAllDay(boolean isAllDay) {
     this.isAllDay = isAllDay;
   }
-  public void setAllDayEnd(LocalDate allDayEnd) {
-    this.allDayEnd = allDayEnd;
+  public void setAllDayEnd(LocalDate allDate) {
+    this.allDate = allDate;
+  }
+  public void setAllDateTime(LocalDateTime allDateTime) {
+    this.allDateTime = allDateTime;
   }
 
 }

@@ -21,7 +21,9 @@ public class EventKeys {
   public static final String WEEKDAYS = "weekdays";
   public static final String OCCURRENCES = "occurrences";
   public static final String REPEAT_DATETIME = "repeatDateTime";
+  public static final String REPEAT_DATE = "repeatDate";
   public static final String ALLDAY_DATETIME = "allDayDateTime";
+  public static final String ALLDAY_DATE = "allDayDate";
   public enum EventType {
     SINGLE, RECURRING, ALL_DAY, ALL_DAY_RECURRING
   }

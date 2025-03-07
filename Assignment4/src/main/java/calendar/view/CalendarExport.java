@@ -16,13 +16,26 @@ import calendar.model.Event;
  **/
 
 public class CalendarExport {
-    public static void generateCSV(String fileName) {
+
+    private List<Event> getEvents(String type){
+      List<Event> events = null;
+      switch (type) {
+        case "SINGLE":
+          return CalendarFactory.getSingleCalender().getEventList();
+        case "RECURRING:" :
+          return CalendarFactory.getRecurringCalender().getEventList();
+        default:
+          events = CalendarFactory.getSingleCalender().getEventList();
+          events.addAll(CalendarFactory.getRecurringCalender().getEventList());
+          return events;
+      }
+    }
+    public void generateCSV(String fileName) {
 
       StringBuffer sb = new StringBuffer();
       File file = new File(fileName);
       try (FileWriter writer = new FileWriter(file)) {
-        List<Event> eventList = CalendarFactory.getSingleCalender().getEventList();
-        eventList.addAll(CalendarFactory.getRecurringCalender().getEventList());
+        List<Event> eventList = getEvents("ALL");
 
         writer.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n");
         for (Event event : eventList) {

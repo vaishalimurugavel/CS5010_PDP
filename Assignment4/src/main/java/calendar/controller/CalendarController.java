@@ -3,7 +3,6 @@ package calendar.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -11,8 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import calendar.model.EventKeys;
-import calendar.view.CalendarExport;
-import calendar.view.CalendarView;
+
 
 
 public class CalendarController {
@@ -29,7 +27,7 @@ public class CalendarController {
         createEvent(command);
         break;
       case "edit":
-        editEvent(command);
+        editEventCommand(command);
         break;
       case "print":
         printEvents(command);
@@ -138,9 +136,7 @@ public class CalendarController {
 
   private static void editEventCommand(String command) {
     String pattern1 = "edit event (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
-
     String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
-
     String pattern3 = "edit events (\\w+) (.+?) (.+)";
 
     Pattern p1 = Pattern.compile(pattern1);
@@ -151,117 +147,80 @@ public class CalendarController {
     Matcher m2 = p2.matcher(command);
     Matcher m3 = p3.matcher(command);
 
+    Map<String, Object> eventDes = new HashMap<>();
     if (m1.matches()) {
-      // Extract values for Case 1
       String property = m1.group(1);
       String eventName = m1.group(2);
       LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DATE_TIME_FORMATTER);
       LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DATE_TIME_FORMATTER);
       String newValue = m1.group(5);
 
-      System.out.println("Editing single event:");
-      System.out.println("Property: " + property);
-      System.out.println("Event Name: " + eventName);
-      System.out.println("Start Time: " + startDateTime);
-      System.out.println("End Time: " + endDateTime);
-      System.out.println("New Value: " + newValue);
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.START_DATETIME, startDateTime);
+      eventDes.put(EventKeys.END_DATETIME, endDateTime);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+
+      CalendarFactory.getSingleCalender().editEvent(eventDes);
     } else if (m2.matches()) {
-      // Extract values for Case 2
       String property = m2.group(1);
       String eventName = m2.group(2);
       LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DATE_TIME_FORMATTER);
       String newValue = m2.group(4);
 
-      System.out.println("Editing multiple events (by date & name):");
-      System.out.println("Property: " + property);
-      System.out.println("Event Name: " + eventName);
-      System.out.println("Start Time: " + startDateTime);
-      System.out.println("New Value: " + newValue);
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.START_DATETIME, startDateTime);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+      CalendarFactory.getSingleCalender().editEvent(eventDes);
     } else if (m3.matches()) {
-      // Extract values for Case 3
       String property = m3.group(1);
       String eventName = m3.group(2);
       String newValue = m3.group(3);
 
-      System.out.println("Editing all events with same name:");
-      System.out.println("Property: " + property);
-      System.out.println("Event Name: " + eventName);
-      System.out.println("New Value: " + newValue);
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+      CalendarFactory.getSingleCalender().editEvent(eventDes);
     } else {
       throw new IllegalArgumentException("Invalid edit command format.");
     }
   }
-  private static void editEvent(String command) {
-      String[] parts = command.split(" ");
-      Map<String, Object> eventMap = new HashMap<>();
-
-      if (parts.length < 4) {
-        throw new IllegalArgumentException("Invalid edit command format.");
-      }
-
-      boolean isMultiple = parts[1].equals("events");
-      String property = parts[2];
-      int nameStartIndex = 3;
-
-      if (!isMultiple) {
-        int fromIndex = Arrays.asList(parts).indexOf("from");
-        int toIndex = Arrays.asList(parts).indexOf("to");
-        int withIndex = Arrays.asList(parts).indexOf("with");
-
-        if (fromIndex == -1 || toIndex == -1 || withIndex == -1 || fromIndex >= toIndex || toIndex >= withIndex) {
-          throw new IllegalArgumentException("Invalid 'edit event' command format.");
-        }
-
-        String eventName = String.join(" ", Arrays.copyOfRange(parts, nameStartIndex, fromIndex)).trim();
-        String startDateTime = parts[fromIndex + 1] + " " + parts[fromIndex + 2];
-        String endDateTime = parts[toIndex + 1] + " " + parts[toIndex + 2];
-        String newValue = String.join(" ", Arrays.copyOfRange(parts, withIndex + 1, parts.length)).trim();
-
-        eventMap.put(EventKeys.SUBJECT, eventName);
-        eventMap.put(EventKeys.START_DATETIME, startDateTime);
-        eventMap.put(EventKeys.END_DATETIME, endDateTime);
-        eventMap.put("property", property);
-        eventMap.put("value", newValue);
-
-      } else {
-        int fromIndex = Arrays.asList(parts).indexOf("from");
-        int withIndex = Arrays.asList(parts).indexOf("with");
-
-        if (fromIndex != -1 && withIndex != -1) {
-          String eventName = String.join(" ", Arrays.copyOfRange(parts, nameStartIndex, fromIndex)).trim();
-          String startDateTime = parts[fromIndex + 1] + " " + parts[fromIndex + 2];
-          String newValue = String.join(" ", Arrays.copyOfRange(parts, withIndex + 1, parts.length)).trim();
-
-          eventMap.put(EventKeys.SUBJECT, eventName);
-          eventMap.put(EventKeys.START_DATETIME, startDateTime);
-          eventMap.put("property", property);
-          eventMap.put("newValue", newValue);
-
-        } else if (fromIndex == -1 && withIndex == -1) {
-          String eventName = String.join(" ", Arrays.copyOfRange(parts, nameStartIndex, parts.length - 1)).trim();
-          String newValue = parts[parts.length - 1];
-
-          eventMap.put(EventKeys.SUBJECT, eventName);
-          eventMap.put("property", property);
-          eventMap.put("newValue", newValue);
-
-        } else {
-          throw new IllegalArgumentException("Invalid 'edit events' command format.");
-        }
-      }
-    }
 
   private static void printEvents(String command) {
-    CalendarView cv = new CalendarView();
-    cv.printSingleCalenderEvent();
+    String pattern1 = "print events on (\\d{4}-\\d{2}-\\d{2})";
+    Pattern p1 = Pattern.compile(pattern1);
+    Matcher m1 = p1.matcher(command);
+    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) ";
+    Pattern p2 = Pattern.compile(pattern2);
+    Matcher m2 = p2.matcher(command);
+    if(m1.matches()){
+      CalendarFactory.getCalendarView().printEventsOn(m1.group(1));
+    }
+    else if (m2.matches()) {
+      CalendarFactory.getCalendarView().printEventsFromTo(m2.group(1), m2.group(2));
+    }
+    else {
+      throw new IllegalArgumentException("Invalid print command format.");
+    }
+
   }
 
   private static void exportCalendar(String command) {
     String[] parts  = command.split(" ");
-    CalendarExport.generateCSV(parts[parts.length -1]);
+    CalendarFactory.getCalendarExport().generateCSV(parts[parts.length -1]);
   }
 
   private static void showStatus(String command) {
+    String showPattern = "show status on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
+    Pattern p = Pattern.compile(showPattern);
+    Matcher m = p.matcher(command);
+    if (m.matches()) {
+      CalendarFactory.getCalendarView().showStatusOn(m.group(1));
+    }
+    else {
+      throw new IllegalArgumentException("Invalid show command format.");
+    }
   }
 
 public static void main(String[] args) {

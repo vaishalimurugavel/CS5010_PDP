@@ -1,5 +1,6 @@
 package calendar.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,85 +9,126 @@ import java.util.stream.Collectors;
 
 public abstract class CalendarEvent {
 
-  List<Event> eventList;
+  List<RecurringEvent> eventList;
 
   public CalendarEvent() {
-    eventList = new ArrayList<Event>();
+    eventList = new ArrayList<RecurringEvent>();
   }
-  protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end){
-    for(Event e: this.eventList){
+  protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end, LocalDateTime allDateTime, LocalDate allDate) {
+    for(RecurringEvent e: this.eventList){
       LocalDateTime start2 = e.getStartDateTime();
       LocalDateTime end2 = e.getEndDateTime();
-      if((start.isBefore(end2) && start2.isBefore(end))){
+      LocalDateTime allDateTime2 = e.getAllDateTime();
+      LocalDate allDate2 = e.getAllDate();
+      LocalDate repeat2 = e.getRepeatDate();
+      LocalDateTime repeatDateTime2 = e.getRepeatDateTime();
+      if(start2 != null && end2 != null && start != null && end != null) {
+        if ( (start.isBefore(end2) && start2.isBefore(end))) {
+          return true;
+        }
+      }
+      if(start != null && start.equals(start2)) {
+        return true;
+      }
+      if(allDate != null && allDate.equals(allDate2) || allDate2 != null
+              && repeat2 != null && allDate2.isBefore(repeat2)  ) {
+        return true;
+      }
+      if(allDateTime != null && allDateTime.equals(allDateTime2) || allDateTime2 != null
+              && allDateTime2.isBefore(repeatDateTime2)) {
         return true;
       }
     }
     return false;
   }
 
-  public List<Event> getEventList(){
+  public List<RecurringEvent> getEventList(){
     return this.eventList;
+  }
+
+  public void addEvent(RecurringEvent e){
+    this.eventList.add(e);
   }
 
   abstract public void addEvent(Map<String, Object> eventDes);
 
-  public void editEvent(Map<String, Object> eventDes){
+  public void editEvent(Map<String, Object> eventDes) {
     LocalDateTime start;
     LocalDateTime end;
     String eventName = (String) eventDes.get(EventKeys.SUBJECT);
     String property = (String) eventDes.get(EventKeys.PROPERTY);
+    String newValue = (String) eventDes.get(EventKeys.NEW_VALUE);
 
     if (eventDes.containsKey(EventKeys.START_DATETIME)) {
-      start = (LocalDateTime) eventDes.getOrDefault(EventKeys.START_DATETIME,null);
+      start = (LocalDateTime) eventDes.getOrDefault(EventKeys.START_DATETIME, null);
     } else {
       start = null;
     }
     if (eventDes.containsKey(EventKeys.END_DATETIME)) {
-      end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME,null);
+      end = (LocalDateTime) eventDes.getOrDefault(EventKeys.END_DATETIME, null);
     } else {
       end = null;
     }
 
-    List<Event> filtered = null;
-    if(start != null && end != null)
+    List<RecurringEvent> filtered = null;
+    if (start != null && end != null)
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)
                       && event.getStartDateTime().equals(start)
                       && event.getEndDateTime().isBefore(end))
               .collect(Collectors.toList());
-    else if(start != null) {
+    else if (start != null) {
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)
                       && event.getStartDateTime().equals(start))
               .collect(Collectors.toList());
-    }
-    else {
+    } else {
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName))
               .collect(Collectors.toList());
     }
-    for (Event event : filtered) {
-      switch (property){
-        case EventKeys.START_DATETIME:
-          event.setStartDateTime(start);
-          break;
-        case EventKeys.END_DATETIME:
-          event.setEndDateTime(end);
-          break;
-        case EventKeys.PRIVATE:
-          event.setEventType(Integer.parseInt((String) eventDes.get(EventKeys.PRIVATE)));
-          break;
-        case EventKeys.SUBJECT:
-          event.setSubject((String) eventDes.get(EventKeys.SUBJECT));
-          break;
-        case EventKeys.LOCATION:
-          event.setLocation((String) eventDes.get(EventKeys.LOCATION));
-          break;
-        case EventKeys.DESCRIPTION:
-          event.setDescription((String) eventDes.get(EventKeys.DESCRIPTION));
-          break;
-      }
+
+    List<RecurringEvent> updatedEvents = new ArrayList<>();
+    for (RecurringEvent event : filtered) {
+      RecurringEvent updatedEvent = updateProperty(event, property, newValue);
+      updatedEvents.add(updatedEvent);
     }
+
+    eventList.removeAll(filtered);
+    eventList.addAll(updatedEvents);
   }
+  private RecurringEvent updateProperty(RecurringEvent event, String property, String newValue) {
+    RecurringEvent.EventBuilder builder = new RecurringEvent.EventBuilder(event.getSubject())
+            .location(event.getLocation())
+            .description(event.getDescription())
+            .privateEvent(event.getEventType())
+            .allDay(event.isAllDay())
+            .allDate(event.getAllDayEnd())
+            .allDateTime(event.getAllDateTime());
+
+    switch (property.toLowerCase()) {
+      case "subject":
+        builder.subject(newValue);
+        break;
+      case "location":
+        builder.location(newValue);
+        break;
+      case "description":
+        builder.description(newValue);
+        break;
+      case "start_datetime":
+        builder.startDateTime(LocalDateTime.parse(newValue));
+        break;
+      case "end_datetime":
+        builder.endDateTime(LocalDateTime.parse(newValue));
+        break;
+      default:
+        System.out.println("Unknown property: " + property);
+        return event;
+    }
+
+    return (RecurringEvent) builder.build();
+  }
+
 
 }

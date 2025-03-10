@@ -50,6 +50,5 @@ public class SingleCalenderEvent extends CalendarEvent {
     single.privateEvent(isPrivate);
 
     this.addEvent(single.build());
-    System.out.println("Size of single: " + this.getEventList().size());
   }
 }

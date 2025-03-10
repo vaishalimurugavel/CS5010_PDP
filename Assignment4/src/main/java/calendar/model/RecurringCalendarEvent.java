@@ -67,7 +67,6 @@ public class RecurringCalendarEvent extends CalendarEvent{
 
 
     this.addEvent(recurringEvent.build());
-    System.out.println("Size of Recurring: " + this.getEventList().size());
 
   }
 

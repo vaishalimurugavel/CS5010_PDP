@@ -1,6 +1,6 @@
 package calendar.view;
 
-import calendar.controller.CalendarFactory;
+import calendar.model.CalendarEvent;
 import calendar.model.Event;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,9 +21,10 @@ public class CalendarView {
   // Print all events on a specific date
   public void printEventsOn(String dateString) {
     LocalDate date = LocalDate.parse(dateString, DATE_FORMAT);
-    List<Event> events = CalendarFactory.getSingleCalender().getEventList()
+    List<Event> events = CalendarEvent.getEventList()
             .stream()
-            .filter(e -> e.getStartDateTime().toLocalDate().equals(date))
+            .filter(e -> e.getStartDateTime() != null)
+            .filter(e -> e.getStartDateTime().toLocalDate().equals(date))  // Compare only the date part
             .collect(Collectors.toList());
 
     if (events.isEmpty()) {
@@ -37,13 +38,15 @@ public class CalendarView {
     }
   }
 
+
   // Print events in a given time range
   public void printEventsFromTo(String startDateTimeStr, String endDateTimeStr) {
     LocalDateTime startDateTime = LocalDateTime.parse(startDateTimeStr, DATE_TIME_FORMAT);
     LocalDateTime endDateTime = LocalDateTime.parse(endDateTimeStr, DATE_TIME_FORMAT);
 
-    List<Event> events = CalendarFactory.getSingleCalender().getEventList()
+    List<Event> events = CalendarEvent.getEventList()
             .stream()
+            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)  // Add null check
             .filter(e -> (e.getStartDateTime().isAfter(startDateTime) || e.getStartDateTime().isEqual(startDateTime))
                     && (e.getEndDateTime().isBefore(endDateTime) || e.getEndDateTime().isEqual(endDateTime)))
             .collect(Collectors.toList());
@@ -62,8 +65,9 @@ public class CalendarView {
   // Show busy status on a given date-time
   public void showStatusOn(String dateTimeStr) {
     LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMAT);
-    boolean isBusy = CalendarFactory.getSingleCalender().getEventList()
+    boolean isBusy = CalendarEvent.getEventList()
             .stream()
+            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
             .anyMatch(e -> (e.getStartDateTime().isBefore(dateTime) || e.getStartDateTime().isEqual(dateTime))
                     && (e.getEndDateTime().isAfter(dateTime) || e.getEndDateTime().isEqual(dateTime)));
 

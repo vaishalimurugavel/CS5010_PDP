@@ -1,18 +1,13 @@
 package calendar.view;
 
-import com.sun.jdi.LocalVariable;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
 
-import calendar.controller.CalendarFactory;
 import calendar.model.CalendarEvent;
-import calendar.model.Event;
 import calendar.model.RecurringEvent;
 
 /**

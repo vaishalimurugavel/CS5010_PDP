@@ -17,6 +17,11 @@ public class Event {
   private boolean isAllDay = false;
   private LocalDate allDate = null;
   private LocalDateTime allDateTime = null;
+  private String weekdays = null;
+  private int occurrences = 0;
+  private LocalDateTime repeatDateTime  = null;
+  private LocalDate repeatDate = null;
+
 
   Event(EventBuilder builder) {
     this.subject = builder.subject;
@@ -28,6 +33,10 @@ public class Event {
     this.isAllDay = builder.isAllDay;
     this.allDate = builder.allDate;
     this.allDateTime = builder.allDateTime;
+    this.weekdays = builder.weekdays;
+    this.occurrences = builder.occurrences;
+    this.repeatDateTime = builder.repeatDateTime;
+    this.repeatDate = builder.repeatDate;
   }
 
   public static class EventBuilder {
@@ -40,6 +49,10 @@ public class Event {
     private boolean isAllDay;
     private LocalDate allDate;
     private LocalDateTime allDateTime;
+    private String weekdays = null;
+    private int occurrences = 0;
+    private LocalDateTime repeatDateTime = null;
+    private LocalDate repeatDate = null;
 
     public EventBuilder(String subject) {
       this.subject = subject;
@@ -93,6 +106,26 @@ public class Event {
       this.subject = subject;
       return this;
     }
+
+    public EventBuilder weekdays(String weekdays) {
+      this.weekdays = weekdays;
+      return this;
+    }
+
+    public EventBuilder occurrences(int occurrences) {
+      this.occurrences = occurrences;
+      return this;
+    }
+
+    public EventBuilder repeatDateTime(LocalDateTime repeatDateTime) {
+      this.repeatDateTime = repeatDateTime;
+      return this;
+    }
+
+    public EventBuilder repeatDate(LocalDate repeatDate) {
+      this.repeatDate = repeatDate;
+      return this;
+    }
   }
 
   // Getters
@@ -135,4 +168,21 @@ public class Event {
   public LocalDateTime getAllDateTime() {
     return allDateTime;
   }
+
+  public String getWeekdays() {
+    return weekdays;
+  }
+
+  public int getOccurrences() {
+    return occurrences;
+  }
+
+  public LocalDateTime getRepeatDateTime() {
+    return repeatDateTime;
+  }
+
+  public LocalDate getRepeatDate() {
+    return repeatDate;
+  }
+
 }

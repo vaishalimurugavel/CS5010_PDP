@@ -9,13 +9,13 @@ import java.util.stream.Collectors;
 
 public abstract class CalendarEvent {
 
-  static List<RecurringEvent> eventList;
+  static List<Event> eventList = new ArrayList<Event>();;
 
   public CalendarEvent() {
-    eventList = new ArrayList<RecurringEvent>();
+
   }
   protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end, LocalDateTime allDateTime, LocalDate allDate) {
-    for(RecurringEvent e: eventList){
+    for(Event e: eventList){
       LocalDateTime start2 = e.getStartDateTime();
       LocalDateTime end2 = e.getEndDateTime();
       LocalDateTime allDateTime2 = e.getAllDateTime();
@@ -42,12 +42,12 @@ public abstract class CalendarEvent {
     return false;
   }
 
-  public static List<RecurringEvent> getEventList(){
+  public static List<Event> getEventList(){
     return eventList;
   }
 
-  public void addEvent(RecurringEvent e){
-    this.eventList.add(e);
+  public void addEvent(Event e){
+    eventList.add(e);
   }
 
   abstract public void addEvent(Map<String, Object> eventDes);
@@ -70,7 +70,7 @@ public abstract class CalendarEvent {
       end = null;
     }
 
-    List<RecurringEvent> filtered = null;
+    List<Event> filtered = null;
     if (start != null && end != null)
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)
@@ -88,17 +88,17 @@ public abstract class CalendarEvent {
               .collect(Collectors.toList());
     }
 
-    List<RecurringEvent> updatedEvents = new ArrayList<>();
-    for (RecurringEvent event : filtered) {
-      RecurringEvent updatedEvent = updateProperty(event, property, newValue);
+    List<Event> updatedEvents = new ArrayList<>();
+    for (Event event : filtered) {
+      Event updatedEvent = updateProperty(event, property, newValue);
       updatedEvents.add(updatedEvent);
     }
 
     eventList.removeAll(filtered);
     eventList.addAll(updatedEvents);
   }
-  private RecurringEvent updateProperty(RecurringEvent event, String property, String newValue) {
-    RecurringEvent.EventBuilder builder = new RecurringEvent.EventBuilder(event.getSubject())
+  private Event updateProperty(Event event, String property, String newValue) {
+    Event.EventBuilder builder = new Event.EventBuilder(event.getSubject())
             .location(event.getLocation())
             .description(event.getDescription())
             .privateEvent(event.getEventType())
@@ -127,7 +127,7 @@ public abstract class CalendarEvent {
         return event;
     }
 
-    return (RecurringEvent) builder.build();
+    return builder.build();
   }
 
 

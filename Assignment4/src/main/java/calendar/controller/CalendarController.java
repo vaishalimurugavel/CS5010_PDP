@@ -70,14 +70,15 @@ public class CalendarController {
     Map<String, Object> eventDetails = new HashMap<>();
 
     String basePattern = "create event( --autoDecline)? (.+?)";
-    String singleAllDay = basePattern + " on (\\d{4}-\\d{2}-\\d{2})";
-    String singleAllDateTime = basePattern + " on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
-    String singleEventPattern = basePattern + " from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
-    String recurringForNTimesPattern = singleEventPattern + " repeats ([MTWRFSU]+) for (\\d+) times";
-    String recurringUntilPattern = singleEventPattern + " repeats ([MTWRFSU]+) until (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
-    String allDayEventPattern = basePattern + " on (\\d{4}-\\d{2}-\\d{2})";
-    String allDayRecurringForNTimesPattern = allDayEventPattern + " repeats ([MTWRFSU]+) for (\\d+) times";
-    String allDayRecurringUntilPattern = allDayEventPattern + " repeats ([MTWRFSU]+) until (\\d{4}-\\d{2}-\\d{2})";
+    String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
+    String singleAllDay = basePattern + " on (\\d{4}-\\d{2}-\\d{2})" + otherInfo;
+    String singleAllDateTime = basePattern + " on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" + otherInfo;
+    String singleEventPattern = basePattern + " from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" + otherInfo;
+    String recurringForNTimesPattern = singleEventPattern + " repeats ([MTWRFSU]+) for (\\d+) times" + otherInfo;
+    String recurringUntilPattern = singleEventPattern + " repeats ([MTWRFSU]+) until (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" + otherInfo;
+    String allDayEventPattern = basePattern + " on (\\d{4}-\\d{2}-\\d{2})" + otherInfo;
+    String allDayRecurringForNTimesPattern = allDayEventPattern + " repeats ([MTWRFSU]+) for (\\d+) times" + otherInfo;
+    String allDayRecurringUntilPattern = allDayEventPattern + " repeats ([MTWRFSU]+) until (\\d{4}-\\d{2}-\\d{2})" + otherInfo;
 
     Pattern pSingle = Pattern.compile(singleEventPattern);
     Pattern pSingleAllDay = Pattern.compile(singleAllDay);
@@ -101,6 +102,7 @@ public class CalendarController {
       if(!checkValidDate(mRecurringForN.group(3), mRecurringForN.group(4))) {
         throw new IllegalArgumentException("Invalid date format.");
       }
+      System.out.println(mRecurringForN.group(6)  );
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
       eventDetails.put(EventKeys.AUTO_DECLINE, mRecurringForN.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mRecurringForN.group(2));
@@ -108,6 +110,21 @@ public class CalendarController {
       eventDetails.put(EventKeys.END_DATETIME, LocalDateTime.parse(mRecurringForN.group(4), DATE_TIME_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mRecurringForN.group(5));
       eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mRecurringForN.group(6)));
+      String otherinfo = null;
+      boolean flag = mRecurringForN.group(4) != null;
+      if(flag ) {
+        otherinfo = mRecurringForN.group(5);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mRecurringForN.group(6) != null;
+      if(flag) {
+        otherinfo = mRecurringForN.group(7);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mRecurringForN.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mRecurringUntil.matches()) {
 
@@ -121,6 +138,21 @@ public class CalendarController {
       eventDetails.put(EventKeys.END_DATETIME, LocalDateTime.parse(mRecurringUntil.group(4), DATE_TIME_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mRecurringUntil.group(5));
       eventDetails.put(EventKeys.REPEAT_DATETIME, LocalDateTime.parse(mRecurringUntil.group(6), DATE_TIME_FORMATTER));
+      String otherinfo = null;
+      boolean flag = mRecurringUntil.group(4) != null;
+      if(flag ) {
+        otherinfo = mRecurringUntil.group(5);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mRecurringUntil.group(6) != null;
+      if(flag) {
+        otherinfo = mRecurringUntil.group(7);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mRecurringUntil.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mSingle.matches()) {
       if(!checkValidDate(mSingle.group(3), mSingle.group(4))) {
@@ -131,18 +163,64 @@ public class CalendarController {
       eventDetails.put(EventKeys.SUBJECT, mSingle.group(2));
       eventDetails.put(EventKeys.START_DATETIME, LocalDateTime.parse(mSingle.group(3), DATE_TIME_FORMATTER));
       eventDetails.put(EventKeys.END_DATETIME, LocalDateTime.parse(mSingle.group(4), DATE_TIME_FORMATTER));
+      String otherinfo = null;
+      boolean flag = mSingle.group(4) != null;
+      if(flag ) {
+        otherinfo = mSingle.group(5);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mSingle.group(6) != null;
+      if(flag) {
+        otherinfo = mSingle.group(7);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mSingle.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getSingleCalender().addEvent(eventDetails);
     } else if (mSingleAllDay.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
       eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDay.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mSingleAllDay.group(2));
       eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mSingleAllDay.group(3), DATE_FORMATTER));
+      String otherinfo = null;
+      boolean flag = mSingleAllDay.group(4) != null;
+      if(flag ) {
+        otherinfo = mSingleAllDay.group(5);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mSingleAllDay.group(6) != null;
+      if(flag) {
+        otherinfo = mSingleAllDay.group(7);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mSingleAllDay.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getSingleCalender().addEvent(eventDetails);
     } else if (mSingleAllDateTime.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
       eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDateTime.group(1) != null);
       eventDetails.put(EventKeys.SUBJECT, mSingleAllDateTime.group(2));
       eventDetails.put(EventKeys.ALLDAY_DATETIME, LocalDateTime.parse(mSingleAllDateTime.group(3), DATE_TIME_FORMATTER));
+      String otherinfo = null;
+      System.out.println(mSingleAllDateTime.group(3));
+      boolean flag = mSingleAllDateTime.group(4) != null;
+      if(flag ) {
+        otherinfo = mSingleAllDateTime.group(5);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mSingleAllDateTime.group(6) != null;
+      if(flag) {
+        otherinfo = mSingleAllDateTime.group(7);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mSingleAllDateTime.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getSingleCalender().addEvent(eventDetails);
     } else if (mAllDayRecurringForN.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
@@ -150,6 +228,21 @@ public class CalendarController {
       eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringForN.group(3), DATE_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringForN.group(4));
       eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mAllDayRecurringForN.group(5)));
+      String otherinfo = null;
+      boolean flag = mAllDayRecurringForN.group(6) != null;
+      if(flag ) {
+        otherinfo = mAllDayRecurringForN.group(7);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mAllDayRecurringForN.group(8) != null;
+      if(flag) {
+        otherinfo = mAllDayRecurringForN.group(9);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mAllDayRecurringForN.group(8);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mAllDayRecurringUntil.matches()) {
       if(!checkValidDate(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
@@ -160,11 +253,41 @@ public class CalendarController {
       eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));
       eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringUntil.group(4));
       eventDetails.put(EventKeys.REPEAT_DATE, LocalDate.parse(mAllDayRecurringUntil.group(5), DATE_FORMATTER));
+      String otherinfo = null;
+      boolean flag = mAllDayRecurringUntil.group(6) != null;
+      if(flag ) {
+        otherinfo = mAllDayRecurringUntil.group(7);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mAllDayRecurringUntil.group(8) != null;
+      if(flag) {
+        otherinfo = mAllDayRecurringUntil.group(9);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mAllDayRecurringUntil.group(10);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else if (mAllDay.matches()) {
       eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
       eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
       eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDay.group(3), DATE_FORMATTER));
+      String otherinfo = null;
+      boolean flag = mAllDay.group(6) != null;
+      if(flag ) {
+        otherinfo = mAllDay.group(7);
+        eventDetails.put(EventKeys.LOCATION, otherinfo);
+      }
+      flag = mAllDay.group(8) != null;
+      if(flag) {
+        otherinfo = mAllDay.group(9);
+        eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
+      }
+      otherinfo = mAllDay.group(10);
+      if (otherinfo != null && otherinfo.equals("private")) {
+        eventDetails.put(EventKeys.PRIVATE, 1);
+      }
       CalendarFactory.getRecurringCalender().addEvent(eventDetails);
     } else {
       throw new IllegalArgumentException("Invalid create event syntax.");
@@ -172,9 +295,6 @@ public class CalendarController {
 
   }
 
-  private static boolean hasConflict(LocalDateTime start, LocalDateTime end) {
-    return false;
-  }
 
   private static void editEventCommand(String command) {
     String pattern1 = "edit event (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";

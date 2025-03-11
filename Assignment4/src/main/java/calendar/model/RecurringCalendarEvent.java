@@ -9,7 +9,7 @@ public class RecurringCalendarEvent extends CalendarEvent{
   @Override
   public void addEvent(Map<String, Object> eventDes) {
     String subject = (String) eventDes.get(EventKeys.SUBJECT);
-    RecurringEvent.RecurringBuilder recurringEvent = new RecurringEvent.RecurringBuilder(subject);
+    Event.EventBuilder Event = new Event.EventBuilder(subject);
 
     LocalDateTime start = null;
     LocalDateTime end = null;
@@ -18,21 +18,21 @@ public class RecurringCalendarEvent extends CalendarEvent{
 
     if(eventDes.containsKey(EventKeys.START_DATETIME)) {
       start = (LocalDateTime) eventDes.get(EventKeys.START_DATETIME);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.startDateTime(start);
+      Event = Event.startDateTime(start);
     }
     if(eventDes.containsKey(EventKeys.END_DATETIME)) {
       end = (LocalDateTime) eventDes.get(EventKeys.END_DATETIME);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.endDateTime(end);
+      Event = Event.endDateTime(end);
     }
     if(eventDes.containsKey(EventKeys.ALLDAY_DATE)){
       allDate = (LocalDate) eventDes.get(EventKeys.ALLDAY_DATE);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.allDate(allDate);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.allDay(true);
+      Event = Event.allDate(allDate);
+      Event = Event.allDay(true);
     }
     if(eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
       allDateTime = (LocalDateTime) eventDes.get(EventKeys.ALLDAY_DATETIME);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.allDateTime(allDateTime);
-      recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.allDay(true);
+      Event = Event.allDateTime(allDateTime);
+      Event = Event.allDay(true);
     }
 
 
@@ -42,31 +42,31 @@ public class RecurringCalendarEvent extends CalendarEvent{
     }
 
     String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
-    recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.location(location);
+    Event = Event.location(location);
     String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
-    recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.description(description);
+    Event = Event.description(description);
     int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
-    recurringEvent = (RecurringEvent.RecurringBuilder) recurringEvent.privateEvent(isPrivate);
+    Event = Event.privateEvent(isPrivate);
 
     if (eventDes.containsKey(EventKeys.OCCURRENCES)) {
       int occ = (int) eventDes.get(EventKeys.OCCURRENCES);
-      recurringEvent = recurringEvent.occurrences(occ);
+      Event = Event.occurrences(occ);
     }
     if (eventDes.containsKey(EventKeys.WEEKDAYS)) {
       String weekDays = (String) eventDes.get(EventKeys.WEEKDAYS);
-      recurringEvent = recurringEvent.weekdays(weekDays);
+      Event = Event.weekdays(weekDays);
     }
     if (eventDes.containsKey(EventKeys.REPEAT_DATETIME)) {
       LocalDateTime repeatDateTime = (LocalDateTime) eventDes.get(EventKeys.REPEAT_DATETIME);
-      recurringEvent = recurringEvent.repeatDateTime(repeatDateTime);
+      Event = Event.repeatDateTime(repeatDateTime);
     }
     if (eventDes.containsKey(EventKeys.REPEAT_DATE)) {
       LocalDate repeatDate = (LocalDate) eventDes.get(EventKeys.REPEAT_DATE);
-      recurringEvent = recurringEvent.repeatDate(repeatDate);
+      Event = Event.repeatDate(repeatDate);
     }
 
 
-    this.addEvent(recurringEvent.build());
+    this.addEvent(Event.build());
 
   }
 

@@ -9,7 +9,7 @@ public class SingleCalenderEvent extends CalendarEvent {
   @Override
   public void addEvent(Map<String, Object> eventDes) {
     String subject = (String) eventDes.get(EventKeys.SUBJECT);
-    RecurringEvent.RecurringBuilder single = new RecurringEvent.RecurringBuilder(subject);
+    Event.EventBuilder single = new Event.EventBuilder(subject);
 
     LocalDateTime start = null;
     LocalDateTime end = null;
@@ -18,21 +18,21 @@ public class SingleCalenderEvent extends CalendarEvent {
     LocalDate allDate = null;
     if(eventDes.containsKey(EventKeys.START_DATETIME)) {
       start = (LocalDateTime) eventDes.get(EventKeys.START_DATETIME);
-      single = (RecurringEvent.RecurringBuilder) single.startDateTime(start);
+      single = single.startDateTime(start);
     }
     if(eventDes.containsKey(EventKeys.END_DATETIME)) {
       end = (LocalDateTime) eventDes.get(EventKeys.END_DATETIME);
-      single = (RecurringEvent.RecurringBuilder) single.endDateTime(end);
+      single = single.endDateTime(end);
     }
     if(eventDes.containsKey(EventKeys.ALLDAY_DATE)){
       allDate = (LocalDate) eventDes.get(EventKeys.ALLDAY_DATE);
-      single = (RecurringEvent.RecurringBuilder) single.allDate(allDate);
-      single = (RecurringEvent.RecurringBuilder) single.allDay(true);
+      single = single.allDate(allDate);
+      single = single.allDay(true);
     }
     if(eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
       allDateTime = (LocalDateTime) eventDes.get(EventKeys.ALLDAY_DATETIME);
-      single = (RecurringEvent.RecurringBuilder) single.allDateTime(allDateTime);
-      single = (RecurringEvent.RecurringBuilder) single.allDay(true);
+      single = single.allDateTime(allDateTime);
+      single = single.allDay(true);
     }
     boolean autoDecline = (boolean) eventDes.getOrDefault(EventKeys.AUTO_DECLINE, false);
     if (autoDecline) {
@@ -43,9 +43,9 @@ public class SingleCalenderEvent extends CalendarEvent {
     }
 
     String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
-    single = (RecurringEvent.RecurringBuilder) single.location(location);
+    single = single.location(location);
     String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
-    single = (RecurringEvent.RecurringBuilder) single.description(description);
+    single = single.description(description);
     int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
     single.privateEvent(isPrivate);
 

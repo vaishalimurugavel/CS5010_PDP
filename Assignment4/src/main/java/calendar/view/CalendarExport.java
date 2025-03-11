@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import calendar.model.CalendarEvent;
-import calendar.model.RecurringEvent;
+import calendar.model.Event;
 
 /**
  * Created at 01-03-2025
@@ -24,10 +24,10 @@ public class CalendarExport {
       File file = new File(fileName);
       String temp;
       try (FileWriter writer = new FileWriter(file)) {
-        List<RecurringEvent> eventList = CalendarEvent.getEventList();
+        List<Event> eventList = CalendarEvent.getEventList();
 
         writer.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n");
-        for (RecurringEvent event : eventList) {
+        for (Event event : eventList) {
           sb.append(event.getSubject()).append(",");
           LocalDateTime date = event.getStartDateTime();
           if(date == null){
@@ -70,6 +70,10 @@ public class CalendarExport {
               sb.append(temp).append(",");
               temp = "00:00";
               sb.append(temp).append(",");
+            }
+            else{
+              sb.append("").append(",");
+              sb.append("").append(",");
             }
           }
           else{

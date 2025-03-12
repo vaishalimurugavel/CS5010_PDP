@@ -2,7 +2,7 @@
 
 Command line argument:
 1) java ControllerApp --mode interactive
-2) java CalendarApp --mode headless "Full absolute File path"
+2) java CalendarApp --mode headless <Full absolute File path>
 
 Using Intellij:
 1) Extract the contents of the code in the src/main/java folder of an Intellij project.

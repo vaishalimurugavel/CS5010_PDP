@@ -99,12 +99,13 @@ public abstract class CalendarEvent {
     }
 
     List<Event> filtered = null;
-    if (start != null && end != null)
+    if (start != null && end != null) {
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)
-                      && event.getStartDateTime().equals(start)
-                      && event.getEndDateTime().isBefore(end))
+                      && event.getStartDateTime().equals(start) || event.getStartDateTime().isBefore(start)
+                      && event.getEndDateTime().isAfter(end) || event.getEndDateTime().equals(end))
               .collect(Collectors.toList());
+    }
     else if (start != null) {
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)

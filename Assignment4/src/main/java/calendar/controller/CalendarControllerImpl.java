@@ -32,8 +32,8 @@ public class CalendarControllerImpl extends CalenderController {
       return startTime.isBefore(endTime) || startTime.equals(endTime);
     }
     else if(startmatcher2.matches() && endMatcher2.matches()) {
-      LocalDate startTime = LocalDate.parse(startDate, DATE_TIME_FORMATTER);
-      LocalDate endTime = LocalDate.parse(endDate, DATE_TIME_FORMATTER);
+      LocalDateTime startTime = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
+      LocalDateTime endTime = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
       return startTime.isBefore(endTime) || startTime.equals(endTime);
     }
     return false;

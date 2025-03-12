@@ -10,15 +10,16 @@ import java.util.stream.Collectors;
 
 /**
  * CalendarView class for displaying calendar events.
- * Created at 01-03-2025
- * Author Vaishali
  **/
 public class CalendarView {
 
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-  // Print all events on a specific date
+  /**
+   * Print all events on a specific date
+   * @param dateString String
+   */
   public void printEventsOn(String dateString) {
     LocalDate date = LocalDate.parse(dateString, DATE_FORMAT);
     List<Event> events = CalendarEvent.getEventList()
@@ -39,7 +40,11 @@ public class CalendarView {
   }
 
 
-  // Print events in a given time range
+  /**
+   * Print events in a given time range
+   * @param startDateTimeStr String
+   * @param endDateTimeStr String
+   */
   public void printEventsFromTo(String startDateTimeStr, String endDateTimeStr) {
     LocalDateTime startDateTime = LocalDateTime.parse(startDateTimeStr, DATE_TIME_FORMAT);
     LocalDateTime endDateTime = LocalDateTime.parse(endDateTimeStr, DATE_TIME_FORMAT);
@@ -62,7 +67,10 @@ public class CalendarView {
     }
   }
 
-  // Show busy status on a given date-time
+  /**
+   * Show busy status on a given date-time
+   * @param dateTimeStr DateTime
+   */
   public void showStatusOn(String dateTimeStr) {
     LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMAT);
     boolean isBusy = CalendarEvent.getEventList()

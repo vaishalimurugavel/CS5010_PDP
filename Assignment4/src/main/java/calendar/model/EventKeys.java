@@ -1,10 +1,8 @@
 package calendar.model;
 
 /**
- * Created at 05-03-2025
- * Author Vaishali
+ * Public keys for key names.
  **/
-
 public class EventKeys {
 
   public static final String SUBJECT = "subject";
@@ -24,6 +22,7 @@ public class EventKeys {
   public static final String REPEAT_DATE = "repeatDate";
   public static final String ALLDAY_DATETIME = "allDayDateTime";
   public static final String ALLDAY_DATE = "allDayDate";
+
   public enum EventType {
     SINGLE, RECURRING, ALL_DAY, ALL_DAY_RECURRING
   }

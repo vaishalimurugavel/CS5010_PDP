@@ -4,6 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+/**
+ * <p>
+ * SingleCalendar event extends the CalendarEvent abstract class.
+ * This class adds any single event to the CalenderEvent.
+ * </p>
+ */
 public class SingleCalenderEvent extends CalendarEvent {
 
   @Override
@@ -16,20 +22,20 @@ public class SingleCalenderEvent extends CalendarEvent {
     LocalDateTime allDateTime = null;
 
     LocalDate allDate = null;
-    if(eventDes.containsKey(EventKeys.START_DATETIME)) {
+    if (eventDes.containsKey(EventKeys.START_DATETIME)) {
       start = (LocalDateTime) eventDes.get(EventKeys.START_DATETIME);
       single = single.startDateTime(start);
     }
-    if(eventDes.containsKey(EventKeys.END_DATETIME)) {
+    if (eventDes.containsKey(EventKeys.END_DATETIME)) {
       end = (LocalDateTime) eventDes.get(EventKeys.END_DATETIME);
       single = single.endDateTime(end);
     }
-    if(eventDes.containsKey(EventKeys.ALLDAY_DATE)){
+    if (eventDes.containsKey(EventKeys.ALLDAY_DATE)) {
       allDate = (LocalDate) eventDes.get(EventKeys.ALLDAY_DATE);
       single = single.allDate(allDate);
       single = single.allDay(true);
     }
-    if(eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
+    if (eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
       allDateTime = (LocalDateTime) eventDes.get(EventKeys.ALLDAY_DATETIME);
       single = single.allDateTime(allDateTime);
       single = single.allDay(true);

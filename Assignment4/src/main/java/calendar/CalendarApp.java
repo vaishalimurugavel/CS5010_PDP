@@ -10,12 +10,14 @@ import calendar.controller.CalendarController;
 
 
 /**
- * Created at 11-03-2025
- * Author Vaishali
+ * Main class of the CalendarApp application.
  **/
-
 public class CalendarApp {
 
+  /**
+   * Main method.
+   * @param args  Arguments
+   */
   public static void main(String[] args) {
     if (args.length < 2 || !args[0].equalsIgnoreCase("--mode")) {
       System.err.println("Usage:");

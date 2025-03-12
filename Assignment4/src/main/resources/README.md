@@ -17,7 +17,43 @@ i) For interactive, give commands line-by-line. To end the program enter "exit"
 ii) the program will automatically terminate.
 
 ### B. Features:
+1) Create: 
+   All supported Commands for create:
+   i) create event --autoDecline \<eventName\> from \<dateStringTtimeString\> to \<dateStringTtimeString\>
+   ii) create event --autoDecline \<eventName\> from \<dateStringTtimeString\> to \<dateStringTtimeString\> repeats \<weekdays\> until \<dateStringTtimeString\>
+   iii) create event --autoDecline \<eventName\> from \<dateStringTtimeString\> to \<dateStringTtimeString\> repeats \<weekdays\> for \<N\> times
+   iv)create event --autoDecline \<eventName\> from \<dateStringTtimeString\> to \<dateStringTtimeString\> repeats \<weekdays\> until \<dateStringTtimeString\>
+   v) create event --autoDecline \<eventName\> on \<dateStringTtimeString\>
+   vi) create event \<eventName\> on \<dateString\> repeats \<weekdays\> for \<N\> times
+   vii) create event \<eventName\> on \<dateString\> repeats \<weekdays\> until \<dateString\>
+   To add location, description and is public or private:
+   Append the structure to the end of the above commands:
+   " location \<locationString\> description \<descriptionStrin\> (private|public)
+   Example: create event --autoDecline Event1 from 2025-03-10 10:00 to 2025-03-11 10:00 location Shillman hall description Event1 at Shillman Hall private
+
+2) Edit:
+   All supported commands for edit:
+   i) edit event \<property\> \<eventName\> from \<dateStringTtimeString\> to \<dateStringTtimeString\> with \<NewPropertyValue\>
+   ii) edit events \<property\> \<eventName\> from \<dateStringTtimeString\> with \<NewPropertyValue\>
+   iii) edit events \<property\> \<eventName\> \<NewPropertyValue\>
+   Properties that can be edited are subject, location, start_datetime, end_datetime, description
+
+3) Print:
+   All supported commands for print:
+   i) print events on \<dateString\>
+   ii) print events from \<dateStringTtimeString\> to \<dateStringTtimeString\>
+
+4) Show:
+   All supported commands for show:
+   show status on \<dateStringTtimeString\>
+
+5) Export:
+   All supported commands for export:
+   export cal \<FileName\>.csv
+
+NOTE: \<dateStringTtimeString\> is of the format: yyyy-MM-dd HH:mm
+\<dateString\> is of the format: yyyy-MM-dd
 
 ### C. Team Members contribution:
-Vaishali - Event addition and updation. Designed the overall design of the application.
+Vaishali - Event addition and editing module. Designed the overall design of the application.
 Aishwarya - Printing event, showing and export 

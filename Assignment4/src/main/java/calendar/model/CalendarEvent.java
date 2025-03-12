@@ -141,6 +141,7 @@ public abstract class CalendarEvent {
         break;
       case "location":
         builder.location(newValue);
+        System.out.println("Location: " + newValue +" old location: " + event.getLocation());
         break;
       case "description":
         builder.description(newValue);

@@ -10,35 +10,10 @@ import java.util.regex.Pattern;
 
 import calendar.model.EventKeys;
 
-public class CalendarController {
+public class CalendarControllerImpl extends CalenderController {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-  public static void processCommand(String command) {
-    String[] tokens = command.split(" ");
-    if (tokens.length < 2) throw new IllegalArgumentException("Invalid command format.");
-
-    switch (tokens[0]) {
-      case "create":
-        createEvent(command);
-        break;
-      case "edit":
-        editEventCommand(command);
-        break;
-      case "print":
-        printEvents(command);
-        break;
-      case "export":
-        exportCalendar(command);
-        break;
-      case "show":
-        showStatus(command);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown command: " + tokens[0]);
-    }
-  }
 
   private static boolean checkValidDate(String startDate, String endDate) {
     String datePattern = "\\d{4}-\\d{2}-\\d{2}";
@@ -54,19 +29,18 @@ public class CalendarController {
     if(startmatcher.matches() && endMatcher.matches()) {
       LocalDate startTime = LocalDate.parse(startDate, DATE_FORMATTER);
       LocalDate endTime = LocalDate.parse(endDate, DATE_FORMATTER);
-      return startTime.isBefore(endTime);
+      return startTime.isBefore(endTime) || startTime.equals(endTime);
     }
     else if(startmatcher2.matches() && endMatcher2.matches()) {
       LocalDate startTime = LocalDate.parse(startDate, DATE_TIME_FORMATTER);
       LocalDate endTime = LocalDate.parse(endDate, DATE_TIME_FORMATTER);
-      return startTime.isBefore(endTime);
+      return startTime.isBefore(endTime) || startTime.equals(endTime);
     }
     return false;
   }
 
-  private static void createEvent(String command) {
-
-    Map<String, Object> eventDetails = new HashMap<>();
+    @Override
+    public void createEvent(String command) {
 
     String basePattern = "create event( --autoDecline)? (.+?)";
     String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
@@ -121,7 +95,7 @@ public class CalendarController {
 
   }
 
-  private static void allDay(Matcher mAllDay) {
+  private void allDay(Matcher mAllDay) {
     Map<String, Object> eventDetails = new HashMap<>();
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
     eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
@@ -143,7 +117,7 @@ public class CalendarController {
     }
     CalendarFactory.getRecurringCalender().addEvent(eventDetails);
   }
-  private static void allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {
+  private void allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
 
     if(!checkValidDate(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
@@ -154,7 +128,7 @@ public class CalendarController {
     eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));
     eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringUntil.group(4));
     eventDetails.put(EventKeys.REPEAT_DATE, LocalDate.parse(mAllDayRecurringUntil.group(5), DATE_FORMATTER));
-    String otherinfo = null;
+    String otherinfo;
     boolean flag = mAllDayRecurringUntil.group(6) != null;
     if(flag ) {
       otherinfo = mAllDayRecurringUntil.group(7);
@@ -171,7 +145,7 @@ public class CalendarController {
     }
     CalendarFactory.getRecurringCalender().addEvent(eventDetails);
   }
-  private static void allDayRecurring(Matcher mAllDayRecurringForN) {
+  private void allDayRecurring(Matcher mAllDayRecurringForN) {
 
     Map<String, Object> eventDetails = new HashMap<>();
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
@@ -196,7 +170,7 @@ public class CalendarController {
     }
     CalendarFactory.getRecurringCalender().addEvent(eventDetails);
   }
-  private static void singleMatchAllDayUntil(Matcher mSingleAllDateTime){
+  private void singleMatchAllDayUntil(Matcher mSingleAllDateTime){
 
     Map<String, Object> eventDetails = new HashMap<>();
 
@@ -221,7 +195,7 @@ public class CalendarController {
     }
     CalendarFactory.getSingleCalender().addEvent(eventDetails);
   }
-  private static void singleMatchAllDay(Matcher mSingleAllDay) {
+  private void singleMatchAllDay(Matcher mSingleAllDay) {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
@@ -246,7 +220,7 @@ public class CalendarController {
     }
     CalendarFactory.getSingleCalender().addEvent(eventDetails);
   }
-  private static void singleMatch(Matcher mSingle) {
+  private void singleMatch(Matcher mSingle) {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
@@ -276,7 +250,7 @@ public class CalendarController {
     CalendarFactory.getSingleCalender().addEvent(eventDetails);
   }
 
-  private static void recurringMatchUntil(Matcher mRecurringUntil) {
+  private void recurringMatchUntil(Matcher mRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
     if(!checkValidDate(mRecurringUntil.group(3), mRecurringUntil.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
@@ -337,7 +311,8 @@ public class CalendarController {
   }
 
 
-  private static void editEventCommand(String command) {
+  @Override
+  void editEventCommand(String command) {
     String pattern1 = "edit event (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
     String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
     String pattern3 = "edit events (\\w+) (.+?) (.+)";
@@ -390,7 +365,8 @@ public class CalendarController {
     }
   }
 
-  private static void printEvents(String command) {
+  @Override
+  void printEvents(String command) {
     String pattern1 = "print events on (\\d{4}-\\d{2}-\\d{2})";
     Pattern p1 = Pattern.compile(pattern1);
     Matcher m1 = p1.matcher(command);
@@ -409,12 +385,14 @@ public class CalendarController {
 
   }
 
-  private static void exportCalendar(String command) {
+  @Override
+  void exportCalendar(String command) {
     String[] parts  = command.split(" ");
     CalendarFactory.getCalendarExport().generateCSV(parts[parts.length -1]);
   }
 
-  private static void showStatus(String command) {
+  @Override
+   void showStatus(String command) {
     String showPattern = "show status on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
     Pattern p = Pattern.compile(showPattern);
     Matcher m = p.matcher(command);

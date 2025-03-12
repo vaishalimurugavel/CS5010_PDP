@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Scanner;
 
-import calendar.controller.CalendarController;
+import calendar.controller.CalendarFactory;
 
 
 /**
@@ -66,7 +66,7 @@ public class CalendarApp {
         System.out.println("Exiting...");
         break;
       }
-      CalendarController.processCommand(command);
+      CalendarFactory.getCalendarController().processCommand(command);
     }
 
     scanner.close();

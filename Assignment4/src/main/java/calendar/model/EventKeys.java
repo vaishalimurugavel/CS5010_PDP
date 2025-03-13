@@ -23,6 +23,9 @@ public class EventKeys {
   public static final String ALLDAY_DATETIME = "allDayDateTime";
   public static final String ALLDAY_DATE = "allDayDate";
 
+  /**
+   * Enum to identify the type of event.
+   */
   public enum EventType {
     SINGLE, RECURRING, ALL_DAY, ALL_DAY_RECURRING
   }

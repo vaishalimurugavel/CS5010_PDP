@@ -27,7 +27,8 @@ public class CalendarExport {
     try (FileWriter writer = new FileWriter(file)) {
       List<Event> eventList = CalendarEvent.getEventList();
 
-      writer.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event,Description,Location,Private\n");
+      writer.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event," +
+              "Description,Location,Private\n");
       for (Event event : eventList) {
         sb.append(event.getSubject()).append(",");
         LocalDateTime date = event.getStartDateTime();

@@ -18,7 +18,7 @@ public class CalendarFactory {
   private static final CalenderController calendarControl = new CalendarControllerImpl();
 
   /**
-   * Returns CalenderController object
+   * Returns CalenderController object.
    * @return  CalenderController
    */
   public static CalenderController getCalendarController() {

@@ -13,11 +13,13 @@ import java.util.stream.Collectors;
  **/
 public class CalendarView {
 
-  private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+  private static final DateTimeFormatter DATE_FORMAT =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final DateTimeFormatter DATE_TIME_FORMAT =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   /**
-   * Print all events on a specific date
+   * Print all events on a specific date.
    * @param dateString String
    */
   public void printEventsOn(String dateString) {
@@ -25,7 +27,7 @@ public class CalendarView {
     List<Event> events = CalendarEvent.getEventList()
             .stream()
             .filter(e -> e.getStartDateTime() != null)
-            .filter(e -> e.getStartDateTime().toLocalDate().equals(date))  // Compare only the date part
+            .filter(e -> e.getStartDateTime().toLocalDate().equals(date))
             .collect(Collectors.toList());
 
     if (events.isEmpty()) {
@@ -33,7 +35,8 @@ public class CalendarView {
     } else {
       System.out.println("Events on " + dateString + ":");
       for (Event e : events) {
-        System.out.println("- " + e.getSubject() + " (" + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
+        System.out.println("- " + e.getSubject() + " ("
+                + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
                 + e.getEndDateTime().format(DATE_TIME_FORMAT) + ") at " + e.getLocation());
       }
     }
@@ -41,7 +44,7 @@ public class CalendarView {
 
 
   /**
-   * Print events in a given time range
+   * Print events in a given time range.
    * @param startDateTimeStr String
    * @param endDateTimeStr String
    */
@@ -51,9 +54,11 @@ public class CalendarView {
 
     List<Event> events = CalendarEvent.getEventList()
             .stream()
-            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)  // Add null check
-            .filter(e -> (e.getStartDateTime().isAfter(startDateTime) || e.getStartDateTime().isEqual(startDateTime))
-                    && (e.getEndDateTime().isBefore(endDateTime) || e.getEndDateTime().isEqual(endDateTime)))
+            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
+            .filter(e -> (e.getStartDateTime().isAfter(startDateTime)
+                    || e.getStartDateTime().isEqual(startDateTime))
+                    && (e.getEndDateTime().isBefore(endDateTime)
+                    || e.getEndDateTime().isEqual(endDateTime)))
             .collect(Collectors.toList());
 
     if (events.isEmpty()) {
@@ -61,14 +66,16 @@ public class CalendarView {
     } else {
       System.out.println("Events from " + startDateTimeStr + " to " + endDateTimeStr + ":");
       for (Event e : events) {
-        System.out.println("- " + e.getSubject() + " (" + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
-                + e.getEndDateTime().format(DATE_TIME_FORMAT) + ") at " + e.getLocation());
+        System.out.println("- " + e.getSubject()
+                + " (" + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
+                + e.getEndDateTime().format(DATE_TIME_FORMAT) + ") at "
+                + e.getLocation());
       }
     }
   }
 
   /**
-   * Show busy status on a given date-time
+   * Show busy status on a given date-time.
    * @param dateTimeStr DateTime
    */
   public void showStatusOn(String dateTimeStr) {
@@ -76,8 +83,10 @@ public class CalendarView {
     boolean isBusy = CalendarEvent.getEventList()
             .stream()
             .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
-            .anyMatch(e -> (e.getStartDateTime().isBefore(dateTime) || e.getStartDateTime().isEqual(dateTime))
-                    && (e.getEndDateTime().isAfter(dateTime) || e.getEndDateTime().isEqual(dateTime)));
+            .anyMatch(e -> (e.getStartDateTime().isBefore(dateTime)
+                    || e.getStartDateTime().isEqual(dateTime))
+                    && (e.getEndDateTime().isAfter(dateTime)
+                    || e.getEndDateTime().isEqual(dateTime)));
 
     if (isBusy) {
       System.out.println("Status: Busy at " + dateTimeStr);

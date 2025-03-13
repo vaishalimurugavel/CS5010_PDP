@@ -50,7 +50,8 @@ public class SingleCalenderEvent extends CalendarEvent {
 
     String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
     single = single.location(location);
-    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
+    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION,
+            "New event Description");
     single = single.description(description);
     int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
     single.privateEvent(isPrivate);

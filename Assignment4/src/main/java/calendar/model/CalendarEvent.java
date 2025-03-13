@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Calendar Event class
+ * Calendar Event class.
  * <p>
  * An abstract class used to perform Calendar operations like add and update events.
  * </p>
@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public abstract class CalendarEvent {
 
   static List<Event> eventList = new ArrayList<Event>();
-  ;
 
   /**
    * The method checks if any event already exists in the given time period.
@@ -27,7 +26,8 @@ public abstract class CalendarEvent {
    * @param allDate     allDay Date
    * @return boolean
    */
-  protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end, LocalDateTime allDateTime, LocalDate allDate) {
+  protected boolean checkForDuplicates(LocalDateTime start, LocalDateTime end,
+                                       LocalDateTime allDateTime, LocalDate allDate) {
     for (Event e : eventList) {
       LocalDateTime start2 = e.getStartDateTime();
       LocalDateTime end2 = e.getEndDateTime();
@@ -65,7 +65,7 @@ public abstract class CalendarEvent {
   }
 
   /**
-   * Add Event to the list of events
+   * Add Event to the list of events.
    *
    * @param e event of type Event
    */
@@ -102,8 +102,10 @@ public abstract class CalendarEvent {
     if (start != null && end != null) {
       filtered = eventList.stream()
               .filter(event -> event.getSubject().equals(eventName)
-                      && event.getStartDateTime().equals(start) || event.getStartDateTime().isBefore(start)
-                      && event.getEndDateTime().isAfter(end) || event.getEndDateTime().equals(end))
+                      && event.getStartDateTime().equals(start)
+                      || event.getStartDateTime().isBefore(start)
+                      && event.getEndDateTime().isAfter(end)
+                      || event.getEndDateTime().equals(end))
               .collect(Collectors.toList());
     }
     else if (start != null) {

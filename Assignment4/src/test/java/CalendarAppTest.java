@@ -5,22 +5,29 @@ import calendar.controller.CalendarFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * Test class to test Calendar Application.
+ */
 public class CalendarAppTest {
 
   private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
   private final PrintStream originalOut = System.out;
-  private final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+  private final DateTimeFormatter DATE_TIME_FORMATTER =
+          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   @Before
   public void setUpStreams() {
@@ -30,15 +37,16 @@ public class CalendarAppTest {
   @After
   public void restoreStreams() {
     System.setOut(originalOut);
-    // Clear the event list after each test
+
     List<Event> events = CalendarEvent.getEventList();
     events.clear();
   }
 
   @Test
   public void testCreateSingleEvent() {
-    // Test creating a single event
-    String command = "create event Meeting from 2025-03-15 14:00 to 2025-03-15 15:00 location Conference Room description Weekly sync";
+
+    String command = "create event Meeting from 2025-03-15 14:00 to 2025-03-15 15:00 "
+            + "location Conference Room description Weekly sync";
 
     CalendarFactory.getCalendarController().processCommand(command);
 
@@ -49,16 +57,19 @@ public class CalendarAppTest {
     assertEquals("Meeting", event.getSubject());
     assertEquals("Conference Room", event.getLocation());
     assertEquals("Weekly sync", event.getDescription());
-    assertEquals(LocalDateTime.parse("2025-03-15 14:00", DATE_TIME_FORMATTER), event.getStartDateTime());
-    assertEquals(LocalDateTime.parse("2025-03-15 15:00", DATE_TIME_FORMATTER), event.getEndDateTime());
-    assertEquals(0, event.getEventType()); // Not private
+    assertEquals(LocalDateTime.parse("2025-03-15 14:00", DATE_TIME_FORMATTER),
+            event.getStartDateTime());
+    assertEquals(LocalDateTime.parse("2025-03-15 15:00", DATE_TIME_FORMATTER),
+            event.getEndDateTime());
+    assertEquals(0, event.getEventType());
     assertFalse(event.isAllDay());
   }
 
   @Test
   public void testCreateAllDayEvent() {
-    // Test creating an all-day event
-    String command = "create event Annual Review on 2025-04-01 description Performance review private";
+
+    String command = "create event Annual Review on 2025-04-01"
+            + " description Performance review private";
 
     CalendarFactory.getCalendarController().processCommand(command);
 
@@ -67,17 +78,18 @@ public class CalendarAppTest {
 
     Event event = events.get(0);
     assertEquals("Annual Review", event.getSubject());
-    assertEquals("Online", event.getLocation()); // Default location
+    assertEquals("Online", event.getLocation());
     assertEquals("Performance review", event.getDescription());
     assertEquals(LocalDate.parse("2025-04-01"), event.getAllDate());
-    assertEquals(1, event.getEventType()); // Private
+    assertEquals(1, event.getEventType());
     assertTrue(event.isAllDay());
   }
 
   @Test
   public void testCreateRecurringEvent() {
-    // Test creating a recurring event
-    String command = "create event Team Standup from 2025-03-15 09:00 to 2025-03-15 09:30 repeats MWF for 10 times";
+
+    String command = "create event Team Standup from 2025-03-15 09:00 to 2025-03-15 09:30 "
+            + "repeats MWF for 10 times";
 
     CalendarFactory.getCalendarController().processCommand(command);
 
@@ -86,16 +98,19 @@ public class CalendarAppTest {
 
     Event event = events.get(0);
     assertEquals("Team Standup", event.getSubject());
-    assertEquals(LocalDateTime.parse("2025-03-15 09:00", DATE_TIME_FORMATTER), event.getStartDateTime());
-    assertEquals(LocalDateTime.parse("2025-03-15 09:30", DATE_TIME_FORMATTER), event.getEndDateTime());
+    assertEquals(LocalDateTime.parse("2025-03-15 09:00", DATE_TIME_FORMATTER),
+            event.getStartDateTime());
+    assertEquals(LocalDateTime.parse("2025-03-15 09:30", DATE_TIME_FORMATTER),
+            event.getEndDateTime());
     assertEquals("MWF", event.getWeekdays());
     assertEquals(10, event.getOccurrences());
   }
 
   @Test
   public void testCreateRecurringEventUntil() {
-    // Test creating a recurring event with an end date
-    String command = "create event Weekly 1:1 from 2025-03-15 15:00 to 2025-03-15 16:00 repeats T until 2025-04-15 16:00";
+
+    String command = "create event Weekly 1:1 from 2025-03-15 15:00 to 2025-03-15 16:00"
+            + " repeats T until 2025-04-15 16:00";
 
     CalendarFactory.getCalendarController().processCommand(command);
 
@@ -104,27 +119,31 @@ public class CalendarAppTest {
 
     Event event = events.get(0);
     assertEquals("Weekly 1:1", event.getSubject());
-    assertEquals(LocalDateTime.parse("2025-03-15 15:00", DATE_TIME_FORMATTER), event.getStartDateTime());
-    assertEquals(LocalDateTime.parse("2025-03-15 16:00", DATE_TIME_FORMATTER), event.getEndDateTime());
+    assertEquals(LocalDateTime.parse("2025-03-15 15:00", DATE_TIME_FORMATTER),
+            event.getStartDateTime());
+    assertEquals(LocalDateTime.parse("2025-03-15 16:00", DATE_TIME_FORMATTER),
+            event.getEndDateTime());
     assertEquals("T", event.getWeekdays());
-    assertEquals(LocalDateTime.parse("2025-04-15 16:00", DATE_TIME_FORMATTER), event.getRepeatDateTime());
+    assertEquals(LocalDateTime.parse("2025-04-15 16:00", DATE_TIME_FORMATTER),
+            event.getRepeatDateTime());
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventWithInvalidTimeRange() {
-    // End time before start time
+
     String command = "create event Invalid Meeting from 2025-03-15 15:00 to 2025-03-15 14:00";
     CalendarFactory.getCalendarController().processCommand(command);
   }
 
   @Test
   public void testEditEventSubject() {
-    // First create an event
+
     String createCommand = "create event Old Subject from 2025-03-15 14:00 to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(createCommand);
 
-    // Edit the event's subject
-    String editCommand = "edit event subject Old Subject from 2025-03-15 14:00 to 2025-03-15 15:00 with New Subject";
+
+    String editCommand = "edit event subject Old Subject from 2025-03-15 14:00 to 2025-03-15 15:00"
+            + " with New Subject";
     CalendarFactory.getCalendarController().processCommand(editCommand);
 
     List<Event> events = CalendarEvent.getEventList();
@@ -134,12 +153,13 @@ public class CalendarAppTest {
 
   @Test
   public void testEditEventLocation() {
-    // First create an event
+
     String createCommand = "create event Meeting from 2025-03-15 14:00 to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(createCommand);
 
-    // Edit the event's location
-    String editCommand = "edit event location Meeting from 2025-03-15 14:00 to 2025-03-15 15:00 with Conference Room A";
+
+    String editCommand = "edit event location Meeting from 2025-03-15 14:00 to " +
+            "2025-03-15 15:00 with Conference Room A";
     CalendarFactory.getCalendarController().processCommand(editCommand);
 
     List<Event> events = CalendarEvent.getEventList();
@@ -149,15 +169,15 @@ public class CalendarAppTest {
 
   @Test
   public void testPrintEventsOn() {
-    // Create two events on different days
+
     String command1 = "create event Event 1 from 2025-03-15 14:00 to 2025-03-15 15:00";
     String command2 = "create event Event 2 from 2025-03-16 10:00 to 2025-03-16 11:00";
     CalendarFactory.getCalendarController().processCommand(command1);
     CalendarFactory.getCalendarController().processCommand(command2);
 
-    outContent.reset(); // Clear previous output
+    outContent.reset();
 
-    // Print events on a specific day
+
     String printCommand = "print events on 2025-03-15";
     CalendarFactory.getCalendarController().processCommand(printCommand);
 
@@ -168,7 +188,7 @@ public class CalendarAppTest {
 
   @Test
   public void testPrintEventsInTimeRange() {
-    // Create events
+
     String command1 = "create event Early Event from 2025-03-15 09:00 to 2025-03-15 10:00";
     String command2 = "create event Mid Event from 2025-03-15 12:00 to 2025-03-15 13:00";
     String command3 = "create event Late Event from 2025-03-15 16:00 to 2025-03-15 17:00";
@@ -177,9 +197,9 @@ public class CalendarAppTest {
     CalendarFactory.getCalendarController().processCommand(command2);
     CalendarFactory.getCalendarController().processCommand(command3);
 
-    outContent.reset(); // Clear previous output
+    outContent.reset();
 
-    // Print events in a specific time range
+
     String printCommand = "print events from 2025-03-15 11:00 to 2025-03-15 14:00";
     CalendarFactory.getCalendarController().processCommand(printCommand);
 
@@ -191,13 +211,13 @@ public class CalendarAppTest {
 
   @Test
   public void testShowStatusBusy() {
-    // Create an event
+
     String command = "create event Meeting from 2025-03-15 14:00 to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(command);
 
-    outContent.reset(); // Clear previous output
+    outContent.reset();
 
-    // Check status during the event
+
     String statusCommand = "show status on 2025-03-15 14:30";
     CalendarFactory.getCalendarController().processCommand(statusCommand);
 
@@ -207,13 +227,13 @@ public class CalendarAppTest {
 
   @Test
   public void testShowStatusAvailable() {
-    // Create an event
+
     String command = "create event Meeting from 2025-03-15 14:00 to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(command);
 
-    outContent.reset(); // Clear previous output
+    outContent.reset();
 
-    // Check status outside the event time
+
     String statusCommand = "show status on 2025-03-15 16:00";
     CalendarFactory.getCalendarController().processCommand(statusCommand);
 
@@ -223,31 +243,33 @@ public class CalendarAppTest {
 
   @Test
   public void testExportCalendar() {
-    // Create an event
+
     String createCommand = "create event Export Test from 2025-03-15 14:00 to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(createCommand);
 
-    // Export to a temporary file
+
     String exportFile = "test_export.csv";
     String exportCommand = "export " + exportFile;
     CalendarFactory.getCalendarController().processCommand(exportCommand);
 
-    // Verify the file was created
+
     File file = new File(exportFile);
     assertTrue(file.exists());
 
-    // Clean up
+
     file.delete();
   }
 
   @Test
   public void testAutoDeclineFeature() {
-    // Create an event
-    String command1 = "create event --autoDecline Meeting 1 from 2025-03-15 14:00 to 2025-03-15 15:00";
+
+    String command1 = "create event --autoDecline Meeting 1 from 2025-03-15 14:00 " +
+            "to 2025-03-15 15:00";
     CalendarFactory.getCalendarController().processCommand(command1);
 
-    // Try to create an overlapping event with autoDecline
-    String command2 = "create event --autoDecline Meeting 2 from 2025-03-15 14:30 to 2025-03-15 15:30";
+
+    String command2 = "create event --autoDecline Meeting 2 from 2025-03-15 14:30 " +
+            "to 2025-03-15 15:30";
 
     try {
       CalendarFactory.getCalendarController().processCommand(command2);
@@ -256,7 +278,7 @@ public class CalendarAppTest {
       assertEquals("Calender shows busy!", e.getMessage());
     }
 
-    // Verify only one event exists
+
     List<Event> events = CalendarEvent.getEventList();
     assertEquals(1, events.size());
   }
@@ -278,7 +300,7 @@ public class CalendarAppTest {
     assertTrue(event.isAllDay());
   }
 
-  // Helper method to access Event.weekdays - not available in original code but needed for tests
+
   private String getRepeatDays(Event event) {
     try {
       java.lang.reflect.Field field = Event.class.getDeclaredField("weekdays");
@@ -289,7 +311,7 @@ public class CalendarAppTest {
     }
   }
 
-  // Helper method to access Event.occurrences - not available in original code but needed for tests
+
   private int getOccurrences(Event event) {
     try {
       java.lang.reflect.Field field = Event.class.getDeclaredField("occurrences");
@@ -299,4 +321,75 @@ public class CalendarAppTest {
       return 0;
     }
   }
+
+
+  @Test
+  public void testEditEventDescription() {
+    // Create event with initial description
+    String createCommand = "create event Meeting from 2025-03-15 14:00 to "
+            + "2025-03-15 15:00 description Initial description";
+    CalendarFactory.getCalendarController().processCommand(createCommand);
+
+    // Edit description
+    String editCommand = "edit event description Meeting from 2025-03-15 14:00"
+            + " to 2025-03-15 15:00 with Updated description";
+    CalendarFactory.getCalendarController().processCommand(editCommand);
+
+    // Verify description was updated
+    List<Event> events = CalendarEvent.getEventList();
+    assertEquals(1, events.size());
+    assertEquals("Updated description", events.get(0).getDescription());
+  }
+
+
+  @Test
+  public void testOverlappingEvents() {
+
+    String command1 = "create event Meeting 1 from 2025-03-15 14:00 to 2025-03-15 15:00";
+    CalendarFactory.getCalendarController().processCommand(command1);
+
+
+    String command2 = "create event Meeting 2 from 2025-03-15 14:30 to 2025-03-15 15:30";
+    CalendarFactory.getCalendarController().processCommand(command2);
+
+
+    List<Event> events = CalendarEvent.getEventList();
+    assertEquals(2, events.size());
+  }
+
+
+  @Test
+  public void testCreateEventWithValidationBoundaries() {
+
+    String minDateCommand = "create event Minimum Date from 1970-01-01 00:00 to 1970-01-01 01:00";
+    CalendarFactory.getCalendarController().processCommand(minDateCommand);
+
+
+    String maxDateCommand = "create event Far Future from 2100-12-31 23:00 to 2100-12-31 23:59";
+    CalendarFactory.getCalendarController().processCommand(maxDateCommand);
+
+
+    List<Event> events = CalendarEvent.getEventList();
+    assertEquals(2, events.size());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateEventWithInvalidDate() {
+    String command = "create event Invalid Date from 2025/03/15 14:00 to 2025/03/15 15:00";
+    CalendarFactory.getCalendarController().processCommand(command);
+  }
+
+  @Test
+  public void testMultiWordLocation() {
+
+    String command = "create event Multi Word from 2025-03-15 14:00 to 2025-03-15 15:00 location "
+            + "Building 3, Floor 2, Room 101";
+    CalendarFactory.getCalendarController().processCommand(command);
+
+    List<Event> events = CalendarEvent.getEventList();
+    assertEquals(1, events.size());
+    assertEquals("Building 3, Floor 2, Room 101", events.get(0).getLocation());
+  }
+
+
 }

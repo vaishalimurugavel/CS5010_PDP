@@ -15,7 +15,7 @@ public class RecurringCalendarEvent extends CalendarEvent {
   @Override
   public void addEvent(Map<String, Object> eventDes) {
     String subject = (String) eventDes.get(EventKeys.SUBJECT);
-    Event.EventBuilder Event = new Event.EventBuilder(subject);
+    Event.EventBuilder event = new Event.EventBuilder(subject);
 
     LocalDateTime start = null;
     LocalDateTime end = null;
@@ -24,21 +24,21 @@ public class RecurringCalendarEvent extends CalendarEvent {
 
     if (eventDes.containsKey(EventKeys.START_DATETIME)) {
       start = (LocalDateTime) eventDes.get(EventKeys.START_DATETIME);
-      Event = Event.startDateTime(start);
+      event = event.startDateTime(start);
     }
     if (eventDes.containsKey(EventKeys.END_DATETIME)) {
       end = (LocalDateTime) eventDes.get(EventKeys.END_DATETIME);
-      Event = Event.endDateTime(end);
+      event = event.endDateTime(end);
     }
     if (eventDes.containsKey(EventKeys.ALLDAY_DATE)) {
       allDate = (LocalDate) eventDes.get(EventKeys.ALLDAY_DATE);
-      Event = Event.allDate(allDate);
-      Event = Event.allDay(true);
+      event = event.allDate(allDate);
+      event = event.allDay(true);
     }
     if (eventDes.containsKey(EventKeys.ALLDAY_DATETIME)) {
       allDateTime = (LocalDateTime) eventDes.get(EventKeys.ALLDAY_DATETIME);
-      Event = Event.allDateTime(allDateTime);
-      Event = Event.allDay(true);
+      event = event.allDateTime(allDateTime);
+      event = event.allDay(true);
     }
 
 
@@ -48,31 +48,32 @@ public class RecurringCalendarEvent extends CalendarEvent {
     }
 
     String location = (String) eventDes.getOrDefault(EventKeys.LOCATION, "Online");
-    Event = Event.location(location);
-    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION, "New event Description");
-    Event = Event.description(description);
+    event = event.location(location);
+    String description = (String) eventDes.getOrDefault(EventKeys.DESCRIPTION,
+            "New event Description");
+    event = event.description(description);
     int isPrivate = (int) eventDes.getOrDefault(EventKeys.PRIVATE, 0);
-    Event = Event.privateEvent(isPrivate);
+    event = event.privateEvent(isPrivate);
 
     if (eventDes.containsKey(EventKeys.OCCURRENCES)) {
       int occ = (int) eventDes.get(EventKeys.OCCURRENCES);
-      Event = Event.occurrences(occ);
+      event = event.occurrences(occ);
     }
     if (eventDes.containsKey(EventKeys.WEEKDAYS)) {
       String weekDays = (String) eventDes.get(EventKeys.WEEKDAYS);
-      Event = Event.weekdays(weekDays);
+      event = event.weekdays(weekDays);
     }
     if (eventDes.containsKey(EventKeys.REPEAT_DATETIME)) {
       LocalDateTime repeatDateTime = (LocalDateTime) eventDes.get(EventKeys.REPEAT_DATETIME);
-      Event = Event.repeatDateTime(repeatDateTime);
+      event = event.repeatDateTime(repeatDateTime);
     }
     if (eventDes.containsKey(EventKeys.REPEAT_DATE)) {
       LocalDate repeatDate = (LocalDate) eventDes.get(EventKeys.REPEAT_DATE);
-      Event = Event.repeatDate(repeatDate);
+      event = event.repeatDate(repeatDate);
     }
 
 
-    this.addEvent(Event.build());
+    this.addEvent(event.build());
 
   }
 

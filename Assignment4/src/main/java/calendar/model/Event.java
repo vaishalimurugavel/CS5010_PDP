@@ -39,6 +39,9 @@ public class Event {
     this.repeatDate = builder.repeatDate;
   }
 
+  /**
+   * Builder class to instantiate Event class variables.
+   */
   public static class EventBuilder {
     private String subject;
     private String location;
@@ -152,7 +155,7 @@ public class Event {
     }
 
     /**
-     * Builds the Event class
+     * Builds the Event class.
      *
      * @return Event instance returned.
      */
@@ -217,7 +220,7 @@ public class Event {
   }
 
   /**
-   * Returns Name of the event
+   * Returns Name of the event.
    *
    * @return String
    */
@@ -226,7 +229,7 @@ public class Event {
   }
 
   /**
-   * Returns location of the event
+   * Returns location of the event.
    *
    * @return String
    */
@@ -235,7 +238,7 @@ public class Event {
   }
 
   /**
-   * Returns Description of the event
+   * Returns Description of the event.
    *
    * @return String
    */

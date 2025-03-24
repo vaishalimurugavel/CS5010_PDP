@@ -1,0 +1,79 @@
+package calendar.controller;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import calendar.model.CalendarEvent;
+import calendar.model.EventKeys;
+import calendar.view.CalendarView;
+
+/**
+ * Created at 22-03-2025
+ * Author Vaishali
+ **/
+
+public class ControllerEditCommand implements ControllerCommand {
+
+  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
+          .ofPattern("yyyy-MM-dd HH:mm");
+  
+  @Override
+  public void execute(String command, CalendarEvent model, CalendarView view) {
+    String pattern1 = "edit event (\\w+) (.+?) from " + "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" 
+            + " to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
+    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) " 
+            + "with (.+)";
+    String pattern3 = "edit events (\\w+) (.+?) (.+)";
+
+    Pattern p1 = Pattern.compile(pattern1);
+    Pattern p2 = Pattern.compile(pattern2);
+    Pattern p3 = Pattern.compile(pattern3);
+
+    Matcher m1 = p1.matcher(command);
+    Matcher m2 = p2.matcher(command);
+    Matcher m3 = p3.matcher(command);
+
+    Map<String, Object> eventDes = new HashMap<>();
+    if (m1.matches()) {
+      String property = m1.group(1);
+      String eventName = m1.group(2);
+      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DATE_TIME_FORMATTER);
+      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DATE_TIME_FORMATTER);
+      String newValue = m1.group(5);
+
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.START_DATETIME, startDateTime);
+      eventDes.put(EventKeys.END_DATETIME, endDateTime);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+
+      model.updateEvent(eventDes);
+    } else if (m2.matches()) {
+      String property = m2.group(1);
+      String eventName = m2.group(2);
+      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DATE_TIME_FORMATTER);
+      String newValue = m2.group(4);
+
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.START_DATETIME, startDateTime);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+      model.updateEvent(eventDes);
+    } else if (m3.matches()) {
+      String property = m3.group(1);
+      String eventName = m3.group(2);
+      String newValue = m3.group(3);
+
+      eventDes.put(EventKeys.PROPERTY, property);
+      eventDes.put(EventKeys.SUBJECT, eventName);
+      eventDes.put(EventKeys.NEW_VALUE, newValue);
+      model.updateEvent(eventDes);
+    } else {
+      throw new IllegalArgumentException("Invalid edit command format.");
+    }
+  }
+}

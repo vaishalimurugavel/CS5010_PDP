@@ -1,12 +1,20 @@
 package calendar;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Scanner;
 
-import calendar.controller.CalendarFactory;
+import calendar.controller.CalendarController;
+import calendar.model.CalendarEvent;
+import calendar.model.CalenderEventManager;
+import calendar.view.CalendarExport;
+import calendar.view.CalendarSimpleView;
+import calendar.view.CalendarView;
 
 
 /**
@@ -14,6 +22,9 @@ import calendar.controller.CalendarFactory;
  **/
 public class CalendarApp {
 
+  static CalendarEvent model = new CalenderEventManager();
+  static CalendarView view = new CalendarSimpleView(System.out);
+  static CalendarView export = view;
   /**
    * Main method.
    * @param args  Arguments
@@ -58,15 +69,28 @@ public class CalendarApp {
 
   private static void processInput(Readable reader, boolean isInteractive) {
     Scanner scanner = new Scanner(reader);
-
+    String path = null;
     while (scanner.hasNextLine()) {
       String command = scanner.nextLine().trim();
       System.out.println("Executing command: " + command);
+      if(command.contains("export")) {
+        String[] parts = command.split(" ");
+        path = parts[parts.length - 1];
+      }
       if (command.equalsIgnoreCase("exit")) {
         System.out.println("Exiting...");
         break;
       }
-      CalendarFactory.getCalendarController().processCommand(command);
+
+      if(path != null) {
+        try {
+          export = new CalendarExport(new FileOutputStream(path));
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+      }
+      CalendarController controller = new CalendarController(model,view,export);
+      controller.processCommand(command);
     }
 
     scanner.close();

@@ -16,7 +16,6 @@ public class Event {
   private LocalDateTime endDateTime = null;
   private boolean isAllDay = false;
   private LocalDate allDate = null;
-  private LocalDateTime allDateTime = null;
   private String weekdays = null;
   private int occurrences = 0;
   private LocalDateTime repeatDateTime = null;
@@ -32,7 +31,6 @@ public class Event {
     this.endDateTime = builder.endDateTime;
     this.isAllDay = builder.isAllDay;
     this.allDate = builder.allDate;
-    this.allDateTime = builder.allDateTime;
     this.weekdays = builder.weekdays;
     this.occurrences = builder.occurrences;
     this.repeatDateTime = builder.repeatDateTime;
@@ -51,7 +49,6 @@ public class Event {
     private LocalDateTime endDateTime;
     private boolean isAllDay;
     private LocalDate allDate;
-    private LocalDateTime allDateTime;
     private String weekdays = null;
     private int occurrences = 0;
     private LocalDateTime repeatDateTime = null;
@@ -140,17 +137,6 @@ public class Event {
      */
     public EventBuilder allDate(LocalDate allDate) {
       this.allDate = allDate;
-      return this;
-    }
-
-    /**
-     * Initialize allDateTime of the event.
-     *
-     * @param allDateTime DateTime
-     * @return EventBuilder instance returned.
-     */
-    public EventBuilder allDateTime(LocalDateTime allDateTime) {
-      this.allDateTime = allDateTime;
       return this;
     }
 
@@ -298,15 +284,6 @@ public class Event {
    */
   public LocalDate getAllDate() {
     return allDate;
-  }
-
-  /**
-   * Returns the alldate time of the event.
-   *
-   * @return LocalDateTime
-   */
-  public LocalDateTime getAllDateTime() {
-    return allDateTime;
   }
 
   /**

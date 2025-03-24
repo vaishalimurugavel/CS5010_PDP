@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import calendar.model.CalendarEvent;
 import calendar.model.EventKeys;
+import calendar.view.CalendarView;
 
 /**
  * Concrete class of the Controller abstract class.
  */
-public class CalendarControllerImpl extends CalenderController {
+public class ControllerCreateCommand implements ControllerCommand {
 
   private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
           .ofPattern("yyyy-MM-dd HH:mm");
@@ -44,7 +46,7 @@ public class CalendarControllerImpl extends CalenderController {
   }
 
   @Override
-  public void createEvent(String command) {
+  public void execute(String command, CalendarEvent event, CalendarView view)  {
 
     String basePattern = "create event( --autoDecline)? (.+?)";
     String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
@@ -85,29 +87,31 @@ public class CalendarControllerImpl extends CalenderController {
     Matcher mAllDayRecurringForN = pAllDayRecurringForN.matcher(command);
     Matcher mAllDayRecurringUntil = pAllDayRecurringUntil.matcher(command);
 
+    Map<String, Object> eventDetails = null;
     if (mRecurringForN.matches()) {
-      recurringMatchForN(mRecurringForN);
+      eventDetails = recurringMatchForN(mRecurringForN);
     } else if (mRecurringUntil.matches()) {
-      recurringMatchUntil(mRecurringUntil);
+      eventDetails =  recurringMatchUntil(mRecurringUntil);
     } else if (mSingle.matches()) {
-      singleMatch(mSingle);
+      eventDetails = singleMatch(mSingle);
     } else if (mSingleAllDay.matches()) {
-      singleMatchAllDay(mSingleAllDay);
+      eventDetails = singleMatchAllDay(mSingleAllDay);
     } else if (mSingleAllDateTime.matches()) {
-      singleMatchAllDayUntil(mSingleAllDateTime);
+      eventDetails = singleMatchAllDayUntil(mSingleAllDateTime);
     } else if (mAllDayRecurringForN.matches()) {
-      allDayRecurring(mAllDayRecurringForN);
+      eventDetails = allDayRecurring(mAllDayRecurringForN);
     } else if (mAllDayRecurringUntil.matches()) {
-      allDayRecurringMatchUntil(mAllDayRecurringUntil);
+      eventDetails = allDayRecurringMatchUntil(mAllDayRecurringUntil);
     } else if (mAllDay.matches()) {
-      allDay(mAllDay);
+      eventDetails =  allDay(mAllDay);
     } else {
       throw new IllegalArgumentException("Invalid create event syntax.");
     }
+    event.addEvent(eventDetails);
 
   }
 
-  private void allDay(Matcher mAllDay) {
+  private Map<String, Object> allDay(Matcher mAllDay) {
     Map<String, Object> eventDetails = new HashMap<>();
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
     eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
@@ -127,10 +131,10 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getRecurringCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {
+  private Map<String, Object> allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
 
     if (!checkValidDate(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
@@ -158,10 +162,10 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getRecurringCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void allDayRecurring(Matcher mAllDayRecurringForN) {
+  private Map<String, Object> allDayRecurring(Matcher mAllDayRecurringForN) {
 
     Map<String, Object> eventDetails = new HashMap<>();
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
@@ -185,17 +189,17 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getRecurringCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void singleMatchAllDayUntil(Matcher mSingleAllDateTime) {
+  private Map<String, Object> singleMatchAllDayUntil(Matcher mSingleAllDateTime) {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
-    eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDateTime.group(1) != null);
+    eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingleAllDateTime.group(2));
-    eventDetails.put(EventKeys.ALLDAY_DATETIME,
+    eventDetails.put(EventKeys.START_DATETIME,
             LocalDateTime.parse(mSingleAllDateTime.group(3), DATE_TIME_FORMATTER));
     String otherinfo = null;
     boolean flag = mSingleAllDateTime.group(4) != null;
@@ -212,15 +216,15 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getSingleCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void singleMatchAllDay(Matcher mSingleAllDay) {
+  private Map<String, Object> singleMatchAllDay(Matcher mSingleAllDay) {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
-    eventDetails.put(EventKeys.AUTO_DECLINE, mSingleAllDay.group(1) != null);
+    eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingleAllDay.group(2));
     eventDetails.put(EventKeys.ALLDAY_DATE,
             LocalDate.parse(mSingleAllDay.group(3), DATE_FORMATTER));
@@ -239,10 +243,10 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getSingleCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void singleMatch(Matcher mSingle) {
+  private Map<String, Object> singleMatch(Matcher mSingle) {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
@@ -250,7 +254,7 @@ public class CalendarControllerImpl extends CalenderController {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
-    eventDetails.put(EventKeys.AUTO_DECLINE, mSingle.group(1) != null);
+    eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingle.group(2));
     eventDetails.put(EventKeys.START_DATETIME, LocalDateTime.parse(mSingle.group(3),
             DATE_TIME_FORMATTER));
@@ -271,16 +275,16 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getSingleCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private void recurringMatchUntil(Matcher mRecurringUntil) {
+  private Map<String, Object> recurringMatchUntil(Matcher mRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
     if (!checkValidDate(mRecurringUntil.group(3), mRecurringUntil.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
-    eventDetails.put(EventKeys.AUTO_DECLINE, mRecurringUntil.group(1) != null);
+    eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mRecurringUntil.group(2));
     eventDetails.put(EventKeys.START_DATETIME,
             LocalDateTime.parse(mRecurringUntil.group(3), DATE_TIME_FORMATTER));
@@ -304,16 +308,16 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getRecurringCalender().addEvent(eventDetails);
+    return eventDetails;
   }
 
-  private static void recurringMatchForN(Matcher mRecurringForN) {
+  private Map<String, Object> recurringMatchForN(Matcher mRecurringForN) {
     Map<String, Object> eventDetails = new HashMap<>();
     if (!checkValidDate(mRecurringForN.group(3), mRecurringForN.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
-    eventDetails.put(EventKeys.AUTO_DECLINE, mRecurringForN.group(1) != null);
+    eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mRecurringForN.group(2));
     eventDetails.put(EventKeys.START_DATETIME,
             LocalDateTime.parse(mRecurringForN.group(3), DATE_TIME_FORMATTER));
@@ -336,102 +340,6 @@ public class CalendarControllerImpl extends CalenderController {
     if (otherinfo != null && otherinfo.equals(" private")) {
       eventDetails.put(EventKeys.PRIVATE, 1);
     }
-    CalendarFactory.getRecurringCalender().addEvent(eventDetails);
+    return eventDetails;
   }
-
-
-  @Override
-  void editEventCommand(String command) {
-    String pattern1 = "edit event (\\w+) (.+?) from " +
-            "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" +
-            " to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
-    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) " +
-            "with (.+)";
-    String pattern3 = "edit events (\\w+) (.+?) (.+)";
-
-    Pattern p1 = Pattern.compile(pattern1);
-    Pattern p2 = Pattern.compile(pattern2);
-    Pattern p3 = Pattern.compile(pattern3);
-
-    Matcher m1 = p1.matcher(command);
-    Matcher m2 = p2.matcher(command);
-    Matcher m3 = p3.matcher(command);
-
-    Map<String, Object> eventDes = new HashMap<>();
-    if (m1.matches()) {
-      String property = m1.group(1);
-      String eventName = m1.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DATE_TIME_FORMATTER);
-      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DATE_TIME_FORMATTER);
-      String newValue = m1.group(5);
-
-      eventDes.put(EventKeys.PROPERTY, property);
-      eventDes.put(EventKeys.SUBJECT, eventName);
-      eventDes.put(EventKeys.START_DATETIME, startDateTime);
-      eventDes.put(EventKeys.END_DATETIME, endDateTime);
-      eventDes.put(EventKeys.NEW_VALUE, newValue);
-
-      CalendarFactory.getSingleCalender().editEvent(eventDes);
-    } else if (m2.matches()) {
-      String property = m2.group(1);
-      String eventName = m2.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DATE_TIME_FORMATTER);
-      String newValue = m2.group(4);
-
-      eventDes.put(EventKeys.PROPERTY, property);
-      eventDes.put(EventKeys.SUBJECT, eventName);
-      eventDes.put(EventKeys.START_DATETIME, startDateTime);
-      eventDes.put(EventKeys.NEW_VALUE, newValue);
-      CalendarFactory.getSingleCalender().editEvent(eventDes);
-    } else if (m3.matches()) {
-      String property = m3.group(1);
-      String eventName = m3.group(2);
-      String newValue = m3.group(3);
-
-      eventDes.put(EventKeys.PROPERTY, property);
-      eventDes.put(EventKeys.SUBJECT, eventName);
-      eventDes.put(EventKeys.NEW_VALUE, newValue);
-      CalendarFactory.getSingleCalender().editEvent(eventDes);
-    } else {
-      throw new IllegalArgumentException("Invalid edit command format.");
-    }
-  }
-
-  @Override
-  void printEvents(String command) {
-    String pattern1 = "print events on (\\d{4}-\\d{2}-\\d{2})";
-    Pattern p1 = Pattern.compile(pattern1);
-    Matcher m1 = p1.matcher(command);
-    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) " +
-            "to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
-    Pattern p2 = Pattern.compile(pattern2);
-    Matcher m2 = p2.matcher(command);
-    if (m1.matches()) {
-      CalendarFactory.getCalendarView().printEventsOn(m1.group(1));
-    } else if (m2.matches()) {
-      CalendarFactory.getCalendarView().printEventsFromTo(m2.group(1), m2.group(2));
-    } else {
-      throw new IllegalArgumentException("Invalid print command format.");
-    }
-
-  }
-
-  @Override
-  void exportCalendar(String command) {
-    String[] parts = command.split(" ");
-    CalendarFactory.getCalendarExport().generateCSV(parts[parts.length - 1]);
-  }
-
-  @Override
-  void showStatus(String command) {
-    String showPattern = "show status on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
-    Pattern p = Pattern.compile(showPattern);
-    Matcher m = p.matcher(command);
-    if (m.matches()) {
-      CalendarFactory.getCalendarView().showStatusOn(m.group(1));
-    } else {
-      throw new IllegalArgumentException("Invalid show command format.");
-    }
-  }
-
 }

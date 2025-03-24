@@ -15,12 +15,10 @@ public class EventKeys {
   public static final String AUTO_DECLINE = "autoDecline";
   public static final String PROPERTY = "property";
   public static final String NEW_VALUE = "newValue";
-  public static final String ALL_DAY = "allDayEvent";
   public static final String WEEKDAYS = "weekdays";
   public static final String OCCURRENCES = "occurrences";
   public static final String REPEAT_DATETIME = "repeatDateTime";
   public static final String REPEAT_DATE = "repeatDate";
-  public static final String ALLDAY_DATETIME = "allDayDateTime";
   public static final String ALLDAY_DATE = "allDayDate";
 
   /**

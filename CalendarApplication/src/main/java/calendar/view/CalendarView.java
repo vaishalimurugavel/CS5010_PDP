@@ -1,97 +1,26 @@
 package calendar.view;
 
-import calendar.model.CalendarEvent;
-import calendar.model.Event;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
- * CalendarView class for displaying calendar events.
+ * Created at 21-03-2025
+ * Author Vaishali
  **/
-public class CalendarView {
+public abstract class CalendarView {
 
-  private static final DateTimeFormatter DATE_FORMAT =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd");
-  private static final DateTimeFormatter DATE_TIME_FORMAT =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+  OutputStream output;
 
-  /**
-   * Print all events on a specific date.
-   * @param dateString String
-   */
-  public void printEventsOn(String dateString) {
-    LocalDate date = LocalDate.parse(dateString, DATE_FORMAT);
-    List<Event> events = CalendarEvent.getEventList()
-            .stream()
-            .filter(e -> e.getStartDateTime() != null)
-            .filter(e -> e.getStartDateTime().toLocalDate().equals(date))
-            .collect(Collectors.toList());
-
-    if (events.isEmpty()) {
-      System.out.println("No events scheduled on " + dateString);
-    } else {
-      System.out.println("Events on " + dateString + ":");
-      for (Event e : events) {
-        System.out.println("- " + e.getSubject() + " ("
-                + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
-                + e.getEndDateTime().format(DATE_TIME_FORMAT) + ") at " + e.getLocation());
-      }
-    }
-  }
-
-
-  /**
-   * Print events in a given time range.
-   * @param startDateTimeStr String
-   * @param endDateTimeStr String
-   */
-  public void printEventsFromTo(String startDateTimeStr, String endDateTimeStr) {
-    LocalDateTime startDateTime = LocalDateTime.parse(startDateTimeStr, DATE_TIME_FORMAT);
-    LocalDateTime endDateTime = LocalDateTime.parse(endDateTimeStr, DATE_TIME_FORMAT);
-
-    List<Event> events = CalendarEvent.getEventList()
-            .stream()
-            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
-            .filter(e -> (e.getStartDateTime().isAfter(startDateTime)
-                    || e.getStartDateTime().isEqual(startDateTime))
-                    && (e.getEndDateTime().isBefore(endDateTime)
-                    || e.getEndDateTime().isEqual(endDateTime)))
-            .collect(Collectors.toList());
-
-    if (events.isEmpty()) {
-      System.out.println("No events scheduled in the given time range.");
-    } else {
-      System.out.println("Events from " + startDateTimeStr + " to " + endDateTimeStr + ":");
-      for (Event e : events) {
-        System.out.println("- " + e.getSubject()
-                + " (" + e.getStartDateTime().format(DATE_TIME_FORMAT) + " - "
-                + e.getEndDateTime().format(DATE_TIME_FORMAT) + ") at "
-                + e.getLocation());
-      }
-    }
+  public CalendarView(OutputStream output) {
+    this.output = output;
   }
 
   /**
-   * Show busy status on a given date-time.
-   * @param dateTimeStr DateTime
+   * Method that out the message.
+   * @param eventList List of Map of event details
    */
-  public void showStatusOn(String dateTimeStr) {
-    LocalDateTime dateTime = LocalDateTime.parse(dateTimeStr, DATE_TIME_FORMAT);
-    boolean isBusy = CalendarEvent.getEventList()
-            .stream()
-            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
-            .anyMatch(e -> (e.getStartDateTime().isBefore(dateTime)
-                    || e.getStartDateTime().isEqual(dateTime))
-                    && (e.getEndDateTime().isAfter(dateTime)
-                    || e.getEndDateTime().isEqual(dateTime)));
-
-    if (isBusy) {
-      System.out.println("Status: Busy at " + dateTimeStr);
-    } else {
-      System.out.println("Status: Available at " + dateTimeStr);
-    }
-  }
+  abstract public void displayOutput(List<Map<String,String>> eventList) throws IOException;
+  abstract public void displayOutput(String msg) throws IOException;
 }

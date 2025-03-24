@@ -1,6 +1,5 @@
 package calendar.view;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
@@ -12,25 +11,28 @@ import java.util.Map;
 import calendar.model.EventKeys;
 
 /**
- * Export class used to export Events as CSV files.
+ * Created at 21-03-2025
+ * Author Vaishali
  **/
-public class CalendarExport extends CalendarView{
 
+public class CalendarSimpleView extends CalendarView {
 
-  public CalendarExport(OutputStream output) {
+  public CalendarSimpleView(OutputStream output) {
     super(output);
   }
 
   @Override
-  public void displayOutput(List<Map<String,String >> eventList) throws IOException {
+  public void displayOutput(List<Map<String, String>> eventList) throws IOException {
 
-    StringBuffer sb = new StringBuffer();
     LocalDate date = null;
     LocalTime time = null;
-
-    sb.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event," +
-            "Description,Location,Private\n");
-    if(eventList != null && !eventList.isEmpty()) {
+    StringBuilder sb = new StringBuilder();
+    if(eventList == null || eventList.isEmpty()) {
+      System.out.println("Simple View: \n");
+      output.write("No calendar event!".getBytes());
+      output.close();
+    }
+    else{
       for (Map<String, String> content : eventList) {
         sb.append(content.get(EventKeys.SUBJECT)).append(",");
         try {
@@ -61,22 +63,22 @@ public class CalendarExport extends CalendarView{
           sb.append("--").append(",");
         }
 
+        sb.append(date).append(",");
+        sb.append(time).append(",");
         sb.append(content.get(EventKeys.EVENT_TYPE)).append(",");
         sb.append(content.get(EventKeys.DESCRIPTION)).append(",");
         sb.append(content.get(EventKeys.LOCATION)).append(",");
         sb.append(content.get(EventKeys.PRIVATE)).append("\n");
-      }
-      System.out.println("Export: \n" + sb.toString());
-      output.write(sb.toString().getBytes());
-      output.close();
 
+        System.out.println("Simple View: \n" + sb.toString());
+        output.write(sb.toString().getBytes());
+        output.close();
+      }
     }
   }
 
   @Override
   public void displayOutput(String msg) throws IOException {
-    output.write(("Export class!").getBytes());
-
+    output.write(msg.getBytes());
   }
 }
-

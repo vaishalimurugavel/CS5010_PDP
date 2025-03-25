@@ -26,6 +26,9 @@ public class EventKeys {
   public static final String REPEAT_DATE = "repeatDate";
   public static final String ALLDAY_DATE = "allDayDate";
 
+  public static final String CALENDAR_NAME = "name";
+  public static final String TIMEZONE = "timezone";
+
   /**
    * <p>
    * Enum to identify the type of event.

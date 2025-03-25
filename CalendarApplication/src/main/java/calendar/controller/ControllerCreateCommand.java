@@ -38,7 +38,7 @@ public class ControllerCreateCommand implements ControllerCommand {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
           .ofPattern("yyyy-MM-dd");
 
-  private static boolean checkValidDate(String startDate, String endDate) {
+  private static boolean checkIfOverlapDates(String startDate, String endDate) {
     String datePattern = "\\d{4}-\\d{2}-\\d{2}";
     Pattern pattern = Pattern.compile(datePattern);
     Matcher startmatcher = pattern.matcher(startDate);
@@ -153,7 +153,7 @@ public class ControllerCreateCommand implements ControllerCommand {
   private Map<String, Object> allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
 
-    if (!checkValidDate(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
+    if (!checkIfOverlapDates(mAllDayRecurringUntil.group(3), mAllDayRecurringUntil.group(5))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
@@ -266,7 +266,7 @@ public class ControllerCreateCommand implements ControllerCommand {
 
     Map<String, Object> eventDetails = new HashMap<>();
 
-    if (!checkValidDate(mSingle.group(3), mSingle.group(4))) {
+    if (!checkIfOverlapDates(mSingle.group(3), mSingle.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
@@ -296,7 +296,7 @@ public class ControllerCreateCommand implements ControllerCommand {
 
   private Map<String, Object> recurringMatchUntil(Matcher mRecurringUntil) {
     Map<String, Object> eventDetails = new HashMap<>();
-    if (!checkValidDate(mRecurringUntil.group(3), mRecurringUntil.group(4))) {
+    if (!checkIfOverlapDates(mRecurringUntil.group(3), mRecurringUntil.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
@@ -329,7 +329,7 @@ public class ControllerCreateCommand implements ControllerCommand {
 
   private Map<String, Object> recurringMatchForN(Matcher mRecurringForN) {
     Map<String, Object> eventDetails = new HashMap<>();
-    if (!checkValidDate(mRecurringForN.group(3), mRecurringForN.group(4))) {
+    if (!checkIfOverlapDates(mRecurringForN.group(3), mRecurringForN.group(4))) {
       throw new IllegalArgumentException("Invalid date format.");
     }
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);

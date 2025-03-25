@@ -52,6 +52,17 @@ public class CalendarGroupManager implements CalendarGroup{
 
   @Override
   public void updateCalendar(Map<String, Object> prop) {
-
+    String groupName = (String) prop.get(EventKeys.CALENDAR_NAME);
+    Calendars calendars = calendarGroups.get(groupName);
+    if(calendars != null) {
+      String propertyName = (String) prop.get(EventKeys.PROPERTY);
+      String newValue = (String) prop.get(EventKeys.NEW_VALUE);
+      if( propertyName.equals(EventKeys.CALENDAR_NAME)) {
+        calendars.setTitle(newValue);
+      }
+      else if(propertyName.equals(EventKeys.TIMEZONE)) {
+        calendars.setZoneName(newValue);
+      }
+    }
   }
 }

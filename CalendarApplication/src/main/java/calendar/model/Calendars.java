@@ -63,4 +63,19 @@ public class Calendars {
   public String getZoneName() {
     return zoneName;
   }
+
+  /**
+   * Sets the title of the calendar group.
+   */
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  /**
+   * Sets the name of the timezone associated with the calendar group.
+   */
+  public void setZoneName(String zoneName) {
+    this.zoneName = zoneName;
+    this.zoneId = ZoneId.of(zoneName);
+  }
 }

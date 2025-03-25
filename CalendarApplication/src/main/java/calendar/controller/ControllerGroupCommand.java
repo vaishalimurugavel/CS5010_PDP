@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -16,7 +17,7 @@ import calendar.model.EventKeys;
 /**
  * <p>
  * ControllerGroupCommand class is responsible for handling group-related commands in the calendar system.
- * These commands include creating and using calendars, copying events between calendars, and managing calendar events.
+ * These commands include creating and using calendars, copying events between calendars, and editing calendar events.
  * The class implements the ControllerCommand interface and overrides the execute method to process various
  * group-based calendar operations.
  * </p>
@@ -50,6 +51,11 @@ public class ControllerGroupCommand implements ControllerCommand {
             + targetPattern + " to (\\d{4}-\\d{2}-\\d{2})";
     Pattern copyCalPattern2 = Pattern.compile(copyCalendar2);
     Matcher copyCalMatcher2 = copyCalPattern2.matcher(command);
+
+
+    String editCalendar = "edit calendar --name ([A-Za-z0-9_]+) --property ([A-Za-z0-9_]+) ([A-Za-z0-9_]+)";
+    Pattern editCalPattern = Pattern.compile(editCalendar);
+    Matcher editCalMatcher = editCalPattern.matcher(command);
 
     if (createMatcher.matches()) {
       CalendarFactory.getGroup().addCalendar(createMatcher.group(1), createMatcher.group(2));
@@ -130,7 +136,23 @@ public class ControllerGroupCommand implements ControllerCommand {
                               || (((LocalDate) e.get(EventKeys.ALLDAY_DATE)).isBefore(to))
                               && ((LocalDate) e.get(EventKeys.ALLDAY_DATE)).isAfter(on))
               .collect(Collectors.toList());
+      for (Map<String, Object> event : events) {
+        CalendarFactory.getGroup().getCalendarEvent(cal2).addEvent(event);
+      }
     }
 
+    else if(editCalMatcher.matches()) {
+
+      String calName = editCalMatcher.group(1);
+      String propName = editCalMatcher.group(2);
+      String newValue = editCalMatcher.group(3);
+
+      Map<String, Object> edit = new HashMap<>();
+      edit.put(EventKeys.CALENDAR_NAME, calName);
+      edit.put(EventKeys.PROPERTY, propName);
+      edit.put(EventKeys.NEW_VALUE, newValue);
+
+      CalendarFactory.getGroup().updateCalendar(edit);
+    }
   }
 }

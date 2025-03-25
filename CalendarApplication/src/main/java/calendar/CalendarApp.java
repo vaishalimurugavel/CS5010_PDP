@@ -1,33 +1,31 @@
 package calendar;
 
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Scanner;
 
 import calendar.controller.CalendarController;
-import calendar.model.CalendarEvent;
-import calendar.model.CalenderEventManager;
-import calendar.view.CalendarExport;
-import calendar.view.CalendarSimpleView;
-import calendar.view.CalendarView;
 
 
 /**
+ * <p>
  * Main class of the CalendarApp application.
+ * This class serves as the entry point for the Calendar application,
+ * allowing it to run in two different modes: interactive and headless.
+ * </p>
  **/
 public class CalendarApp {
 
-  static CalendarEvent model = new CalenderEventManager();
-  static CalendarView view = new CalendarSimpleView(System.out);
-  static CalendarView export = view;
   /**
+   * <p>
    * Main method.
-   * @param args  Arguments
+   * This method processes command-line arguments to decide the mode
+   * of operation (interactive or headless).
+   * </p>
+   *
+   * @param args  Arguments passed from the command line.
    */
   public static void main(String[] args) {
     if (args.length < 2 || !args[0].equalsIgnoreCase("--mode")) {
@@ -39,13 +37,11 @@ public class CalendarApp {
 
     String mode = args[1].toLowerCase(Locale.ROOT);
     Readable reader;
-    boolean isInteractive = false;
 
     switch (mode) {
       case "interactive":
-        System.out.println("Entering interactive mode. Type 'exit' to quit.\nEnter commands:");
+        System.out.println("Entering interactive mode. Type 'exit' to quit.\nEnter command:");
         reader = new InputStreamReader(System.in);
-        isInteractive = true;
         break;
       case "headless":
         if (args.length < 3) {
@@ -63,34 +59,38 @@ public class CalendarApp {
         System.err.println("Invalid mode. Use 'interactive' or 'headless'.");
         return;
     }
-
-    processInput(reader, isInteractive);
+    CalendarController controller = new CalendarController();
+    processInput(reader,controller);
   }
 
-  private static void processInput(Readable reader, boolean isInteractive) {
+  /**
+   * <p>
+   * Process the input commands.
+   * This method continuously reads commands from the given reader (interactive or file)
+   * and delegates processing of the commands to the CalendarController.
+   * </p>
+   *
+   * @param reader      The source of input (either console or file).
+   * @param controller  The controller that processes the commands.
+   */
+  private static void processInput(Readable reader, CalendarController controller) {
     Scanner scanner = new Scanner(reader);
-    String path = null;
     while (scanner.hasNextLine()) {
       String command = scanner.nextLine().trim();
       System.out.println("Executing command: " + command);
-      if(command.contains("export")) {
-        String[] parts = command.split(" ");
-        path = parts[parts.length - 1];
-      }
+
       if (command.equalsIgnoreCase("exit")) {
         System.out.println("Exiting...");
         break;
       }
-
-      if(path != null) {
-        try {
-          export = new CalendarExport(new FileOutputStream(path));
-        } catch (IOException e) {
-          throw new RuntimeException(e);
-        }
+      try {
+        controller.processCommand(command);
+      } catch (IllegalAccessException e) {
+        System.err.println("Error! Could not process command: " + command + "\n" + e);
+        scanner.close();
+        System.exit(1);
       }
-      CalendarController controller = new CalendarController(model,view,export);
-      controller.processCommand(command);
+      System.out.println("Enter command: ");
     }
 
     scanner.close();

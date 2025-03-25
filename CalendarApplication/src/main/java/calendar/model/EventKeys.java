@@ -1,8 +1,13 @@
 package calendar.model;
 
 /**
+ * <p>
  * Public keys for key names.
- **/
+ * This class provides constant key names for various event attributes
+ * that can be used in the application. These key names are used when
+ * serializing, deserializing, or handling event data.
+ * </p>
+ */
 public class EventKeys {
 
   public static final String SUBJECT = "subject";
@@ -22,7 +27,14 @@ public class EventKeys {
   public static final String ALLDAY_DATE = "allDayDate";
 
   /**
+   * <p>
    * Enum to identify the type of event.
+   * This enum represents the different types of events:
+   * - SINGLE: A one-time event.
+   * - RECURRING: An event that occurs repeatedly.
+   * - ALL_DAY: A full-day event with no specific start/end times.
+   * - ALL_DAY_RECURRING: A recurring full-day event.
+   * </p>
    */
   public enum EventType {
     SINGLE, RECURRING, ALL_DAY, ALL_DAY_RECURRING

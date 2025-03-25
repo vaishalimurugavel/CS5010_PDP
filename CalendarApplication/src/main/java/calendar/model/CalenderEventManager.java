@@ -9,14 +9,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Created at 22-03-2025
- * Author Vaishali
+ *  Manages calendar events, including adding, updating, checking for duplicates, and retrieving events for display.
  **/
-
 public class CalenderEventManager implements CalendarEvent {
   List<Event> events = new ArrayList<Event>();
 
-  private Event.EventBuilder addEvents(Map<String , Object> event, Event.EventBuilder eventBuilder) {
+  private void addEvents(Map<String , Object> event, Event.EventBuilder eventBuilder) {
     if(event.containsKey(EventKeys.START_DATETIME)){
       eventBuilder.startDateTime((LocalDateTime) event.get(EventKeys.START_DATETIME));
     }
@@ -53,15 +51,8 @@ public class CalenderEventManager implements CalendarEvent {
     else {
       eventBuilder.privateEvent(0);
     }
-    if(event.get(EventKeys.EVENT_TYPE).equals(EventKeys.EventType.ALL_DAY)
-            || event.get(EventKeys.EVENT_TYPE).equals(EventKeys.EventType.ALL_DAY_RECURRING))
-    {
-      eventBuilder.allDay(true);
-    }
-    else {
-      eventBuilder.allDay(false);
-    }
-    return eventBuilder;
+    eventBuilder.allDay(event.get(EventKeys.EVENT_TYPE).equals(EventKeys.EventType.ALL_DAY)
+            || event.get(EventKeys.EVENT_TYPE).equals(EventKeys.EventType.ALL_DAY_RECURRING));
   }
 
   @Override
@@ -208,30 +199,30 @@ public class CalenderEventManager implements CalendarEvent {
     return builder.build();
   }
 
-  private List<Map<String,String>> getEventDetails(List<Event> events) {
-    List<Map<String, String>> eventList = new ArrayList<>();
-    Map<String, String> eventDetails;
+  private List<Map<String,Object>> getEventDetails(List<Event> events) {
+    List<Map<String, Object>> eventList = new ArrayList<>();
+    Map<String, Object> eventDetails;
     for (Event event : events) {
       eventDetails = new HashMap<>();
       eventDetails.put(EventKeys.SUBJECT, event.getSubject());
       LocalDateTime startDateTime = event.getStartDateTime();
       if(startDateTime != null) {
-        eventDetails.put(EventKeys.START_DATETIME, startDateTime.toString());
+        eventDetails.put(EventKeys.START_DATETIME, startDateTime);
       } else {
         LocalDate allDate = event.getAllDayEnd();
         if(allDate != null) {
-          eventDetails.put(EventKeys.START_DATETIME, allDate.toString());
+          eventDetails.put(EventKeys.START_DATETIME, allDate);
         }
       }
       LocalDateTime endDateTime = event.getEndDateTime();
       if(endDateTime != null) {
-        eventDetails.put(EventKeys.END_DATETIME, endDateTime.toString());
+        eventDetails.put(EventKeys.END_DATETIME, endDateTime);
       } else if (event.getRepeatDateTime() != null) {
-        eventDetails.put(EventKeys.END_DATETIME, event.getRepeatDateTime().toString());
+        eventDetails.put(EventKeys.END_DATETIME, event.getRepeatDateTime());
       } else {
         LocalDate repDate = event.getRepeatDate();
         if(repDate != null) {
-          eventDetails.put(EventKeys.END_DATETIME, repDate.toString());
+          eventDetails.put(EventKeys.END_DATETIME, repDate);
         }
       }
       eventDetails.put(EventKeys.LOCATION, event.getLocation());
@@ -244,12 +235,12 @@ public class CalenderEventManager implements CalendarEvent {
   }
 
   @Override
-  public List<Map<String,String>> getEventsForDisplay() {
+  public List<Map<String,Object>> getEventsForDisplay() {
     return getEventDetails(events);
   }
 
   @Override
-  public List<Map<String,String>> getEventForDisplay(Event event) {
+  public List<Map<String,Object>> getEventForDisplay(Event event) {
     LocalDateTime start = (event.getStartDateTime() != null) ? event.getStartDateTime() : null;
     LocalDateTime end = (event.getEndDateTime() != null) ? event.getEndDateTime() : null;
     LocalDate allDate = (event.getAllDate() != null) ? event.getAllDate() : null;
@@ -275,14 +266,14 @@ public class CalenderEventManager implements CalendarEvent {
 
 
   @Override
-  public List<Map<String,String>> getEventForDisplay(String subject) {
+  public List<Map<String,Object>> getEventForDisplay(String subject) {
     List<Event> eventList = events.stream().filter(e -> e.getSubject().equals(subject))
             .collect(Collectors.toList());
     return getEventDetails(eventList);
   }
 
   @Override
-  public List<Map<String,String>> getEventForDisplay(LocalDateTime startTime, LocalDateTime endTime) {
+  public List<Map<String,Object>> getEventForDisplay(LocalDateTime startTime, LocalDateTime endTime) {
     LocalDate allDate = (startTime != null) ? startTime.toLocalDate() : null;
     LocalDate repeat = (endTime != null) ? endTime.toLocalDate() : null;
 
@@ -310,12 +301,12 @@ public class CalenderEventManager implements CalendarEvent {
 
 
   @Override
-  public List<Map<String,String>> getEventForDisplay(LocalDate startDate, LocalDate endDate) {
+  public List<Map<String,Object>> getEventForDisplay(LocalDate startDate, LocalDate endDate) {
     return null;
   }
 
   @Override
-  public List<Map<String,String>> getUserStatus(LocalDateTime date) {
+  public List<Map<String,Object>> getUserStatus(LocalDateTime date) {
 
     List<Event> eventList = events.stream()
             .filter(e->((e.getStartDateTime() != null && e.getEndDateTime() != null )

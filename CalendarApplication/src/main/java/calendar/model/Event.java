@@ -4,7 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Event bean class using EventBuilder pattern.
+ * <p>
+ * Event bean class using the EventBuilder pattern.
+ * This class represents an event with various properties such as subject, location,
+ * description, timings, recurrence, and more.
+ * </p>
  */
 public class Event {
 
@@ -38,7 +42,10 @@ public class Event {
   }
 
   /**
+   * <p>
    * Builder class to instantiate Event class variables.
+   * The builder pattern helps to create complex Event objects step-by-step.
+   * </p>
    */
   public static class EventBuilder {
     private String subject;

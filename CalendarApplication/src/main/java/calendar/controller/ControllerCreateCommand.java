@@ -8,12 +8,28 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import calendar.model.CalendarEvent;
 import calendar.model.EventKeys;
-import calendar.view.CalendarView;
 
 /**
- * Concrete class of the Controller abstract class.
+ * <p>
+ * Concrete implementation of the ControllerCommand interface, responsible for handling
+ * the creation of different types of calendar events based on the given command.
+ * This class interprets commands related to single, recurring, and all-day events,
+ * and then processes them accordingly to create appropriate event objects.
+ * </p>
+ *
+ * <p>
+ * The class uses regular expressions to parse various event formats such as single events,
+ * recurring events (either for a set number of occurrences or until a specific date),
+ * and all-day events. It validates input date formats and constructs event details which
+ * are subsequently added to the calendar model.
+ * </p>
+ *
+ * <p>
+ * Each method in this class is responsible for processing a specific event pattern and
+ * extracting the relevant details (such as subject, start and end times, location,
+ * description, and privacy settings) to form an event object that is added to the calendar.
+ * </p>
  */
 public class ControllerCreateCommand implements ControllerCommand {
 
@@ -46,7 +62,7 @@ public class ControllerCreateCommand implements ControllerCommand {
   }
 
   @Override
-  public void execute(String command, CalendarEvent event, CalendarView view)  {
+  public void execute(String command)  {
 
     String basePattern = "create event( --autoDecline)? (.+?)";
     String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
@@ -107,7 +123,7 @@ public class ControllerCreateCommand implements ControllerCommand {
     } else {
       throw new IllegalArgumentException("Invalid create event syntax.");
     }
-    event.addEvent(eventDetails);
+    CalendarFactory.getModel().addEvent(eventDetails);
 
   }
 

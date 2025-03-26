@@ -19,6 +19,9 @@ import calendar.model.EventKeys;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for CalendarExportCommand. Tests if the export calendar command is processed as intended.
+ */
 public class ControllerExportCommandTest {
 
   private ExportControllerCommand exportController;

@@ -2,15 +2,15 @@ package calendar.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import calendar.model.CalendarEvent;
-import calendar.model.Event;
-import calendar.model.EventKeys;
 
+/**
+ * Mock class for CalendarEvent.
+ */
 public class MockModel implements CalendarEvent {
 
   private List<Map<String, Object>> events;

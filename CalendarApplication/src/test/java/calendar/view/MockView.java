@@ -1,12 +1,13 @@
 package calendar.view;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-import java.io.OutputStream;
-import java.io.IOException;
 
-import calendar.view.CalendarView;
-
+/**
+ * Mock class for CalendarView.
+ */
 public class MockView extends CalendarView {
 
   private String viewName;

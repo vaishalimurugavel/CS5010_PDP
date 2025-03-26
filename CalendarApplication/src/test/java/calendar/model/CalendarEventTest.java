@@ -13,11 +13,16 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Test class for CalendarEvent class. All the Events operations are verified here.
+ */
 public class CalendarEventTest {
 
   private CalendarEvent eventManager;
   private Map<String, Object> event1;
   private Map<String, Object> event2;
+  Map<String, Object> event4;
+  Map<String, Object> event5;
 
   @Before
   public void setUp() {
@@ -38,6 +43,24 @@ public class CalendarEventTest {
     event2.put(EventKeys.LOCATION, "Room B");
     event2.put(EventKeys.DESCRIPTION, "Technical workshop");
     event2.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+
+
+    event4 = new HashMap<>();
+    event4.put(EventKeys.SUBJECT, "Workshop All Day");
+    event4.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-03-25T11:30:00"));
+    event4.put(EventKeys.REPEAT_DATETIME, LocalDateTime.parse("2025-03-27T13:00:00"));
+    event4.put(EventKeys.LOCATION, "Room B");
+    event4.put(EventKeys.DESCRIPTION, "Technical workshop");
+    event4.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
+
+
+    event5 = new HashMap<>();
+    event5.put(EventKeys.SUBJECT, "Workshop All Day");
+    event5.put(EventKeys.ALLDAY_DATE,LocalDate.parse("2025-03-29"));
+    event5.put(EventKeys.REPEAT_DATE, LocalDate.parse("2025-03-30"));
+    event5.put(EventKeys.LOCATION, "Room B");
+    event5.put(EventKeys.DESCRIPTION, "Technical workshop");
+    event5.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
   }
 
   @Test
@@ -61,6 +84,86 @@ public class CalendarEventTest {
             .build();
     assertTrue(eventManager.checkForDuplicates(duplicateEvent));
   }
+
+  @Test
+  public void testCheckForDuplicates_Recurring() {
+    eventManager.addEvent(event4);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day")
+            .startDateTime(LocalDateTime.parse("2025-03-25T11:30:00"))
+            .repeatDateTime(LocalDateTime.parse("2025-03-27T13:00:00"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertTrue(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
+  @Test
+  public void testCheckForDuplicates_endStart() {
+    eventManager.addEvent(event4);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day1")
+            .startDateTime(LocalDateTime.parse("2025-03-27T15:00:00"))
+            .repeatDateTime(LocalDateTime.parse("2025-03-27T19:00:00"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertFalse(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
+
+  @Test
+  public void testCheckForDuplicates_RecurringRepeat() {
+    eventManager.addEvent(event4);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day")
+            .startDateTime(LocalDateTime.parse("2025-03-27T11:30:00"))
+            .repeatDateTime(LocalDateTime.parse("2025-03-27T13:00:00"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertTrue(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
+  @Test
+  public void testCheckForDuplicates_allDay() {
+    eventManager.addEvent(event4);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day")
+            .allDate(LocalDate.parse("2025-03-25"))
+            .repeatDate(LocalDate.parse("2025-03-27"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertTrue(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
+  @Test
+  public void testCheckForDuplicates_allDay2() {
+    eventManager.addEvent(event5);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day2")
+            .allDate(LocalDate.parse("2025-03-29"))
+            .repeatDate(LocalDate.parse("2025-03-30"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertTrue(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
+  @Test
+  public void testCheckForDuplicates_allDayRepeat() {
+    eventManager.addEvent(event5);
+    Event duplicateEvent = new Event.EventBuilder("Workshop All Day2")
+            .allDate(LocalDate.parse("2025-03-10"))
+            .repeatDate(LocalDate.parse("2025-03-30"))
+            .allDay(true)
+            .location("Room A")
+            .description("Another meeting")
+            .build();
+    assertTrue(eventManager.checkForDuplicates(duplicateEvent));
+  }
+
 
   @Test
   public void testCheckForDuplicates2() {

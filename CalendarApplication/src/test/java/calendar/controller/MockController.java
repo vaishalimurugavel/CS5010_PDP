@@ -1,12 +1,14 @@
 package calendar.controller;
 
-import calendar.controller.CalendarController;
-import calendar.model.CalendarEvent;
-import calendar.view.CalendarView;
-
 import java.io.IOException;
 import java.util.Map;
 
+import calendar.model.CalendarEvent;
+import calendar.view.CalendarView;
+
+/**
+ * Mock class for the Controller.
+ */
 public class MockController extends CalendarController {
 
   private CalendarEvent model;

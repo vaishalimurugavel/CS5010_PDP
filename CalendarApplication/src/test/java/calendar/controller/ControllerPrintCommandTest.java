@@ -12,6 +12,9 @@ import calendar.view.CalendarSimpleView;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for CalendarPrintCommand. Tests if the print event command is processed as intended.
+ */
 public class ControllerPrintCommandTest {
 
   private final PrintEventsCommand command = new PrintEventsCommand();

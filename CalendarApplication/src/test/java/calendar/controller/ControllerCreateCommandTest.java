@@ -11,6 +11,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
+/**
+ *  Test class for CalendarCreateCommand. Tests if the create event command is processed as intended.
+ */
 public class ControllerCreateCommandTest {
 
   private ControllerCreateCommand controllerCreateCommand;

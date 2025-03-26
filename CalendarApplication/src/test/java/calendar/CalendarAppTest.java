@@ -1,103 +1,97 @@
 package calendar;
 
-import calendar.model.CalendarEvent;
-import calendar.controller.MockController;
-import calendar.model.MockModel;
-import calendar.view.MockView;
-import calendar.view.CalendarView;
-
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.PrintStream;
+
 import static org.junit.Assert.assertTrue;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
+/**
+ * Test class for CalendarApp.
+ */
 public class CalendarAppTest {
 
-  @Test
-  public void testAddEvent() throws IOException {
-    // Arrange
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    CalendarEvent mockModel = new MockModel();
-    CalendarView mockView = new MockView(outputStream);
-    MockController mockController = new MockController(mockModel, mockView);
+  private final PrintStream originalOut = System.out;
+  private final PrintStream originalErr = System.err;
+  private final InputStream originalIn = System.in;
+  private ByteArrayOutputStream outContent;
+  private ByteArrayOutputStream errContent;
 
-    // Act
-    try {
-      mockController.processCommand("add event");
-      mockController.processCommand("view events");
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-
-    // Assert
-    mockView.displayOutput("New Event");
-//    System.out.println(output);
-//    assertTrue(output.contains("New Event"));  // Check if the new event appears in the output
+  @Before
+  public void setUpStreams() {
+    outContent = new ByteArrayOutputStream();
+    errContent = new ByteArrayOutputStream();
+    System.setOut(new PrintStream(outContent));
+    System.setErr(new PrintStream(errContent));
   }
 
-  public void testRemoveEvent() throws IOException {
-    // Arrange
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    MockModel mockModel = new MockModel();
-    MockView mockView = new MockView(outputStream);
-    MockController mockController = new MockController(mockModel, mockView);
-
-    // Act
-    try {
-      mockController.processCommand("view event");
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-    try {
-      mockController.processCommand("view events");
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-
-    // Assert
-    String output = mockView.getOutput();
-    assertTrue(output.contains("New Event"));  // Ensure the event is removed from the output
+  @After
+  public void restoreStreams() {
+    System.setOut(originalOut);
+    System.setErr(originalErr);
+    System.setIn(originalIn);
   }
 
   @Test
-  public void testViewEvents() throws IOException {
-    // Arrange
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    MockModel mockModel = new MockModel();
-    MockView mockView = new MockView(outputStream);
-    MockController mockController = new MockController(mockModel, mockView);
-
-    // Act
-    try {
-      mockController.processCommand("view events");
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-
-    // Assert
-    String output = mockView.getOutput();
-    assertTrue(output.contains("Meeting"));  // Ensure the "Meeting" event appears in the output
+  public void testMain_InvalidArgs() {
+    CalendarApp.main(new String[]{});
+    String output = errContent.toString();
+    assertTrue(output.contains("Usage:"));
   }
 
   @Test
-  public void testInvalidCommand() throws IOException {
-    // Arrange
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    MockModel mockModel = new MockModel();
-    MockView mockView = new MockView(outputStream);
-    MockController mockController = new MockController(mockModel, mockView);
+  public void testMain_InvalidMode() {
+    CalendarApp.main(new String[]{"--mode", "invalid"});
+    String output = errContent.toString();
+    assertTrue(output.contains("Invalid mode"));
+  }
 
-    // Act
-    try {
-      mockController.processCommand("invalid command");
-    } catch (IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
+  @Test
+  public void testMain_MissingFilenameInHeadlessMode() {
+    CalendarApp.main(new String[]{"--mode", "headless"});
+    String output = errContent.toString();
+    assertTrue(output.contains("Error: Missing filename for headless mode."));
+  }
 
-    // Assert
-    String output = mockView.getOutput();
-    assertEquals("Invalid command\n", output);  // Ensure invalid command is handled
+  @Test
+  public void testMain_FileNotFoundInHeadlessMode() {
+    CalendarApp.main(new String[]{"--mode", "headless", "non_existent_file.txt"});
+    String output = errContent.toString();
+    assertTrue(output.contains("Error: File not found"));
+  }
+
+  @Test
+  public void testInteractiveMode_ExitCommand() {
+    String simulatedInput = "exit\n";
+    System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
+
+    CalendarApp.main(new String[]{"--mode", "interactive"});
+    String output = outContent.toString();
+
+    assertTrue(output.contains("Entering interactive mode"));
+    assertTrue(output.contains("Exiting..."));
+  }
+
+  @Test
+  public void testHeadlessMode_FileProcessing() throws Exception {
+    File tempFile = File.createTempFile("test", ".txt");
+    FileWriter writer = new FileWriter(tempFile);
+    writer.write("exit\n");
+    writer.close();
+
+    CalendarApp.main(new String[]{"--mode", "headless", tempFile.getAbsolutePath()});
+    String output = outContent.toString();
+
+    assertTrue(output.contains("Executing command: exit"));
+    assertTrue(output.contains("Exiting..."));
+
+    tempFile.delete();
   }
 }

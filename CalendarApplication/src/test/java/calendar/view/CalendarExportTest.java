@@ -8,7 +8,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import calendar.model.EventKeys;
 
@@ -17,6 +21,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+
+/**
+ * Test class for the CalendarExport. All the export commands are verified.
+ */
 public class CalendarExportTest {
 
   private ByteArrayOutputStream output;

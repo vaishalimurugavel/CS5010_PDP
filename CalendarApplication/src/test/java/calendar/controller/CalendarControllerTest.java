@@ -6,6 +6,9 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
+/**
+ * Test class for CalendarController. Used to test if the command is invoked correctly.
+ */
 public class CalendarControllerTest {
 
   private CalendarController controller;
@@ -14,19 +17,12 @@ public class CalendarControllerTest {
   public void setUp() {
     controller = new CalendarController();
 
-    // Replace the static mapper with real implementations for testing
     CalendarController.mapper.put("create", new TestCommand("create"));
     CalendarController.mapper.put("edit", new TestCommand("edit"));
     CalendarController.mapper.put("print", new TestCommand("print"));
     CalendarController.mapper.put("show", new TestCommand("show"));
     CalendarController.mapper.put("export", new TestCommand("export"));
     CalendarController.mapper.put("copy", new TestCommand("copy"));
-  }
-
-  public void testProcessCommand_ValidCreateCommand() {
-    NullPointerException thrown = assertThrows(NullPointerException.class,
-            () -> controller.processCommand
-                    ("create event --autoDecline Event4 on 2025-03-14 10:20"));
   }
 
   @Test
@@ -54,10 +50,6 @@ public class CalendarControllerTest {
     });
   }
 
-
-  /**
-   * A simple test implementation of ControllerCommand for validation.
-   */
   static class TestCommand implements ControllerCommand {
     private final String name;
 

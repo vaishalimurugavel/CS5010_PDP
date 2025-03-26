@@ -3,10 +3,8 @@ package calendar.model;
 import java.util.Map;
 
 /**
- * Created at 25-03-2025
- * Author Vaishali
+ * Mock class for the CalendarGroup.
  **/
-
 public class MockGroup implements CalendarGroup{
 
   private String groupName;

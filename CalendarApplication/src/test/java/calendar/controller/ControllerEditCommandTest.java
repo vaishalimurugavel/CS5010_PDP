@@ -9,7 +9,9 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-
+/**
+ * Test class for ControllerEditCommand. Test if the edit event command is processed as intended.
+ */
 public class ControllerEditCommandTest {
 
   private ControllerEditCommand controllerEditCommand;

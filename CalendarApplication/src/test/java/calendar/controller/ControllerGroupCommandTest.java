@@ -20,6 +20,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThrows;
 
 
+/**
+ * Test class for CalendarGroupCommand. Tests if the Calendar operations are processed as intended.
+ */
 public class ControllerGroupCommandTest {
 
   private ControllerGroupCommand controllerGroupCommand;

@@ -13,6 +13,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * Test class for CalendarShowCommand. Tests if the show command is processed as intended.
+ */
 public class CalendarShowCommandTest {
 
   private final ShowStatusCommand command = new ShowStatusCommand();
@@ -92,4 +95,27 @@ public class CalendarShowCommandTest {
     assertTrue(exception.getMessage().contains("Invalid show command format"));
   }
 
+  @Test
+  public void testNullCommand() {
+    Exception exception = assertThrows(NullPointerException.class, () -> {
+      command.execute(null);
+    });
+  }
+
+  @Test
+  public void testEmptyCommand() {
+    Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+      command.execute("");
+    });
+    assertTrue(exception.getMessage().contains("Invalid show command format"));
+  }
+
+  @Test
+  public void testValidCommand_WithExtraWhitespace() {
+    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 " +
+            "location room1 description meeting public";
+    controllerCreateCommand.execute(createCommand);
+    outputStream.reset();
+
+  }
 }

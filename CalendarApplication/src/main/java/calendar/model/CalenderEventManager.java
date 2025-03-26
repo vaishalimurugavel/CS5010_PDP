@@ -57,46 +57,79 @@ public class CalenderEventManager implements CalendarEvent {
 
   @Override
   public boolean checkForDuplicates(Event event) {
-      if (event == null || events == null) {
-        return false;
+    if (event == null || events == null) return false;
+
+    LocalDateTime start = event.getStartDateTime();
+    LocalDateTime end = event.getEndDateTime();
+    LocalDate allDay = event.getAllDate();
+    LocalDate repeat = event.getRepeatDate();
+    LocalDateTime repeatDt = event.getRepeatDateTime();
+
+    for (Event e : events) {
+      if (e == null) continue;
+
+      LocalDateTime start2 = e.getStartDateTime();
+      LocalDateTime end2 = e.getEndDateTime();
+      LocalDate allDay2 = e.getAllDate();
+      LocalDate repeat2 = e.getRepeatDate();
+      LocalDateTime repeatDt2 = e.getRepeatDateTime();
+
+      LocalDate startDate = (start != null) ? start.toLocalDate() : null;
+      LocalDate endDate = (end != null) ? end.toLocalDate() : null;
+      LocalDate startDate2 = (start2 != null) ? start2.toLocalDate() : null;
+      LocalDate endDate2 = (end2 != null) ? end2.toLocalDate() : null;
+      LocalDate repeatDtDate = (repeatDt != null) ? repeatDt.toLocalDate() : null;
+      LocalDate repeatDtDate2 = (repeatDt2 != null) ? repeatDt2.toLocalDate() : null;
+
+      // **Case 1: Exact or Overlapping Start & End times**
+      if (start != null && end != null && start2 != null && end2 != null) {
+        if (!(end.isBefore(start2) || start.isAfter(end2))) return true;
       }
 
-      LocalDateTime start = event.getStartDateTime();
-      LocalDate allDate = event.getAllDate();
-      LocalDate repeat = event.getRepeatDate();
-      LocalDateTime repeatDt = event.getRepeatDateTime();
-
-      for (Event e : events) {
-        if (e == null) {
-          continue;
-        }
-
-        LocalDateTime start2 = e.getStartDateTime();
-        LocalDateTime end2 = e.getEndDateTime();
-        LocalDate allDate2 = e.getAllDate();
-        LocalDate repeat2 = e.getRepeatDate();
-        LocalDateTime repeatDt2 = e.getRepeatDateTime();
-
-        if ((end2 != null && start != null && (end2.isAfter(start) || end2.isEqual(start)))
-                || (start2 != null && start != null && start2.isEqual(start))
-                || (allDate2 != null && allDate != null && (allDate2.isAfter(allDate)
-                || allDate2.isEqual(allDate)))
-                || (repeat != null && allDate2 != null && (allDate2.isEqual(repeat)
-                || allDate2.isAfter(allDate) && allDate2.isBefore(repeat)))
-                || (repeat != null && repeat2 != null && repeat2.isEqual(repeat))
-                || (repeatDt != null && repeatDt2 != null && (repeatDt2.isAfter(repeatDt)
-                || repeatDt2.isEqual(repeatDt)))
-                || (repeat2 != null && allDate != null && repeat2.isEqual(allDate))
-                || (repeatDt != null && start2 != null && (start2.isAfter(repeatDt)
-                || start2.isEqual(repeatDt)))) {
-          return true;
-        }
+      // **Case 2: Start overlaps with RepeatDateTime**
+      if (start != null && repeatDt != null && start2 != null && repeatDt2 != null) {
+        if (!(repeatDt.isBefore(start2) || start.isAfter(repeatDt2))) return true;
       }
-      return false;
+
+      // **Case 3: All-day event overlaps**
+      if ((allDay != null && allDay.equals(allDay2)) || (allDay != null && repeat2 != null && allDay.equals(repeat2))) {
+        return true;
+      }
+
+      // **Case 4: RepeatDate overlaps**
+      if ((repeat != null && repeat.equals(repeat2)) || (repeat != null && allDay2 != null && repeat.equals(allDay2))) {
+        return true;
+      }
+
+      // **Case 5: RepeatDateTime overlaps another event's time**
+      if (repeatDt != null && start2 != null && end2 != null) {
+        if (!(repeatDt.isBefore(start2) || repeatDt.isAfter(end2))) return true;
+      }
+
+      // **Case 6: RepeatDateTime exact match**
+      if (repeatDt != null && repeatDt2 != null && repeatDt.equals(repeatDt2)) return true;
+
+      // **Case 7: StartDate or EndDate overlaps with AllDay or RepeatDate**
+      if ((startDate != null && (allDay2 != null && startDate.equals(allDay2))) ||
+              (endDate != null && (allDay2 != null && endDate.equals(allDay2))) ||
+              (startDate != null && (repeat2 != null && startDate.equals(repeat2))) ||
+              (endDate != null && (repeat2 != null && endDate.equals(repeat2)))) {
+        return true;
+      }
+
+      // **Case 8: RepeatDateTime Date overlaps with RepeatDate**
+      if ((repeatDtDate != null && repeat2 != null && repeatDtDate.equals(repeat2)) ||
+              (repeatDtDate2 != null && repeat != null && repeatDtDate2.equals(repeat))) {
+        return true;
+      }
     }
 
+    return false;
+  }
 
-    @Override
+
+
+  @Override
   public void addEvent(Map<String, Object> eventMap) {
     String subject = eventMap.get(EventKeys.SUBJECT).toString();
     Event.EventBuilder eventNew = new Event.EventBuilder(subject);
@@ -279,7 +312,7 @@ public class CalenderEventManager implements CalendarEvent {
 
   @Override
   public List<Map<String,Object>> getEventForDisplay(LocalDate startDate, LocalDate endDate) {
-    if(startDate == null && endDate == null) {
+    if(startDate == null || endDate == null) {
       return null;
     }
     return null;

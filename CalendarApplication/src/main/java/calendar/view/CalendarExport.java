@@ -77,8 +77,6 @@ public class CalendarExport extends CalendarView{
         sb.append(content.get(EventKeys.PRIVATE)).append("\n");
       }
       output.write(sb.toString().getBytes());
-      output.flush();
-
     }
   }
 

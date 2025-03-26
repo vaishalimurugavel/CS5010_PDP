@@ -33,16 +33,16 @@ class ExportControllerCommand implements ControllerCommand {
           try {
             export = new CalendarExport(new FileOutputStream(path));
           } catch (IOException e) {
-            throw new RuntimeException("Unable to export data");
+            throw new IOException("Unable to export data");
           }
         }
         export.displayOutput(CalendarFactory.getModel().getEventsForDisplay());
       }
       else {
-        throw new RuntimeException("Invalid command: " + command);
+        throw new IllegalArgumentException("Invalid command: " + command);
       }
     } catch (IOException e) {
-      throw new RuntimeException("Unable to export data");
+      System.err.println("Unable to export data");
     }
   }
 }

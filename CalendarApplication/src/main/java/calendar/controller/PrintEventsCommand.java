@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import calendar.view.CalendarSimpleView;
+
 /**
  * <p>
  * Command to handle the printing of events based on user input.
@@ -17,6 +19,9 @@ import java.util.regex.Pattern;
  **/
 class PrintEventsCommand implements ControllerCommand {
 
+  PrintEventsCommand(){
+    CalendarFactory.setView(new CalendarSimpleView(System.out));
+  }
 
   @Override
   public void execute(String command) {
@@ -34,8 +39,8 @@ class PrintEventsCommand implements ControllerCommand {
       try {
         LocalDate localDate = LocalDate.parse(m1.group(1), DateTimeFormatter.ISO_DATE);
 
-        CalendarFactory.getView().displayOutput(CalendarFactory.getModel()
-                .getEventForDisplay(localDate, null));
+        CalendarFactory.getView()
+                .displayOutput(CalendarFactory.getModel().getEventForDisplay(localDate, null));
       } catch (IOException e) {
         throw new RuntimeException("Error occurred while trying to fetch and display events " +
                 "for the date " + m1.group(1) + ": Unable to write data.", e);

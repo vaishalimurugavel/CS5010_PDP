@@ -32,8 +32,9 @@ public class CalendarController {
     String[] tokens = command.split(" ");
     try {
       if ( (tokens[0].equals("create") && tokens[1].equals("calendar") ) || tokens[0].equals("use")
-              || tokens[0].equals("copy")) {
+              || tokens[0].equals("copy") || tokens[0].equals("edit") && tokens[1].equals("calendar") ) {
         mapper.get("copy").execute(command);
+        return;
       }
       mapper.get(tokens[0]).execute(command);
     } catch (IllegalAccessException e) {

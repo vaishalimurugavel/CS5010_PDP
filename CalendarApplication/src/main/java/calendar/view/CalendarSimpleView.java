@@ -35,9 +35,7 @@ public class CalendarSimpleView extends CalendarView {
     LocalTime time = null;
     StringBuilder sb = new StringBuilder();
     if(eventList == null || eventList.isEmpty()) {
-      System.out.println("Simple View: \n");
       output.write("No calendar event!".getBytes());
-      output.close();
     }
     else{
       for (Map<String, Object> content : eventList) {
@@ -77,9 +75,7 @@ public class CalendarSimpleView extends CalendarView {
         sb.append(content.get(EventKeys.LOCATION)).append(",");
         sb.append(content.get(EventKeys.PRIVATE)).append("\n");
 
-        System.out.println("Simple View: \n" + sb);
         output.write(sb.toString().getBytes());
-        output.close();
       }
     }
   }

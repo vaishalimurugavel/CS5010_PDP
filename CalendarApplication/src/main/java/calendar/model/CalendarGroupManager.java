@@ -63,6 +63,8 @@ public class CalendarGroupManager implements CalendarGroup{
       else if(propertyName.equals(EventKeys.TIMEZONE)) {
         calendars.setZoneName(newValue);
       }
+    } else {
+      throw new IllegalArgumentException ("No Calendar available with the name " + groupName);
     }
   }
 }

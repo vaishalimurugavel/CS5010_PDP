@@ -16,17 +16,16 @@ import java.util.regex.Pattern;
  * </p>
  **/
 class ShowStatusCommand implements ControllerCommand {
-  DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   @Override
   public void execute(String command) {
-    String showPattern = "show status on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
+    String showPattern = "show status on (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})";
     Pattern p = Pattern.compile(showPattern);
     Matcher m = p.matcher(command);
     String comment = null;
 
     if (m.matches()) {
-      LocalDateTime start = LocalDateTime.parse(m.group(1), dateTimeFormatter);
+      LocalDateTime start = LocalDateTime.parse(m.group(1), DateTimeFormatter.ISO_DATE_TIME);
       try {
         List<Map<String, Object >> res = CalendarFactory.getModel().getUserStatus(start);
         if(!res.isEmpty()) {

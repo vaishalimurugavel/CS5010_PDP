@@ -76,9 +76,7 @@ public class CalendarExport extends CalendarView{
         sb.append(content.get(EventKeys.LOCATION)).append(",");
         sb.append(content.get(EventKeys.PRIVATE)).append("\n");
       }
-      System.out.println("Export: \n" + sb);
       output.write(sb.toString().getBytes());
-      output.close();
 
     }
   }

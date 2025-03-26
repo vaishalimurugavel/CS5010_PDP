@@ -192,7 +192,7 @@ public class CalenderEventManager implements CalendarEvent {
         builder.endDateTime(LocalDateTime.parse(newValue));
         break;
       default:
-        System.out.println("Unknown property: " + property);
+        System.err.println("Unknown property: " + property);
         return event;
     }
 
@@ -240,32 +240,6 @@ public class CalenderEventManager implements CalendarEvent {
   }
 
   @Override
-  public List<Map<String,Object>> getEventForDisplay(Event event) {
-    LocalDateTime start = (event.getStartDateTime() != null) ? event.getStartDateTime() : null;
-    LocalDateTime end = (event.getEndDateTime() != null) ? event.getEndDateTime() : null;
-    LocalDate allDate = (event.getAllDate() != null) ? event.getAllDate() : null;
-    LocalDate repeat = (event.getRepeatDate() != null) ? event.getRepeatDate() : null;
-    LocalDateTime rDt = (event.getRepeatDateTime() != null) ? event.getRepeatDateTime() : null;
-
-    List<Event> eventList = events.stream()
-            .filter(e -> e.getStartDateTime() != null && e.getEndDateTime() != null)
-            .filter(e -> (e.getStartDateTime() != null &&
-                    (e.getStartDateTime().isAfter(start) || e.getStartDateTime().isEqual(start)))
-                    || (e.getEndDateTime() != null &&
-                    (e.getEndDateTime().isBefore(end) || e.getEndDateTime().isEqual(end)))
-                    || (e.getAllDate() != null &&
-                    (e.getAllDate().isAfter(allDate) || e.getAllDate().equals(allDate)))
-                    || (e.getRepeatDate() != null &&
-                    (e.getRepeatDate().isAfter(repeat) || e.getRepeatDate().equals(repeat)))
-                    || (e.getRepeatDateTime() != null && (e.getRepeatDateTime().isAfter(rDt)
-                    || e.getRepeatDateTime().equals(rDt))))
-            .collect(Collectors.toList());
-
-    return getEventDetails(eventList);
-  }
-
-
-  @Override
   public List<Map<String,Object>> getEventForDisplay(String subject) {
     List<Event> eventList = events.stream().filter(e -> e.getSubject().equals(subject))
             .collect(Collectors.toList());
@@ -274,6 +248,9 @@ public class CalenderEventManager implements CalendarEvent {
 
   @Override
   public List<Map<String,Object>> getEventForDisplay(LocalDateTime startTime, LocalDateTime endTime) {
+    if(startTime == null && endTime == null) {
+      return null;
+    }
     LocalDate allDate = (startTime != null) ? startTime.toLocalDate() : null;
     LocalDate repeat = (endTime != null) ? endTime.toLocalDate() : null;
 
@@ -302,6 +279,9 @@ public class CalenderEventManager implements CalendarEvent {
 
   @Override
   public List<Map<String,Object>> getEventForDisplay(LocalDate startDate, LocalDate endDate) {
+    if(startDate == null && endDate == null) {
+      return null;
+    }
     return null;
   }
 

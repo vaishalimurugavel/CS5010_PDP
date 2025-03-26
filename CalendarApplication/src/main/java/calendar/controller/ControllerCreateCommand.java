@@ -33,29 +33,25 @@ import calendar.model.EventKeys;
  */
 public class ControllerCreateCommand implements ControllerCommand {
 
-  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
-          .ofPattern("yyyy-MM-dd HH:mm");
-  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter
-          .ofPattern("yyyy-MM-dd");
 
   private static boolean checkIfOverlapDates(String startDate, String endDate) {
     String datePattern = "\\d{4}-\\d{2}-\\d{2}";
     Pattern pattern = Pattern.compile(datePattern);
     Matcher startmatcher = pattern.matcher(startDate);
     Matcher endMatcher = pattern.matcher(endDate);
-    String datePattern2 = "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}";
+    String datePattern2 = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}";
     Pattern pattern2 = Pattern.compile(datePattern2);
     Matcher startmatcher2 = pattern2.matcher(startDate);
     Matcher endMatcher2 = pattern2.matcher(endDate);
 
 
     if (startmatcher.matches() && endMatcher.matches()) {
-      LocalDate startTime = LocalDate.parse(startDate, DATE_FORMATTER);
-      LocalDate endTime = LocalDate.parse(endDate, DATE_FORMATTER);
+      LocalDate startTime = LocalDate.parse(startDate, DateTimeFormatter.ISO_DATE);
+      LocalDate endTime = LocalDate.parse(endDate, DateTimeFormatter.ISO_DATE);
       return startTime.isBefore(endTime) || startTime.equals(endTime);
     } else if (startmatcher2.matches() && endMatcher2.matches()) {
-      LocalDateTime startTime = LocalDateTime.parse(startDate, DATE_TIME_FORMATTER);
-      LocalDateTime endTime = LocalDateTime.parse(endDate, DATE_TIME_FORMATTER);
+      LocalDateTime startTime = LocalDateTime.parse(startDate, DateTimeFormatter.ISO_DATE_TIME);
+      LocalDateTime endTime = LocalDateTime.parse(endDate, DateTimeFormatter.ISO_DATE_TIME);
       return startTime.isBefore(endTime) || startTime.equals(endTime);
     }
     return false;
@@ -67,15 +63,15 @@ public class ControllerCreateCommand implements ControllerCommand {
     String basePattern = "create event( --autoDecline)? (.+?)";
     String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
     String singleAllDay = basePattern + " on (\\d{4}-\\d{2}-\\d{2})" + otherInfo;
-    String singleAllDateTime = basePattern + " on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})"
+    String singleAllDateTime = basePattern + " on (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})"
             + otherInfo;
-    String singleEventPatternCommon = basePattern + " from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) " +
-            "to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
+    String singleEventPatternCommon = basePattern + " from (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) " +
+            "to (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})";
     String singleEventPattern = singleEventPatternCommon + otherInfo;
     String recurringForNTimesPattern = singleEventPatternCommon + " repeats ([MTWRFSU]+) " +
             "for (\\d+) times" + otherInfo;
     String recurringUntilPattern = singleEventPatternCommon + " repeats ([MTWRFSU]+) until " +
-            "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" + otherInfo;
+            "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})" + otherInfo;
     String allDayEventPatternCommon = basePattern + " on (\\d{4}-\\d{2}-\\d{2})";
     String allDayEventPattern = allDayEventPatternCommon + " on (\\d{4}-\\d{2}-\\d{2})"
             + otherInfo;
@@ -131,7 +127,7 @@ public class ControllerCreateCommand implements ControllerCommand {
     Map<String, Object> eventDetails = new HashMap<>();
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
     eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
-    eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDay.group(3), DATE_FORMATTER));
+    eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDay.group(3), DateTimeFormatter.ISO_DATE));
     String otherinfo = null;
     boolean flag = mAllDay.group(4) != null;
     if (flag) {
@@ -159,10 +155,10 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
     eventDetails.put(EventKeys.SUBJECT, mAllDayRecurringUntil.group(2));
     eventDetails.put(EventKeys.ALLDAY_DATE,
-            LocalDate.parse(mAllDayRecurringUntil.group(3), DATE_FORMATTER));
+            LocalDate.parse(mAllDayRecurringUntil.group(3), DateTimeFormatter.ISO_DATE));
     eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringUntil.group(4));
     eventDetails.put(EventKeys.REPEAT_DATE,
-            LocalDate.parse(mAllDayRecurringUntil.group(5), DATE_FORMATTER));
+            LocalDate.parse(mAllDayRecurringUntil.group(5), DateTimeFormatter.ISO_DATE));
     String otherinfo;
     boolean flag = mAllDayRecurringUntil.group(6) != null;
     if (flag) {
@@ -187,7 +183,7 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
     eventDetails.put(EventKeys.SUBJECT, mAllDayRecurringForN.group(2));
     eventDetails.put(EventKeys.ALLDAY_DATE,
-            LocalDate.parse(mAllDayRecurringForN.group(3), DATE_FORMATTER));
+            LocalDate.parse(mAllDayRecurringForN.group(3), DateTimeFormatter.ISO_DATE));
     eventDetails.put(EventKeys.WEEKDAYS, mAllDayRecurringForN.group(4));
     eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mAllDayRecurringForN.group(5)));
     String otherinfo = null;
@@ -216,7 +212,7 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingleAllDateTime.group(2));
     eventDetails.put(EventKeys.START_DATETIME,
-            LocalDateTime.parse(mSingleAllDateTime.group(3), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mSingleAllDateTime.group(3), DateTimeFormatter.ISO_DATE_TIME));
     String otherinfo = null;
     boolean flag = mSingleAllDateTime.group(4) != null;
     if (flag) {
@@ -243,7 +239,7 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingleAllDay.group(2));
     eventDetails.put(EventKeys.ALLDAY_DATE,
-            LocalDate.parse(mSingleAllDay.group(3), DATE_FORMATTER));
+            LocalDate.parse(mSingleAllDay.group(3), DateTimeFormatter.ISO_DATE));
     String otherinfo = null;
     boolean flag = mSingleAllDay.group(4) != null;
     if (flag) {
@@ -273,9 +269,9 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mSingle.group(2));
     eventDetails.put(EventKeys.START_DATETIME, LocalDateTime.parse(mSingle.group(3),
-            DATE_TIME_FORMATTER));
+            DateTimeFormatter.ISO_DATE_TIME));
     eventDetails.put(EventKeys.END_DATETIME, LocalDateTime.parse(mSingle.group(4),
-            DATE_TIME_FORMATTER));
+            DateTimeFormatter.ISO_DATE_TIME));
     String otherinfo = null;
     boolean flag = mSingle.group(5) != null;
     if (flag) {
@@ -303,12 +299,12 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mRecurringUntil.group(2));
     eventDetails.put(EventKeys.START_DATETIME,
-            LocalDateTime.parse(mRecurringUntil.group(3), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mRecurringUntil.group(3), DateTimeFormatter.ISO_DATE_TIME));
     eventDetails.put(EventKeys.END_DATETIME,
-            LocalDateTime.parse(mRecurringUntil.group(4), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mRecurringUntil.group(4), DateTimeFormatter.ISO_DATE_TIME));
     eventDetails.put(EventKeys.WEEKDAYS, mRecurringUntil.group(5));
     eventDetails.put(EventKeys.REPEAT_DATETIME,
-            LocalDateTime.parse(mRecurringUntil.group(6), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mRecurringUntil.group(6), DateTimeFormatter.ISO_DATE_TIME));
     String otherinfo = null;
     boolean flag = mRecurringUntil.group(7) != null;
     if (flag) {
@@ -336,9 +332,9 @@ public class ControllerCreateCommand implements ControllerCommand {
     eventDetails.put(EventKeys.AUTO_DECLINE, true);
     eventDetails.put(EventKeys.SUBJECT, mRecurringForN.group(2));
     eventDetails.put(EventKeys.START_DATETIME,
-            LocalDateTime.parse(mRecurringForN.group(3), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mRecurringForN.group(3), DateTimeFormatter.ISO_DATE_TIME));
     eventDetails.put(EventKeys.END_DATETIME,
-            LocalDateTime.parse(mRecurringForN.group(4), DATE_TIME_FORMATTER));
+            LocalDateTime.parse(mRecurringForN.group(4), DateTimeFormatter.ISO_DATE_TIME));
     eventDetails.put(EventKeys.WEEKDAYS, mRecurringForN.group(5));
     eventDetails.put(EventKeys.OCCURRENCES, Integer.parseInt(mRecurringForN.group(6)));
     String otherinfo = null;

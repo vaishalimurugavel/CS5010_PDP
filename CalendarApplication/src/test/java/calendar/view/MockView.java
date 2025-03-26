@@ -1,0 +1,49 @@
+package calendar.view;
+
+import java.util.List;
+import java.util.Map;
+import java.io.OutputStream;
+import java.io.IOException;
+
+import calendar.view.CalendarView;
+
+public class MockView extends CalendarView {
+
+  private String viewName;
+
+  public MockView(String viewName) {
+    super(System.out);
+    this.viewName = viewName;
+  }
+
+  public String getViewName() {
+    return viewName;
+  }
+
+  private StringBuilder output;
+
+  public MockView(OutputStream output) {
+    super(output);
+    this.output = new StringBuilder();
+  }
+
+  @Override
+  public void displayOutput(List<Map<String, Object>> eventList) throws IOException {
+    if (eventList != null && !eventList.isEmpty()) {
+      for (Map<String, Object> event : eventList) {
+        output.append("Event: ").append(event.get("subject")).append("\n");
+      }
+    } else {
+      output.append("No events available\n");
+    }
+  }
+
+  @Override
+  public void displayOutput(String msg) throws IOException {
+    output.append(msg).append("\n");
+  }
+
+  public String getOutput() {
+    return output.toString();
+  }
+}

@@ -36,12 +36,12 @@ public class ControllerGroupCommand implements ControllerCommand {
 
     String targetPattern = " --target ([A-Za-z0-9_]+)";
 
-    String copyCalendar = "copy event (.+?) on (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})"
-            + targetPattern + " to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
+    String copyCalendar = "copy event (.+?) on (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})"
+            + targetPattern + " to (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})";
     Pattern copyCalPattern = Pattern.compile(copyCalendar);
     Matcher copyCalMatcher = copyCalPattern.matcher(command);
 
-    String copyCalendar1 = "copy event (.+?) on (\\d{4}-\\d{2}-\\d{2})" + targetPattern
+    String copyCalendar1 = "copy event ([A-Za-z0-9_]+) on (\\d{4}-\\d{2}-\\d{2})" + targetPattern
             + " to (\\d{4}-\\d{2}-\\d{2})";
     Pattern copyCalPattern1 = Pattern.compile(copyCalendar1);
     Matcher copyCalMatcher1 = copyCalPattern1.matcher(command);
@@ -52,8 +52,7 @@ public class ControllerGroupCommand implements ControllerCommand {
     Pattern copyCalPattern2 = Pattern.compile(copyCalendar2);
     Matcher copyCalMatcher2 = copyCalPattern2.matcher(command);
 
-
-    String editCalendar = "edit calendar --name ([A-Za-z0-9_]+) --property ([A-Za-z0-9_]+) ([A-Za-z0-9_]+)";
+    String editCalendar = "edit calendar --name ([A-Za-z0-9_]+) --property (timezone ([A-Za-z]+/[A-Za-z_]+)|name ([A-Za-z]+))";
     Pattern editCalPattern = Pattern.compile(editCalendar);
     Matcher editCalMatcher = editCalPattern.matcher(command);
 
@@ -103,17 +102,18 @@ public class ControllerGroupCommand implements ControllerCommand {
       }
     } else if (copyCalMatcher1.matches()) {
       String cal2 = copyCalMatcher1.group(3);
-      LocalDate on = LocalDate.parse(copyCalMatcher1.group(1));
-      LocalDate to = LocalDate.parse(copyCalMatcher1.group(2));
+      String eventName = copyCalMatcher1.group(1);
+      LocalDate on = LocalDate.parse(copyCalMatcher1.group(2));
+      LocalDate to = LocalDate.parse(copyCalMatcher1.group(4));
       ZoneId targetZone = CalendarFactory.getGroup().getCalendar(cal2).getZoneId();
 
       List<Map<String, Object>> events = CalendarFactory.getModel().getEventsForDisplay();
       events = events.stream().filter(
               (e) -> {
                 LocalDate eventDate = ((LocalDate) e.get(EventKeys.ALLDAY_DATE));
-                return eventDate.isEqual(on)
+                return (eventDate.isEqual(on)
                         || (eventDate.isAfter(on) && eventDate.isBefore(to))
-                        || (eventDate.isEqual(to));
+                        || (eventDate.isEqual(to)) && e.get(EventKeys.SUBJECT).equals(eventName));
               }).collect(Collectors.toList());
 
       for (Map<String, Object> event : events) {

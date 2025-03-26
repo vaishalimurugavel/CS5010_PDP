@@ -32,14 +32,12 @@ import calendar.model.EventKeys;
  **/
 public class ControllerEditCommand implements ControllerCommand {
 
-  private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter
-          .ofPattern("yyyy-MM-dd HH:mm");
   
   @Override
   public void execute(String command) {
-    String pattern1 = "edit event (\\w+) (.+?) from " + "(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})" 
-            + " to (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) with (.+)";
-    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) " 
+    String pattern1 = "edit event (\\w+) (.+?) from " + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})" 
+            + " to (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) with (.+)";
+    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) " 
             + "with (.+)";
     String pattern3 = "edit events (\\w+) (.+?) (.+)";
 
@@ -55,8 +53,8 @@ public class ControllerEditCommand implements ControllerCommand {
     if (m1.matches()) {
       String property = m1.group(1);
       String eventName = m1.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DATE_TIME_FORMATTER);
-      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DATE_TIME_FORMATTER);
+      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DateTimeFormatter.ISO_DATE_TIME);
+      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DateTimeFormatter.ISO_DATE_TIME);
       String newValue = m1.group(5);
 
       eventDes.put(EventKeys.PROPERTY, property);
@@ -69,7 +67,7 @@ public class ControllerEditCommand implements ControllerCommand {
     } else if (m2.matches()) {
       String property = m2.group(1);
       String eventName = m2.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DATE_TIME_FORMATTER);
+      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DateTimeFormatter.ISO_DATE_TIME);
       String newValue = m2.group(4);
 
       eventDes.put(EventKeys.PROPERTY, property);

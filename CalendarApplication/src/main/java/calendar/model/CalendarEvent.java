@@ -43,14 +43,6 @@ public interface CalendarEvent {
   List<Map<String, Object>> getEventsForDisplay();
 
   /**
-   * Retrieves events that match the given event's properties.
-   *
-   * @param event The event whose properties are used to filter events.
-   * @return A list of events that match the given event's properties.
-   */
-  List<Map<String, Object>> getEventForDisplay(Event event);
-
-  /**
    * Retrieves events that match the specified subject.
    *
    * @param subject The subject of the event to search for.

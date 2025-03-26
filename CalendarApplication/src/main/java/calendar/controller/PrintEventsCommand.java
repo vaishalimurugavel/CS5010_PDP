@@ -17,16 +17,12 @@ import java.util.regex.Pattern;
  **/
 class PrintEventsCommand implements ControllerCommand {
 
-  private static final DateTimeFormatter DATE_TIME_FORMATTER =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-  private static final DateTimeFormatter DATE_FORMATTER =
-          DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   @Override
   public void execute(String command) {
     String pattern1 = "print events on (\\d{4}-\\d{2}-\\d{2})";
-    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}) to" +
-            " (\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2})";
+    String pattern2 = "print events from (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) to" +
+            " (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})";
 
     Pattern p1 = Pattern.compile(pattern1);
     Matcher m1 = p1.matcher(command);
@@ -36,7 +32,7 @@ class PrintEventsCommand implements ControllerCommand {
 
     if (m1.matches()) {
       try {
-        LocalDate localDate = LocalDate.parse(m1.group(1), DATE_FORMATTER);
+        LocalDate localDate = LocalDate.parse(m1.group(1), DateTimeFormatter.ISO_DATE);
 
         CalendarFactory.getView().displayOutput(CalendarFactory.getModel()
                 .getEventForDisplay(localDate, null));
@@ -49,8 +45,8 @@ class PrintEventsCommand implements ControllerCommand {
     }
     else if (m2.matches()) {
       try {
-        LocalDateTime start = LocalDateTime.parse(m2.group(1), DATE_TIME_FORMATTER);
-        LocalDateTime end = LocalDateTime.parse(m2.group(2), DATE_TIME_FORMATTER);
+        LocalDateTime start = LocalDateTime.parse(m2.group(1), DateTimeFormatter.ISO_DATE_TIME);
+        LocalDateTime end = LocalDateTime.parse(m2.group(2), DateTimeFormatter.ISO_DATE_TIME);
 
         CalendarFactory.getView().displayOutput(CalendarFactory.getModel()
                 .getEventForDisplay(start, end));

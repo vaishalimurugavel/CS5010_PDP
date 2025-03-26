@@ -48,4 +48,19 @@ public interface CalendarGroup {
    * @return The `Calendars` object representing the calendar.
    */
   Calendars getCalendar(String name);
+
+  /**
+   * Retrieves the calendar associated with the specified name.
+   *
+   * @param name The name of the calendar to retrieve.
+   * @return The `Calendars` object representing the calendar.
+   */
+  Calendars setCurrentCalendar(String name);
+
+  /**
+   * Retrieves the calendar currently in use.
+   *
+   * @return The `Calendars` object representing the calendar.
+   */
+  Calendars getCurrentCalendar();
 }

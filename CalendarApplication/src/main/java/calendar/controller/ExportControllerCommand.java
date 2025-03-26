@@ -17,10 +17,13 @@ import calendar.view.CalendarView;
 class ExportControllerCommand implements ControllerCommand {
   @Override
   public void execute(String command) {
+    if(command == null || command.isEmpty()){
+      throw new IllegalArgumentException("command is null or empty");
+    }
     CalendarView export = CalendarFactory.getExport();
     try {
       String path = null;
-      String exportPattern = "export ([A-Za-z0-9_\\-]+) ([A-Za-z0-9_\\-]+).csv";
+      String exportPattern = "export ([A-Za-z0-9_\\-]+) ([A-Za-z0-9_\\-\\\\:]+).csv";
       Pattern create = Pattern.compile(exportPattern);
       Matcher createMatcher = create.matcher(command);
       if(createMatcher.matches()) {

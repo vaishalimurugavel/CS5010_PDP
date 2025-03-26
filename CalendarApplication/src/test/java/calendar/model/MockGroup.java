@@ -43,4 +43,14 @@ public class MockGroup implements CalendarGroup{
   public Calendars getCalendar(String name) {
     return null;
   }
+
+  @Override
+  public Calendars setCurrentCalendar(String name) {
+    return null;
+  }
+
+  @Override
+  public Calendars getCurrentCalendar() {
+    return null;
+  }
 }

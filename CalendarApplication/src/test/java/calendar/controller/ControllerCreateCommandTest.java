@@ -21,7 +21,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testSingleEventCreation() {
-    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location room1 description meeting public";
+    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
+            "room1 description meeting public";
 
     // Call the method to execute the command
     controllerCreateCommand.execute(command);
@@ -41,7 +42,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testAllDayEventCreation() {
-    String command = "create event subject on 2025-03-25 location room1 description meeting public";
+    String command = "create event subject on 2025-03-25 location room1" +
+            " description meeting public";
 
     controllerCreateCommand.execute(command);
 
@@ -56,7 +58,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testRecurringEventCreation() {
-    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 repeats MTWRFSU for 5 times location room1 description meeting public";
+    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 repeats " +
+            "MTWRFSU for 5 times location room1 description meeting public";
 
     controllerCreateCommand.execute(command);
 
@@ -71,7 +74,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testInvalidDateFormat() {
-    String command = "create event subject from 2025-03-25T10:00 to 2025-03-24T12:00 location room1 description meeting public";
+    String command = "create event subject from 2025-03-25T10:00 to 2025-03-24T12:00 location" +
+            " room1 description meeting public";
 
     IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> {
       controllerCreateCommand.execute(command);
@@ -82,7 +86,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testAllDayRecurringEventCreation() {
-    String command = "create event subject on 2025-03-25 repeats MTWRFSU for 5 times location room1 description meeting public";
+    String command = "create event subject on 2025-03-25 repeats MTWRFSU for 5 times location" +
+            " room1 description meeting public";
 
     controllerCreateCommand.execute(command);
 
@@ -124,7 +129,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testEventWithoutDescription() {
-    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location room1 public";
+    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00" +
+            " location room1 public";
 
     controllerCreateCommand.execute(command);
 
@@ -138,7 +144,8 @@ public class ControllerCreateCommandTest {
 
   @Test
   public void testEventWithPrivateFlag() {
-    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location room1 description meeting private";
+    String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
+            "room1 description meeting private";
 
     controllerCreateCommand.execute(command);
 

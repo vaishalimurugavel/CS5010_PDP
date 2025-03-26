@@ -14,6 +14,7 @@ import java.util.Map;
 public class CalendarGroupManager implements CalendarGroup{
 
   static Map<String, Calendars> calendarGroups = new HashMap<>();
+  Calendars currentCalendar;
 
   @Override
   public CalendarEvent getCalendarEvent(String groupName) {
@@ -35,6 +36,22 @@ public class CalendarGroupManager implements CalendarGroup{
     }
     return null;
   }
+
+  @Override
+  public Calendars setCurrentCalendar(String name) {
+    currentCalendar = getCalendar(name);
+    return currentCalendar;
+  }
+
+  @Override
+  public Calendars getCurrentCalendar() {
+    if(currentCalendar == null) {
+      return null;
+    }
+    return currentCalendar;
+  }
+
+
 
   @Override
   public boolean checkForDuplicates(String name) {
@@ -59,10 +76,13 @@ public class CalendarGroupManager implements CalendarGroup{
       String newValue = (String) prop.get(EventKeys.NEW_VALUE);
       if( propertyName.equals(EventKeys.CALENDAR_NAME)) {
         calendars.setTitle(newValue);
+        calendarGroups.remove(groupName);
+        calendarGroups.put(newValue, calendars);
       }
       else if(propertyName.equals(EventKeys.TIMEZONE)) {
         calendars.setZoneName(newValue);
       }
+
     } else {
       throw new IllegalArgumentException ("No Calendar available with the name " + groupName);
     }

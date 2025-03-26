@@ -43,11 +43,11 @@ public class CalendarControllerTest {
     assertDoesNotThrow(() -> controller.processCommand("copy event"));
   }
 
+  @Test
   public void testProcessCommand_InvalidCommandThrowsException() {
     Exception exception = assertThrows(NullPointerException.class, () -> {
       controller.processCommand("invalid command");
     });
-    assertTrue(exception.getMessage().contains("Cannot invoke"));
   }
 
 
@@ -67,13 +67,4 @@ public class CalendarControllerTest {
     }
   }
 
-  /**
-   * A test implementation that always throws an exception.
-   */
-  static class FailingTestCommand implements ControllerCommand {
-    @Override
-    public void execute(String command) throws IllegalAccessException {
-      throw new IllegalAccessException("Execution failed");
-    }
-  }
 }

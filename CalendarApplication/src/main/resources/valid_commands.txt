@@ -1,15 +1,23 @@
-create event --autoDecline Event1 from 2025-03-10 10:00 to 2025-03-11 10:00 location Shillman hall description Event1 at Shillman Hall private
-create event --autoDecline Event2 from 2025-03-11 10:30 to 2025-03-12 10:00 repeats MTW for 3 times location Ryder hall description Event2 at Ryder Hall private
-create event --autoDecline Event3 from 2025-03-13 10:00 to 2025-03-14 10:00 repeats MTW until 2025-03-19 10:00
-create event --autoDecline Event4 on 2025-03-14 10:00
-create event Event5 on 2025-03-10 repeats MTW for 6 times
-create event Event6 on 2025-03-10 repeats TRF until 2025-03-25
+create calendar --name WorkCalendar --timezone America/New_York
+use calendar --name WorkCalendar
+edit calendar --name WorkCalendar --property timezone America/Los_Angeles
+create event --autoDecline Event1 from 2025-03-26T10:00 to 2025-03-27T10:00 location Shillman hall description Event1 at Shillman Hall private
+create event --autoDecline Event2 from 2025-03-27T10:30 to 2025-03-28T10:00 repeats MTW for 3 times location Ryder hall description Event2 at Ryder Hall private
+create event --autoDecline Event3 from 2025-03-28T10:10 to 2025-03-29T10:00 repeats MTW until 2025-03-19T10:00
+create event --autoDecline Event4 on 2025-03-25T10:20
+create event Event5 on 2025-03-30 repeats MTW for 6 times
+create event Event6 on 2025-03-21 repeats TRF until 2025-03-25
 export cal Created.csv
-edit event subject Event2 from 2025-03-22 10:00 to 2025-03-24 10:00 with Event2Edited
-edit events subject Event3 from 2025-03-25 10:00 with Event3Edited
+edit event subject Event2 from 2025-03-27T10:00 to 2025-03-28T10:00 with Event2Edited
+edit events subject Event3 from 2025-03-28T10:00 with Event3Edited
 edit events subject Event5 Event5Edited
 export cal Edited.csv
-print events on 2025-03-11
-print events from 2025-03-10 10:00 to 2025-03-25 10:00
-show status on 2025-03-10 10:00
+print events on 2025-03-20
+print events from 2025-03-28T10:10 to 2025-03-29T10:00
+show status on 2025-03-28T10:10
+create calendar --name HomeCalendar --timezone America/New_York
+use calendar --name WorkCalendar
+copy event Event3 on 2025-03-28T10:10 --target HomeCalendar to 2025-03-25T12:00
+use calendar --name HomeCalendar
+export cal HomeCalendar.csv
 exit

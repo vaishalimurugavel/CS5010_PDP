@@ -10,8 +10,7 @@ import calendar.model.CalenderEventManager;
 import calendar.view.CalendarSimpleView;
 
 import static org.junit.Assert.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 public class ControllerPrintCommandTest {
 
@@ -63,7 +62,7 @@ public class ControllerPrintCommandTest {
     outputStream.reset();
     String validCommand = "print events from 2025-03-26T10:00 to 2025-03-29T12:00";
 
-    assertDoesNotThrow(() -> command.execute(validCommand));
+    command.execute(validCommand);
     String output = outputStream.toString();
     assertTrue(output.contains("subject"));
     assertTrue(output.contains("subject2"));
@@ -87,8 +86,7 @@ public class ControllerPrintCommandTest {
     Exception exception = assertThrows(RuntimeException.class,
             () -> command.execute(invalidCommand));
 
-    assertTrue(exception.getMessage().contains("Invalid print command format"),
-            "Expected error for incorrect command structure.");
+    assertTrue(exception.getMessage().contains("Invalid print command format"));
   }
 
   @Test
@@ -99,8 +97,7 @@ public class ControllerPrintCommandTest {
     Exception exception = assertThrows(IllegalArgumentException.class,
             () -> command.execute(invalidCommand));
 
-    assertTrue(exception.getMessage().contains("Invalid print command format"),
-            "Expected error for incorrect command structure.");
+    assertTrue(exception.getMessage().contains("Invalid print command format"));
   }
 
 }

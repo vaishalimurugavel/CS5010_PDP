@@ -6,7 +6,9 @@ import calendar.model.CalenderEventManager;
 import calendar.model.EventKeys;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 
 public class ControllerEditCommandTest {
 

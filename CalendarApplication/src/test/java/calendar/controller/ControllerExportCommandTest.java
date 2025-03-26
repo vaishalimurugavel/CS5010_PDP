@@ -4,40 +4,40 @@ package calendar.controller;
 import org.junit.Before;
 import org.junit.Test;
 
-import calendar.model.CalenderEventManager;
-import calendar.model.EventKeys;
-import calendar.view.CalendarExport;
-import calendar.view.CalendarView;
-import calendar.model.CalendarEvent;
-
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import calendar.model.CalendarEvent;
+import calendar.model.CalenderEventManager;
+import calendar.model.EventKeys;
+
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class ControllerExportCommandTest {
 
   private ExportControllerCommand exportController;
-  private CalendarView exportView;
   private CalendarEvent model;
+  private static final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
 
   @Before
   public void setUp() {
+    System.setOut(new PrintStream(outputStream));
     exportController = new ExportControllerCommand();
-    exportView = new CalendarExport(System.out); // Using console output for testing
     model = new CalenderEventManager();
-
-    // Set the factory components
-    CalendarFactory.setExport(exportView);
     CalendarFactory.setModel(model);
   }
 
   @Test
   public void testValidExportCommand() throws IOException {
     // Create a temporary file path for testing
-    File tempFile = new File("test_output.csv");
+    File tempFile = new File("test_output1.csv");
     String validCommand = "export CalendarName " + tempFile.getAbsolutePath();
 
     Map<String, Object> event = new HashMap<>();
@@ -48,8 +48,8 @@ public class ControllerExportCommandTest {
 
     exportController.execute(validCommand);
 
-    assertTrue(tempFile.exists(), "Export file should be created");
-    assertTrue(tempFile.length() > 0, "Export file should contain data");
+    assertTrue(tempFile.exists());
+    assertTrue(tempFile.length() > 0);
   }
 
 
@@ -72,4 +72,5 @@ public class ControllerExportCommandTest {
 
     assertTrue(exception.getMessage().contains("command is null or empty"));
   }
+
 }

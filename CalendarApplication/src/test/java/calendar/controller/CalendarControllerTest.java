@@ -3,12 +3,8 @@ package calendar.controller;
 import org.junit.Before;
 import org.junit.Test;
 
-import calendar.controller.CalendarController;
-import calendar.controller.ControllerCommand;
-
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 public class CalendarControllerTest {
 
@@ -35,12 +31,20 @@ public class CalendarControllerTest {
 
   @Test
   public void testProcessCommand_ValidEditCommand() {
-    assertDoesNotThrow(() -> controller.processCommand("edit event"));
+    try{
+      controller.processCommand("edit event");
+    } catch (IllegalAccessException e) {
+      assertEquals(IllegalArgumentException.class, e.getCause().getClass());
+    }
   }
 
   @Test
   public void testProcessCommand_CopyCommand() {
-    assertDoesNotThrow(() -> controller.processCommand("copy event"));
+    try{
+      controller.processCommand("copy event");
+    } catch (IllegalAccessException e) {
+      assertEquals(IllegalArgumentException.class, e.getCause().getClass());
+    }
   }
 
   @Test

@@ -7,7 +7,9 @@ import calendar.model.EventKeys;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 public class ControllerCreateCommandTest {
 
@@ -24,16 +26,12 @@ public class ControllerCreateCommandTest {
     String command = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
             "room1 description meeting public";
 
-    // Call the method to execute the command
     controllerCreateCommand.execute(command);
 
-    // Retrieve the event details (assuming the event has been added to the calendar model)
     Map<String, Object> eventDetails = CalendarFactory.getModel().getEventsForDisplay().get(0);
 
-    // Check if the event type is correct
     assertEquals("false", eventDetails.get(EventKeys.EVENT_TYPE));
 
-    // Validate event details
     assertEquals("subject", eventDetails.get(EventKeys.SUBJECT));
     assertEquals("room1", eventDetails.get(EventKeys.LOCATION));
     assertEquals("meeting", eventDetails.get(EventKeys.DESCRIPTION));

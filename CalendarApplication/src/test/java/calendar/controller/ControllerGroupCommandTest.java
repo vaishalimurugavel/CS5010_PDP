@@ -1,13 +1,13 @@
 package calendar.controller;
 
 
+import org.junit.Before;
+import org.junit.Test;
+
 import calendar.model.CalendarGroupManager;
 import calendar.model.Calendars;
 import calendar.model.CalenderEventManager;
 import calendar.model.EventKeys;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 
 import java.io.ByteArrayOutputStream;
@@ -15,7 +15,10 @@ import java.io.PrintStream;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
+
 
 public class ControllerGroupCommandTest {
 
@@ -24,7 +27,7 @@ public class ControllerGroupCommandTest {
 
   private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-  @BeforeEach
+  @Before
   public void setUp() {
     controllerGroupCommand = new ControllerGroupCommand();
     controllerCreateCommand = new ControllerCreateCommand();

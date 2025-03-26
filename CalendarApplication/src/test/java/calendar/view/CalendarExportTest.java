@@ -1,15 +1,21 @@
 package calendar.view;
 
-import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
 import calendar.model.EventKeys;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 
 public class CalendarExportTest {
 
@@ -23,7 +29,6 @@ public class CalendarExportTest {
     calendarExport = new CalendarExport(output);
     eventList = new ArrayList<>();
 
-    // Setup a sample event
     Map<String, Object> event = new HashMap<>();
     event.put(EventKeys.SUBJECT, "Meeting");
     event.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-03-25T09:00"));
@@ -138,4 +143,35 @@ public class CalendarExportTest {
 
     assertEquals("Export class!", result);
   }
+
+  class FailingOutputStream extends OutputStream {
+    @Override
+    public void write(int b) throws IOException {
+    }
+
+    @Override
+    public void close() throws IOException {
+      throw new IOException("Simulated IO exception on close");
+    }
+  }
+
+  @Test
+  public void testCloseNormal() throws IOException {
+    OutputStream outputStream = new FailingOutputStream() {
+      @Override
+      public void close() throws IOException {
+        //simulation
+      }
+    };
+    CalendarExport calendarExport = new CalendarExport(outputStream);
+    calendarExport.close();
+  }
+  @Test
+  public void testCloseThrowsIOException() {
+    OutputStream outputStream = new FailingOutputStream();
+    CalendarExport calendarExport = new CalendarExport(outputStream);
+
+    assertThrows(IOException.class, () -> calendarExport.close());
+  }
+
 }

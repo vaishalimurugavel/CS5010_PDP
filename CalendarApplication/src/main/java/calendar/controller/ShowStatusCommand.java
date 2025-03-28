@@ -27,11 +27,10 @@ class ShowStatusCommand implements ControllerCommand {
     if (m.matches()) {
       LocalDateTime start = LocalDateTime.parse(m.group(1), DateTimeFormatter.ISO_DATE_TIME);
       try {
-        List<Map<String, Object >> res = CalendarFactory.getModel().getUserStatus(start);
-        if(!res.isEmpty()) {
+        List<Map<String, Object>> res = CalendarFactory.getModel().getUserStatus(start);
+        if (!res.isEmpty()) {
           comment = "User is BUSY!\n";
-        }
-        else {
+        } else {
           comment = "User is not BUSY!\n";
         }
         CalendarFactory.getView().displayOutput(comment);

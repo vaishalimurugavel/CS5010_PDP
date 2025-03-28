@@ -1,2 +1,10 @@
 create calendar --name WorkCalendar --timezone America/New_York
-create event --autoDecline Event1 from 2025-03-26T10:00 to 2025-03-27T10:00 location Shillman hall description Event1 at Shillman Hall private
+use calendar --name WorkCalendar
+create event --autoDecline Event1 from 2025-03-10T10:00 to 2025-03-12T10:00 location Shillman hall description Event1 at Shillman Hall private
+create event --autoDecline Event4 on 2025-03-25
+export cal WorkCalendar.csv
+create calendar --name WorkCalendar1 --timezone America/Los_Angeles
+copy events on 2025-03-25 --target WorkCalendar1 to 2025-03-26
+copy events between 2025-03-10 and 2025-03-25 --target WorkCalendar1 to 2025-03-30
+use calendar --name WorkCalendar1
+export cal WorkCalendar1.csv

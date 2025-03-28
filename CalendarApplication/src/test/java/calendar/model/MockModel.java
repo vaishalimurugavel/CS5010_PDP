@@ -17,14 +17,25 @@ public class MockModel implements CalendarEvent {
 
   private String name;
 
+  /**
+   * Constructor for MockModel.
+   * @param name String
+   */
   public MockModel(String name) {
     this.name = name;
   }
 
+  /**
+   * Getter class for name.
+   * @return String
+   */
   public String getName() {
     return name;
   }
 
+  /**
+   * Constructor for Mockmodel.
+   */
   public MockModel() {
     events = new ArrayList<>();
     // Adding mock data
@@ -50,7 +61,7 @@ public class MockModel implements CalendarEvent {
 
   @Override
   public void updateEvent(Map<String, Object> eventsMap) {
-
+    //Do nothing
   }
 
   @Override
@@ -65,7 +76,8 @@ public class MockModel implements CalendarEvent {
   }
 
   @Override
-  public List<Map<String, Object>> getEventForDisplay(LocalDateTime startTime, LocalDateTime endTime) {
+  public List<Map<String, Object>> getEventForDisplay(LocalDateTime startTime,
+                                                      LocalDateTime endTime) {
     return getEventsForDisplay();
   }
 
@@ -77,6 +89,11 @@ public class MockModel implements CalendarEvent {
   @Override
   public List<Map<String, Object>> getUserStatus(LocalDateTime date) {
     return getEventsForDisplay();
+  }
+
+  @Override
+  public List<Map<String, Object>> getEvents() {
+    return List.of();
   }
 
 }

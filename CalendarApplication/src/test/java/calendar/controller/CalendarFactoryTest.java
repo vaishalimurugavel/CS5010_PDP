@@ -4,13 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
-import calendar.model.CalendarEvent;
 import calendar.model.CalendarGroup;
 import calendar.model.MockGroup;
-import calendar.model.MockModel;
 import calendar.view.CalendarView;
 import calendar.view.MockView;
 
@@ -19,17 +15,18 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 /**
- * Test class for CalendarFactory class. Tests if all the method invoked performs the intended operation.
+ * <p>
+ * Test class for CalendarFactory class. Tests if all the method invoked performs
+ * the intended operation.
+ * </p>
  */
 public class CalendarFactoryTest {
 
-  private CalendarEvent calendarEvent;
   private CalendarView calendarView;
   private CalendarGroup calendarGroup;
 
   @Before
   public void setUp() {
-    calendarEvent = new MockModel("Meeting");
     calendarView = new MockView("Monthly View");
     calendarGroup = new MockGroup("Work Group");
 

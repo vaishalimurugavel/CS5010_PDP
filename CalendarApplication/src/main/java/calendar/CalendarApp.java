@@ -29,9 +29,8 @@ public class CalendarApp {
    */
   public static void main(String[] args) {
     if (args.length < 2 || !args[0].equalsIgnoreCase("--mode")) {
-      System.err.println("Usage:");
-      System.err.println("  java CalendarApp --mode interactive");
-      System.err.println("  java CalendarApp --mode headless <filename>");
+      System.err.println("Usage: \n java CalendarApp --mode interactive " +
+              "\n java CalendarApp --mode headless <filename>");
       return;
     }
 
@@ -85,7 +84,7 @@ public class CalendarApp {
       }
       try {
         controller.processCommand(command);
-      } catch (IllegalAccessException e) {
+      } catch (IllegalArgumentException e) {
         System.err.println("Error! Could not process command: " + command + "\n" + e);
         scanner.close();
         System.exit(1);

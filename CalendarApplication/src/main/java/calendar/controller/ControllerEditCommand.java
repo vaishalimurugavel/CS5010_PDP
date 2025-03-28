@@ -11,13 +11,14 @@ import calendar.model.EventKeys;
 
 
 /**
- * ControllerEditCommand class is responsible for handling the logic of editing events in the calendar.
- * It implements the ControllerCommand interface and overrides the execute method to process various
- * types of edit commands related to calendar events.
+ * ControllerEditCommand class is responsible for handling the logic of editing
+ * events in the calendar.
+ * It implements the ControllerCommand interface and overrides the execute method to process
+ * various types of edit commands related to calendar events.
  * <p>
- * The class uses regular expressions to parse the input command string and extract relevant details
- * like event properties, start and end times, and new values for the events. It then passes these details
- * to the model for updating the event.
+ * The class uses regular expressions to parse the input command string and extract
+ * relevant details like event properties, start and end times, and new values for the events.
+ * It then passes these details to the model for updating the event.
  * </p>
  * <p>
  * The class supports three types of edit commands:
@@ -26,8 +27,8 @@ import calendar.model.EventKeys;
  * 3. Editing multiple events with no time details, just updating properties.
  * </p>
  * <p>
- * Each pattern is compiled, matched against the input command, and relevant data is extracted to update
- * the event properties accordingly.
+ * Each pattern is compiled, matched against the input command, and relevant data is extracted
+ * to update the event properties accordingly.
  * </p>
  **/
 public class ControllerEditCommand implements ControllerCommand {
@@ -53,8 +54,10 @@ public class ControllerEditCommand implements ControllerCommand {
     if (m1.matches()) {
       String property = m1.group(1);
       String eventName = m1.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3), DateTimeFormatter.ISO_DATE_TIME);
-      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4), DateTimeFormatter.ISO_DATE_TIME);
+      LocalDateTime startDateTime = LocalDateTime.parse(m1.group(3),
+              DateTimeFormatter.ISO_DATE_TIME);
+      LocalDateTime endDateTime = LocalDateTime.parse(m1.group(4),
+              DateTimeFormatter.ISO_DATE_TIME);
       String newValue = m1.group(5);
 
       eventDes.put(EventKeys.PROPERTY, property);
@@ -67,7 +70,8 @@ public class ControllerEditCommand implements ControllerCommand {
     } else if (m2.matches()) {
       String property = m2.group(1);
       String eventName = m2.group(2);
-      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3), DateTimeFormatter.ISO_DATE_TIME);
+      LocalDateTime startDateTime = LocalDateTime.parse(m2.group(3),
+              DateTimeFormatter.ISO_DATE_TIME);
       String newValue = m2.group(4);
 
       eventDes.put(EventKeys.PROPERTY, property);

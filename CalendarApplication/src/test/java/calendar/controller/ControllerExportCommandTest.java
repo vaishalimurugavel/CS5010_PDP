@@ -20,14 +20,16 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Test class for CalendarExportCommand. Tests if the export calendar command is processed as intended.
+ * <p>
+ * Test class for CalendarExportCommand. Tests if the export calendar
+ * command is processed as intended.
+ * </p>
  */
 public class ControllerExportCommandTest {
 
+  private static final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
   private ExportControllerCommand exportController;
   private CalendarEvent model;
-  private static final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
 
   @Before
   public void setUp() {

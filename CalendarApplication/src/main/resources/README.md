@@ -34,7 +34,7 @@ ii) the program will automatically terminate.
 
 4) Copy events between groups:
    i)copy event <eventName> on <dateStringTtimeString> --target <calendarName> to <dateStringTtimeString>
-   ii)copy events on <dateString> --target <calendarName> to <dateString> - Not Working
+   ii)copy events on <dateString> --target <calendarName> to <dateString>
    iii) copy events between <dateString> and <dateString> --target <calendarName> to <dateString> - Not working
 
 ##Event Management
@@ -50,7 +50,7 @@ ii) the program will automatically terminate.
    To add location, description and is public or private:
    Append the structure to the end of the above commands:
    " location \<locationString\> description \<descriptionStrin\> (private|public)
-   Example: create event --autoDecline Event1 from 2025-03-10 10:00 to 2025-03-11 10:00 location Shillman hall description Event1 at Shillman Hall private
+   Example: create event --autoDecline Event1 from 2025-03-10T10:00 to 2025-03-11T10:00 location Shillman hall description Event1 at Shillman Hall private
 
 2) Edit:
    All supported commands for edit:

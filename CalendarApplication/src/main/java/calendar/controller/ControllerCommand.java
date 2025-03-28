@@ -17,7 +17,7 @@ public interface ControllerCommand {
   /**
    * Execute method that needs to be implemented to perform any necessary actions.
    * @param command command String
-   * @throws IllegalAccessException  Any error during any of the operation
+   * @throws IllegalArgumentException  Any error during any of the operation
    */
-  void execute(String command) throws IllegalAccessException;
+  void execute(String command) throws IllegalArgumentException;
 }

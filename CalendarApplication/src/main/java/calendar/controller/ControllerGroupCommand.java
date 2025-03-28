@@ -13,22 +13,25 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import calendar.model.CalendarEvent;
-import calendar.model.CalendarGroup;
 import calendar.model.EventKeys;
 
 /**
  * <p>
- * ControllerGroupCommand class is responsible for handling group-related commands in the calendar system.
- * These commands include creating and using calendars, copying events between calendars, and editing calendar events.
- * The class implements the ControllerCommand interface and overrides the execute method to process various
+ * ControllerGroupCommand class is responsible for handling group-related commands in the
+ * calendar system.
+ * These commands include creating and using calendars, copying events between calendars,
+ * and editing calendar events.
+ * The class implements the ControllerCommand interface and overrides the execute method to
+ * process various
  * group-based calendar operations.
  * </p>
  **/
 public class ControllerGroupCommand implements ControllerCommand {
 
   @Override
-  public void execute(String command) throws IllegalAccessException {
-    String createCalendar = "create calendar --name ([A-Za-z0-9]+) --timezone ([A-Za-z]+/[A-Za-z_]+)";
+  public void execute(String command) throws IllegalArgumentException {
+    String createCalendar = "create calendar --name ([A-Za-z0-9]+) " +
+            "--timezone ([A-Za-z]+/[A-Za-z_]+)";
     Pattern create = Pattern.compile(createCalendar);
     Matcher createMatcher = create.matcher(command);
 
@@ -43,7 +46,7 @@ public class ControllerGroupCommand implements ControllerCommand {
     Pattern copyCalPattern = Pattern.compile(copyCalendar);
     Matcher copyCalMatcher = copyCalPattern.matcher(command);
 
-    String copyCalendar1 = "copy event ([A-Za-z0-9_]+) on (\\d{4}-\\d{2}-\\d{2})" + targetPattern
+    String copyCalendar1 = "copy events on (\\d{4}-\\d{2}-\\d{2})" + targetPattern
             + " to (\\d{4}-\\d{2}-\\d{2})";
     Pattern copyCalPattern1 = Pattern.compile(copyCalendar1);
     Matcher copyCalMatcher1 = copyCalPattern1.matcher(command);
@@ -54,20 +57,20 @@ public class ControllerGroupCommand implements ControllerCommand {
     Pattern copyCalPattern2 = Pattern.compile(copyCalendar2);
     Matcher copyCalMatcher2 = copyCalPattern2.matcher(command);
 
-    String editCalendar = "edit calendar --name ([A-Za-z0-9_]+) --property timezone ([A-Za-z]+/[A-Za-z_]+)|edit calendar --name ([A-Za-z0-9_]+) --property name ([A-Za-z0-9]+)";
+    String editCalendar = "edit calendar --name ([A-Za-z0-9_]+) --property timezone" +
+            " ([A-Za-z]+/[A-Za-z_]+)|edit calendar --name ([A-Za-z0-9_]+)" +
+            " --property name ([A-Za-z0-9]+)";
     Pattern editCalPattern = Pattern.compile(editCalendar);
     Matcher editCalMatcher = editCalPattern.matcher(command);
 
     if (createMatcher.matches()) {
       CalendarFactory.getGroup().addCalendar(createMatcher.group(1), createMatcher.group(2));
-    }
-    else if (useCalMatcher.matches()) {
+    } else if (useCalMatcher.matches()) {
       CalendarEvent model = CalendarFactory.getGroup().getCalendarEvent(useCalMatcher.group(1));
       CalendarFactory.setModel(model);
       CalendarFactory.getGroup().setCurrentCalendar(useCalMatcher.group(1));
-      System.out.println("Using Calendar Event: "  + useCalMatcher.group(1));
-    }
-    else if (copyCalMatcher.matches()) {
+      System.out.println("Using Calendar Event: " + useCalMatcher.group(1));
+    } else if (copyCalMatcher.matches()) {
       String eventName = copyCalMatcher.group(1);
       String cal2 = copyCalMatcher.group(3);
       LocalDateTime on = LocalDateTime.parse(copyCalMatcher.group(2));
@@ -80,19 +83,19 @@ public class ControllerGroupCommand implements ControllerCommand {
 
       List<Map<String, Object>> events = CalendarFactory.getModel().getEventForDisplay(eventName);
       events = events.stream().filter(
-              (e) -> {
-                ZonedDateTime eventStart = ((LocalDateTime) e.get(EventKeys.START_DATETIME))
-                        .atZone(sourceZone).withZoneSameInstant(targetZone);
-                ZonedDateTime eventEnd = e.get(EventKeys.END_DATETIME) != null
+        (e) -> {
+          ZonedDateTime eventStart = ((LocalDateTime) e.get(EventKeys.START_DATETIME))
+                  .atZone(sourceZone).withZoneSameInstant(targetZone);
+          ZonedDateTime eventEnd = e.get(EventKeys.END_DATETIME) != null
                         ? ((LocalDateTime) e.get(EventKeys.END_DATETIME)).atZone(sourceZone)
                         .withZoneSameInstant(targetZone) : null;
-                return eventStart.toLocalDateTime().isEqual(onZoned.toLocalDateTime())
+          return eventStart.toLocalDateTime().isEqual(onZoned.toLocalDateTime())
                         || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
                         && eventEnd != null
                         && eventEnd.toLocalDateTime().isAfter(onZoned.toLocalDateTime()))
                         || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
                         && eventStart.toLocalDateTime().isAfter(onZoned.toLocalDateTime()));
-              }).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
       for (Map<String, Object> event : events) {
         event.put(EventKeys.START_DATETIME, ((LocalDateTime) event.get(EventKeys.START_DATETIME))
@@ -104,42 +107,35 @@ public class ControllerGroupCommand implements ControllerCommand {
         CalendarFactory.getGroup().getCalendarEvent(cal2).addEvent(event);
       }
     } else if (copyCalMatcher1.matches()) {
-      // Extract the necessary values from the matched command
-      String cal2 = copyCalMatcher1.group(3);
-      String eventName = copyCalMatcher1.group(1);
-      LocalDate on = LocalDate.parse(copyCalMatcher1.group(2));
-      LocalDate to = LocalDate.parse(copyCalMatcher1.group(4));
+      String cal2 = copyCalMatcher1.group(2);
+      LocalDate on = LocalDate.parse(copyCalMatcher1.group(1));
+      LocalDate to = LocalDate.parse(copyCalMatcher1.group(3));
       ZoneId targetZone = CalendarFactory.getGroup().getCalendar(cal2).getZoneId();
 
-      // Get all events from the source calendar
-      List<Map<String, Object>> events = CalendarFactory.getModel().getEventsForDisplay();
+      List<Map<String, Object>> events = CalendarFactory.getModel().getEvents();
 
-      // Filter the events based on the 'on' and 'to' date range and event name
       events = events.stream().filter(e -> {
-        // Retrieve the necessary event data
-        LocalDate allDayDate = (LocalDate) e.get(EventKeys.ALLDAY_DATE);  // All-day event date
-        LocalDateTime startDateTime = (LocalDateTime) e.get(EventKeys.START_DATETIME);  // Event start date-time
+        LocalDate allDayDate = (LocalDate) e.get(EventKeys.ALLDAY_DATE);
+        LocalDateTime startDateTime = (LocalDateTime) e.get(EventKeys.START_DATETIME);
 
-        // Flag to check if the event falls within the date range
         boolean isInDateRange = false;
 
-        // Check for all-day events
         if (allDayDate != null) {
-          isInDateRange = (allDayDate.isEqual(on) || (allDayDate.isAfter(on) && allDayDate.isBefore(to)) || allDayDate.isEqual(to));
-        }
-        else if (startDateTime != null) {
-          LocalDate eventDate = startDateTime.toLocalDate();  // Extract event date
-          isInDateRange = (eventDate.isEqual(on) || (eventDate.isAfter(on) && eventDate.isBefore(to)) || eventDate.isEqual(to));
+          isInDateRange = (allDayDate.isEqual(on) || (allDayDate.isAfter(on)
+                  && allDayDate.isBefore(to)) || allDayDate.isEqual(to));
+        } else if (startDateTime != null) {
+          LocalDate eventDate = startDateTime.toLocalDate();
+          isInDateRange = (eventDate.isEqual(on) ||
+                  (eventDate.isAfter(on) && eventDate.isBefore(to)) || eventDate.isEqual(to));
         }
 
-        return isInDateRange && e.get(EventKeys.SUBJECT).equals(eventName);
+        return isInDateRange;
       }).collect(Collectors.toList());
       for (Map<String, Object> event : events) {
         LocalDateTime startDateTime = (LocalDateTime) event.get(EventKeys.START_DATETIME);
 
         if (startDateTime != null) {
-          LocalDateTime adjustedStDt = to.atTime(startDateTime.toLocalTime());
-
+          LocalDateTime adjustedStDt = to.atStartOfDay();
           ZonedDateTime startZoned =
                   adjustedStDt.atZone(CalendarFactory.getGroup().getCurrentCalendar().getZoneId());
           ZonedDateTime startConverted = startZoned.withZoneSameInstant(targetZone);
@@ -149,20 +145,18 @@ public class ControllerGroupCommand implements ControllerCommand {
 
         CalendarFactory.getGroup().getCalendarEvent(cal2).addEvent(event);
       }
-    }
-
-
-    else if (copyCalMatcher2.matches()) {
+    } else if (copyCalMatcher2.matches()) {
       String cal2 = copyCalMatcher2.group(3);
       LocalDate on = LocalDate.parse(copyCalMatcher2.group(1));
       LocalDate to = LocalDate.parse(copyCalMatcher2.group(2));
       LocalDate targetTimeZone = LocalDate.parse(copyCalMatcher2.group(4));
 
-      List<Map<String, Object>> events = CalendarFactory.getModel().getEventsForDisplay();
+      List<Map<String, Object>> events = CalendarFactory.getModel().getEvents();
 
       if (!events.isEmpty()) {
         events = events.stream()
                 .filter(e -> {
+
                   LocalDate start = (e.get(EventKeys.START_DATETIME) != null) ?
                           ((LocalDateTime) e.get(EventKeys.START_DATETIME)).toLocalDate() : null;
                   LocalDate end = (e.get(EventKeys.END_DATETIME) != null) ?
@@ -180,8 +174,7 @@ public class ControllerGroupCommand implements ControllerCommand {
                     isWithinDateRange = (allDayDate.isAfter(on) && allDayDate.isBefore(to)) ||
                             (repeatDate.isAfter(on) && repeatDate.isBefore(to)) ||
                             (allDayDate.isEqual(on) || allDayDate.isEqual(to));
-                  }
-                  else if (isStartEndDateValid) {
+                  } else if (isStartEndDateValid) {
                     isWithinDateRange = (start.isAfter(on) && start.isBefore(to)) ||
                             (end.isAfter(on) && end.isBefore(to)) ||
                             (start.isEqual(on) || start.isEqual(to));
@@ -199,15 +192,14 @@ public class ControllerGroupCommand implements ControllerCommand {
           LocalDate repeatDate = (LocalDate) event.get(EventKeys.REPEAT_DATE);
 
           if (startTime != null && endTime != null) {
-            long daysBetween = ChronoUnit.DAYS.between(on, to);
-            LocalDate shiftedEnd = to.plusDays(daysBetween);
+            long eventDuration = ChronoUnit.DAYS.between(startTime.toLocalDate(),
+                    endTime.toLocalDate());
+            LocalDate shiftedEnd = targetTimeZone.plusDays(eventDuration);
 
             event.put(EventKeys.START_DATETIME, targetTimeZone.atStartOfDay());
             event.put(EventKeys.END_DATETIME, shiftedEnd.atStartOfDay());
 
-          }
-
-          else if (repeatDate != null && allDayDate != null) {
+          } else if (repeatDate != null && allDayDate != null) {
             long daysBetween = ChronoUnit.DAYS.between(allDayDate, repeatDate);
             LocalDate shiftedEnd = targetTimeZone.plusDays(daysBetween);
 
@@ -218,10 +210,7 @@ public class ControllerGroupCommand implements ControllerCommand {
           CalendarFactory.getGroup().getCalendarEvent(cal2).addEvent(event);
         }
       }
-    }
-
-
-    else if(editCalMatcher.matches()) {
+    } else if (editCalMatcher.matches()) {
 
       String calName;
       String propName;
@@ -235,8 +224,7 @@ public class ControllerGroupCommand implements ControllerCommand {
         propName = EventKeys.CALENDAR_NAME;
         calName = editCalMatcher.group(3);
         newValue = editCalMatcher.group(4);
-      }
-      else{
+      } else {
         throw new RuntimeException("Unsupported command: " + editCalMatcher.group(1));
       }
       Map<String, Object> edit = new HashMap<>();
@@ -245,6 +233,10 @@ public class ControllerGroupCommand implements ControllerCommand {
       edit.put(EventKeys.NEW_VALUE, newValue);
 
       CalendarFactory.getGroup().updateCalendar(edit);
+    }
+
+    else {
+      throw new IllegalArgumentException("Invalid command: " + command);
     }
   }
 }

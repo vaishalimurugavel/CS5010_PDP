@@ -3,6 +3,7 @@ package calendar.view;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -152,34 +153,26 @@ public class CalendarExportTest {
     assertEquals("Export class!", result);
   }
 
-  class FailingOutputStream extends OutputStream {
-    @Override
-    public void write(int b) throws IOException {
-    }
 
-    @Override
-    public void close() throws IOException {
-      throw new IOException("Simulated IO exception on close");
-    }
-  }
-
-  @Test
-  public void testCloseNormal() throws IOException {
-    OutputStream outputStream = new FailingOutputStream() {
-      @Override
-      public void close() throws IOException {
-        //simulation
-      }
-    };
-    CalendarExport calendarExport = new CalendarExport(outputStream);
-    calendarExport.close();
-  }
   @Test
   public void testCloseThrowsIOException() {
     OutputStream outputStream = new FailingOutputStream();
     CalendarExport calendarExport = new CalendarExport(outputStream);
 
     assertThrows(IOException.class, () -> calendarExport.close());
+  }
+
+
+  class FailingOutputStream extends OutputStream {
+    @Override
+    public void write(int b) throws IOException {
+      //Do nothing
+    }
+
+    @Override
+    public void close() throws IOException {
+      throw new IOException("Simulated IO exception on close");
+    }
   }
 
 }

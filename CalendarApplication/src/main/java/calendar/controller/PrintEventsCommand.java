@@ -7,8 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import calendar.view.CalendarSimpleView;
-
 /**
  * <p>
  * Command to handle the printing of events based on user input.
@@ -18,10 +16,6 @@ import calendar.view.CalendarSimpleView;
  * </p>
  **/
 class PrintEventsCommand implements ControllerCommand {
-
-  PrintEventsCommand(){
-    CalendarFactory.setView(new CalendarSimpleView(System.out));
-  }
 
   @Override
   public void execute(String command) {
@@ -47,8 +41,7 @@ class PrintEventsCommand implements ControllerCommand {
       } catch (IllegalArgumentException e) {
         throw new RuntimeException("Invalid date format provided: " + m1.group(1), e);
       }
-    }
-    else if (m2.matches()) {
+    } else if (m2.matches()) {
       try {
         LocalDateTime start = LocalDateTime.parse(m2.group(1), DateTimeFormatter.ISO_DATE_TIME);
         LocalDateTime end = LocalDateTime.parse(m2.group(2), DateTimeFormatter.ISO_DATE_TIME);
@@ -63,8 +56,7 @@ class PrintEventsCommand implements ControllerCommand {
         throw new RuntimeException("Invalid date format provided: " + m2.group(1) + " or "
                 + m2.group(2), e);
       }
-    }
-    else {
+    } else {
       throw new IllegalArgumentException("Invalid print command format. Please use one" +
               " of the following formats: "
               + "'print events on YYYY-MM-DD' " +

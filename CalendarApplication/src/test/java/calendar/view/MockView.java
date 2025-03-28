@@ -11,21 +11,20 @@ import java.util.Map;
 public class MockView extends CalendarView {
 
   private String viewName;
+  private StringBuilder output;
 
   public MockView(String viewName) {
     super(System.out);
     this.viewName = viewName;
   }
 
-  public String getViewName() {
-    return viewName;
-  }
-
-  private StringBuilder output;
-
   public MockView(OutputStream output) {
     super(output);
     this.output = new StringBuilder();
+  }
+
+  public String getViewName() {
+    return viewName;
   }
 
   @Override

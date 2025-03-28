@@ -17,7 +17,7 @@ import calendar.view.CalendarView;
 class ExportControllerCommand implements ControllerCommand {
   @Override
   public void execute(String command) {
-    if(command == null || command.isEmpty()){
+    if (command == null || command.isEmpty()) {
       throw new IllegalArgumentException("command is null or empty");
     }
     CalendarView export = CalendarFactory.getExport();
@@ -26,7 +26,7 @@ class ExportControllerCommand implements ControllerCommand {
       String exportPattern = "export ([A-Za-z0-9_\\-]+) ([A-Za-z0-9_\\-\\\\:]+).csv";
       Pattern create = Pattern.compile(exportPattern);
       Matcher createMatcher = create.matcher(command);
-      if(createMatcher.matches()) {
+      if (createMatcher.matches()) {
         String[] parts = command.split(" ");
         path = parts[parts.length - 1];
         if (path != null) {
@@ -37,8 +37,7 @@ class ExportControllerCommand implements ControllerCommand {
           }
         }
         export.displayOutput(CalendarFactory.getModel().getEventsForDisplay());
-      }
-      else {
+      } else {
         throw new IllegalArgumentException("Invalid command: " + command);
       }
     } catch (IOException e) {

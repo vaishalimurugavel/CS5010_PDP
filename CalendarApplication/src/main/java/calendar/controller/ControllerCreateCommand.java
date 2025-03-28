@@ -59,7 +59,6 @@ public class ControllerCreateCommand implements ControllerCommand {
 
   @Override
   public void execute(String command)  {
-
     String basePattern = "create event( --autoDecline)? (.+?)";
     String otherInfo = "( location (.+?))?( description (.+?))?( (public|private))?";
     String singleAllDay = basePattern + " on (\\d{4}-\\d{2}-\\d{2})" + otherInfo;
@@ -73,8 +72,6 @@ public class ControllerCreateCommand implements ControllerCommand {
     String recurringUntilPattern = singleEventPatternCommon + " repeats ([MTWRFSU]+) until " +
             "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})" + otherInfo;
     String allDayEventPatternCommon = basePattern + " on (\\d{4}-\\d{2}-\\d{2})";
-    String allDayEventPattern = allDayEventPatternCommon + " on (\\d{4}-\\d{2}-\\d{2})"
-            + otherInfo;
     String allDayRecurringForNTimesPattern = allDayEventPatternCommon + " repeats ([MTWRFSU]+) " +
             "for (\\d+) times" + otherInfo;
     String allDayRecurringUntilPattern = allDayEventPatternCommon + " repeats ([MTWRFSU]+) " +
@@ -86,7 +83,6 @@ public class ControllerCreateCommand implements ControllerCommand {
     Pattern pSingleAllDateTime = Pattern.compile(singleAllDateTime);
     Pattern pRecurringForN = Pattern.compile(recurringForNTimesPattern);
     Pattern pRecurringUntil = Pattern.compile(recurringUntilPattern);
-    Pattern pAllDay = Pattern.compile(allDayEventPattern);
     Pattern pAllDayRecurringForN = Pattern.compile(allDayRecurringForNTimesPattern);
     Pattern pAllDayRecurringUntil = Pattern.compile(allDayRecurringUntilPattern);
 
@@ -95,7 +91,6 @@ public class ControllerCreateCommand implements ControllerCommand {
     Matcher mSingleAllDateTime = pSingleAllDateTime.matcher(command);
     Matcher mRecurringForN = pRecurringForN.matcher(command);
     Matcher mRecurringUntil = pRecurringUntil.matcher(command);
-    Matcher mAllDay = pAllDay.matcher(command);
     Matcher mAllDayRecurringForN = pAllDayRecurringForN.matcher(command);
     Matcher mAllDayRecurringUntil = pAllDayRecurringUntil.matcher(command);
 
@@ -114,36 +109,11 @@ public class ControllerCreateCommand implements ControllerCommand {
       eventDetails = allDayRecurring(mAllDayRecurringForN);
     } else if (mAllDayRecurringUntil.matches()) {
       eventDetails = allDayRecurringMatchUntil(mAllDayRecurringUntil);
-    } else if (mAllDay.matches()) {
-      eventDetails =  allDay(mAllDay);
     } else {
       throw new IllegalArgumentException("Invalid create event syntax.");
     }
     CalendarFactory.getModel().addEvent(eventDetails);
 
-  }
-
-  private Map<String, Object> allDay(Matcher mAllDay) {
-    Map<String, Object> eventDetails = new HashMap<>();
-    eventDetails.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
-    eventDetails.put(EventKeys.SUBJECT, mAllDay.group(2));
-    eventDetails.put(EventKeys.ALLDAY_DATE, LocalDate.parse(mAllDay.group(3), DateTimeFormatter.ISO_DATE));
-    String otherinfo = null;
-    boolean flag = mAllDay.group(4) != null;
-    if (flag) {
-      otherinfo = mAllDay.group(5);
-      eventDetails.put(EventKeys.LOCATION, otherinfo);
-    }
-    flag = mAllDay.group(6) != null;
-    if (flag) {
-      otherinfo = mAllDay.group(7);
-      eventDetails.put(EventKeys.DESCRIPTION, otherinfo);
-    }
-    otherinfo = mAllDay.group(8);
-    if (otherinfo != null && otherinfo.equals(" private")) {
-      eventDetails.put(EventKeys.PRIVATE, 1);
-    }
-    return eventDetails;
   }
 
   private Map<String, Object> allDayRecurringMatchUntil(Matcher mAllDayRecurringUntil) {

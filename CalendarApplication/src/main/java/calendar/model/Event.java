@@ -310,22 +310,4 @@ public class Event {
   public LocalDate getRepeatDate() {
     return repeatDate;
   }
-
-  /**
-   * Returns the weekdays on which the event are repeated.
-   *
-   * @return LocalDate
-   */
-  public String getWeekdays() {
-    return weekdays;
-  }
-
-  /**
-   * Returns the number of time the event is repeated.
-   * @return int
-   */
-  public int getOccurrences() {
-    return occurrences;
-  }
-
 }

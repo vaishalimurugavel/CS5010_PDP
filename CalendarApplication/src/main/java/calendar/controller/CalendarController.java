@@ -19,6 +19,7 @@ import java.util.Map;
 public class CalendarController {
 
   static Map<String, ControllerCommand> mapper = new HashMap<>();
+
   static {
     mapper.put("create", new ControllerCreateCommand());
     mapper.put("edit", new ControllerEditCommand());
@@ -28,17 +29,26 @@ public class CalendarController {
     mapper.put("copy", new ControllerGroupCommand());
   }
 
-  public void processCommand(String command) throws IllegalAccessException {
+  /**
+   * Process the CalendarApp commands one by one.
+   * @param command String command
+   * @throws IllegalArgumentException Exception thrown in case of invalid command.
+   */
+  public void processCommand(String command) throws IllegalArgumentException {
     String[] tokens = command.split(" ");
     try {
       if ( (tokens[0].equals("create") && tokens[1].equals("calendar") ) || tokens[0].equals("use")
-              || tokens[0].equals("copy") || tokens[0].equals("edit") && tokens[1].equals("calendar") ) {
+              || tokens[0].equals("copy") || tokens[0].equals("edit")
+              && tokens[1].equals("calendar") ) {
         mapper.get("copy").execute(command);
         return;
       }
+      if (!mapper.containsKey(tokens[0])) {
+        throw new IllegalArgumentException("Unknown command: " + command);
+      }
       mapper.get(tokens[0]).execute(command);
-    } catch (IllegalAccessException e) {
-      throw new IllegalAccessException("Error while processing command " + command);
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Error while processing command " + command);
     }
   }
 

@@ -3,7 +3,10 @@ package calendar.model;
 import java.time.ZoneId;
 
 /**
- * Represents a calendar group that holds information about its title, timezone, and associated events.
+ * <p>
+ * Represents a calendar group that holds information about its title,
+ * timezone, and associated events.
+ * </p>
  **/
 public class Calendars {
 

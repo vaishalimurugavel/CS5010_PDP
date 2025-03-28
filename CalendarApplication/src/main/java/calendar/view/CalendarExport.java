@@ -18,7 +18,7 @@ import calendar.model.EventKeys;
  * event data into a CSV format.
  * </p>
  **/
-public class CalendarExport extends CalendarView{
+public class CalendarExport extends CalendarView {
 
 
   /**
@@ -31,7 +31,7 @@ public class CalendarExport extends CalendarView{
   }
 
   @Override
-  public void displayOutput(List<Map<String,Object>> eventList) throws IOException {
+  public void displayOutput(List<Map<String, Object>> eventList) throws IOException {
 
     StringBuffer sb = new StringBuffer();
     LocalDate date = null;
@@ -39,7 +39,7 @@ public class CalendarExport extends CalendarView{
 
     sb.append("Subject,Start Date,Start Time,End Date,End Time,All Day Event," +
             "Description,Location,Private\n");
-    if(eventList != null && !eventList.isEmpty()) {
+    if (eventList != null && !eventList.isEmpty()) {
       for (Map<String, Object> content : eventList) {
         sb.append(content.get(EventKeys.SUBJECT)).append(",");
         try {
@@ -52,7 +52,7 @@ public class CalendarExport extends CalendarView{
         }
         sb.append(date).append(",");
         sb.append(time).append(",");
-        if(content.get(EventKeys.END_DATETIME) != null) {
+        if (content.get(EventKeys.END_DATETIME) != null) {
           try {
             LocalDateTime dateTime = (LocalDateTime) (content.get(EventKeys.END_DATETIME));
             date = dateTime.toLocalDate();
@@ -65,8 +65,7 @@ public class CalendarExport extends CalendarView{
           }
           sb.append(date).append(",");
           sb.append(time).append(",");
-        }
-        else {
+        } else {
           sb.append("--").append(",");
           sb.append("--").append(",");
         }
@@ -86,6 +85,10 @@ public class CalendarExport extends CalendarView{
 
   }
 
+  /**
+   * Close the output stream.
+   * @throws IOException exception
+   */
   public void close() throws IOException {
     if (output != null) {
       output.close();

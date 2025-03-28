@@ -20,7 +20,7 @@ public class MockController extends CalendarController {
   }
 
   @Override
-  public void processCommand(String command) throws IllegalAccessException {
+  public void processCommand(String command) throws IllegalArgumentException {
     if (command.equals("add event")) {
       Map<String, Object> newEvent = Map.of(
               "subject", "New Event",

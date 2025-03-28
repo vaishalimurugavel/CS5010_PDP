@@ -75,4 +75,11 @@ public interface CalendarEvent {
    * @return A list of events that indicate whether the user is busy or not at the given time.
    */
   List<Map<String, Object>> getUserStatus(LocalDateTime date);
+
+  /**
+   * Retrieves a list of events.
+   *
+   * @return A list of maps where each map represents an event with its details.
+   */
+  List<Map<String, Object>> getEvents();
 }

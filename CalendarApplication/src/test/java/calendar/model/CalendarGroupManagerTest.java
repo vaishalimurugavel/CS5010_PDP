@@ -36,7 +36,7 @@ public class CalendarGroupManagerTest {
     calendarGroupManager.addCalendar("Group19", "America/New_York");
 
     assertThrows(IllegalArgumentException.class,
-            () -> calendarGroupManager.addCalendar("Group19", "America/Los_Angeles"));
+        () -> calendarGroupManager.addCalendar("Group19", "America/Los_Angeles"));
 
   }
 
@@ -99,8 +99,10 @@ public class CalendarGroupManagerTest {
 
     calendarGroupManager.addCalendar("Group1", "America/New_York");
 
-    assertTrue("Calendar group should exist", calendarGroupManager.checkForDuplicates("Group1"));
-    assertFalse("Calendar group should not exist", calendarGroupManager.checkForDuplicates("NonExistingGroup"));
+    assertTrue("Calendar group should exist",
+            calendarGroupManager.checkForDuplicates("Group1"));
+    assertFalse("Calendar group should not exist",
+            calendarGroupManager.checkForDuplicates("NonExistingGroup"));
   }
 
   @Test

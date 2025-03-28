@@ -18,9 +18,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class CalendarShowCommandTest {
 
+  private static ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
   private final ShowStatusCommand command = new ShowStatusCommand();
   ControllerCreateCommand controllerCreateCommand = new ControllerCreateCommand();
-  private static ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
   @Before
   public void setUp() {
@@ -39,8 +39,8 @@ public class CalendarShowCommandTest {
   @Test
   public void testValidCommand_UserIsBusy() {
 
-    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
-            "room1 description meeting public";
+    String createCommand = "create event subject from 2025-03-25T10:00 to " +
+            "2025-03-25T12:00 location room1 description meeting public";
 
     controllerCreateCommand.execute(createCommand);
     outputStream.reset();
@@ -53,8 +53,8 @@ public class CalendarShowCommandTest {
   @Test
   public void testValidCommand_UserIsNotBusy() {
 
-    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
-            "room1 description meeting public";
+    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 " +
+            "location room1 description meeting public";
 
     controllerCreateCommand.execute(createCommand);
     outputStream.reset();
@@ -66,8 +66,8 @@ public class CalendarShowCommandTest {
   @Test
   public void testInvalidCommand_WrongFormat() {
 
-    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
-            "room1 description meeting public";
+    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 " +
+            "location room1 description meeting public";
 
     controllerCreateCommand.execute(createCommand);
     outputStream.reset();
@@ -82,8 +82,8 @@ public class CalendarShowCommandTest {
   @Test
   public void testInvalidCommand_WrongDateFormat() {
 
-    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 location " +
-            "room1 description meeting public";
+    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 " +
+            "location room1 description meeting public";
 
     controllerCreateCommand.execute(createCommand);
     outputStream.reset();
@@ -100,6 +100,7 @@ public class CalendarShowCommandTest {
     Exception exception = assertThrows(NullPointerException.class, () -> {
       command.execute(null);
     });
+    assertEquals(null,exception.getMessage());
   }
 
   @Test
@@ -110,12 +111,4 @@ public class CalendarShowCommandTest {
     assertTrue(exception.getMessage().contains("Invalid show command format"));
   }
 
-  @Test
-  public void testValidCommand_WithExtraWhitespace() {
-    String createCommand = "create event subject from 2025-03-25T10:00 to 2025-03-25T12:00 " +
-            "location room1 description meeting public";
-    controllerCreateCommand.execute(createCommand);
-    outputStream.reset();
-
-  }
 }

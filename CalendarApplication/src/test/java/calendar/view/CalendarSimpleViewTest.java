@@ -2,6 +2,7 @@ package calendar.view;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -18,7 +19,9 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 
-
+/**
+ * Test class to test CalendarView.
+ */
 public class CalendarSimpleViewTest {
 
   private ByteArrayOutputStream output;

@@ -11,7 +11,11 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintStream;
 
+import calendar.controller.CalendarController;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Test class for CalendarApp.
@@ -94,4 +98,19 @@ public class CalendarAppTest {
 
     tempFile.delete();
   }
+
+  @Test
+  public void testProcessCommand_InvalidCommand() {
+    CalendarController controller = new CalendarController();
+    String invalidCommand = "invalid command";
+
+    try {
+      controller.processCommand(invalidCommand);
+      fail("Expected IllegalArgumentException not thrown");
+    } catch (IllegalArgumentException e) {
+      assertEquals("Error while processing command invalid command", e.getMessage());
+    }
+  }
+
+
 }

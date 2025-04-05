@@ -10,7 +10,7 @@ public interface CalendarFeatures {
 
   void addCalendar(String name, String timeZone);
   void editCalendar(Map<String, String> properties);
-  void addEvent(Map<String, String> details);
-  void editEvent(Map<String, String> details);
+  void addEvent(Map<String, String> properties);
+  void editEvent(Map<String, String> properties);
   void removeEvent(String name);
 }

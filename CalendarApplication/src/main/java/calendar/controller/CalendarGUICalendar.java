@@ -25,13 +25,18 @@ public class CalendarGUICalendar implements CalendarFeatures {
   }
 
   @Override
-  public void addEvent(Map<String, String> details) {
+  public void addEvent(Map<String, String> properties) {
 
-
+    Map<String, Object> details = new HashMap<String, Object>();
+    details.put(EventKeys.SUBJECT, properties.get(EventKeys.SUBJECT));
+    details.put(EventKeys.LOCATION, properties.getOrDefault(EventKeys.LOCATION,null));
+    details.put(EventKeys.DESCRIPTION, properties.getOrDefault(EventKeys.NEW_VALUE,null));
+    details.put(EventKeys.START_DATETIME, properties.getOrDefault(EventKeys.START_DATETIME,null));
+    CalendarFactory.getModel().addEvent(details);
   }
 
   @Override
-  public void editEvent(Map<String, String> details) {
+  public void editEvent(Map<String, String> properties) {
 
 
   }

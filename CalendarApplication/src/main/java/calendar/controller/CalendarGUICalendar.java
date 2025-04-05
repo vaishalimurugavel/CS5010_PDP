@@ -18,16 +18,9 @@ public class CalendarGUICalendar implements CalendarFeatures {
   @Override
   public void editCalendar(Map<String ,String> properties) {
     Map<String, Object> details = new HashMap<String, Object>();
-    for (String key: properties.keySet()) {
-      if(key.equals(EventKeys.CALENDAR_NAME)){
-        details.put(EventKeys.CALENDAR_NAME, properties.get(key));
-      }
-      else {
-        throw new IllegalArgumentException("No Calendar name property found");
-      }
-      details.put(EventKeys.PROPERTY, properties.get(EventKeys.PROPERTY));
-      details.put(EventKeys.NEW_VALUE, properties.get(EventKeys.NEW_VALUE));
-    }
+    details.put(EventKeys.CALENDAR_NAME, properties.get(EventKeys.CALENDAR_NAME));
+    details.put(EventKeys.PROPERTY, properties.get(EventKeys.PROPERTY));
+    details.put(EventKeys.NEW_VALUE, properties.get(EventKeys.NEW_VALUE));
     CalendarFactory.getGroup().updateCalendar(details);
   }
 

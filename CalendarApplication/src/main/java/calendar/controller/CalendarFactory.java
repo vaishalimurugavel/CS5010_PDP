@@ -71,7 +71,7 @@ public class CalendarFactory {
    * Sets a new CalendarEvent for singleCalender.
    * @param calendarEvent CalendarEvent
    */
-  static void setModel(CalendarEvent calendarEvent) {
+  public static void setModel(CalendarEvent calendarEvent) {
     model = calendarEvent;
   }
 
@@ -79,7 +79,7 @@ public class CalendarFactory {
    * Sets a new CalendarView object.
    * @param cview CalendarView
    */
-  static void setView(CalendarView cview) {
+  public static void setView(CalendarView cview) {
     view = cview;
   }
 
@@ -87,7 +87,7 @@ public class CalendarFactory {
    * Sets a new CalendarExport object.
    * @param cexport CalendarExport
    */
-  static void setExport(CalendarView cexport) {
+  public static void setExport(CalendarView cexport) {
     export = cexport;
   }
 
@@ -95,7 +95,7 @@ public class CalendarFactory {
    * Sets a new CalendarGroup object.
    * @param cgroup CalendarGroup
    */
-  static void setGroup(CalendarGroup cgroup) {
+  public static void setGroup(CalendarGroup cgroup) {
     group = cgroup;
   }
 
@@ -103,7 +103,7 @@ public class CalendarFactory {
    * Sets a new CalendarViewModel object.
    * @param cViewModel CalendarViewModel
    */
-  static void setViewModel(CalendarViewModel cViewModel) {
+  public static void setViewModel(CalendarViewModel cViewModel) {
     viewModel = cViewModel;
   }
 

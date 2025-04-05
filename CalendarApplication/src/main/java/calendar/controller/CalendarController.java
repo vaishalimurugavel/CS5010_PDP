@@ -30,7 +30,7 @@ public class CalendarController {
   }
 
   /**
-   * Process the CalendarApp commands one by one.
+   * Process the CalendarApp8 commands one by one.
    * @param command String command
    * @throws IllegalArgumentException Exception thrown in case of invalid command.
    */
@@ -45,6 +45,9 @@ public class CalendarController {
       }
       if (!mapper.containsKey(tokens[0])) {
         throw new IllegalArgumentException("Unknown command: " + command);
+      }
+      if(CalendarFactory.getGroup().getCurrentCalendar() == null){
+        throw new IllegalArgumentException("No calendar is active");
       }
       mapper.get(tokens[0]).execute(command);
     } catch (IllegalArgumentException e) {

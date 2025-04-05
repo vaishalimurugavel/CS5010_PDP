@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * retrieving events for display.
  * </p>
  **/
-public class CalenderEventManager implements CalendarEvent {
+public class CalenderEventManager implements CalendarEvent, CalendarViewModel{
   List<Event> events = new ArrayList<Event>();
 
   private void addEvents(Map<String, Object> event, Event.EventBuilder eventBuilder) {
@@ -417,6 +417,11 @@ public class CalenderEventManager implements CalendarEvent {
       eventList.add(eventDetails);
     }
     return eventList;
+  }
+
+  @Override
+  public List<String> getGroups() {
+    return null;
   }
 
 }

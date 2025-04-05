@@ -16,6 +16,11 @@ public class CalendarGroupManager implements CalendarGroup {
   static Map<String, Calendars> calendarGroups = new HashMap<>();
   Calendars currentCalendar;
 
+  public CalendarGroupManager() {
+    calendarGroups.put("Default Calendar", new Calendars("Default Calendar",
+            ZoneId.systemDefault(), ZoneId.systemDefault().getId()));
+  }
+
   @Override
   public CalendarEvent getCalendarEvent(String groupName) {
     Calendars calendars = calendarGroups.get(groupName);
@@ -48,6 +53,20 @@ public class CalendarGroupManager implements CalendarGroup {
       return null;
     }
     return currentCalendar;
+  }
+
+  @Override
+  public String[] getCalendarNames() {
+    if(calendarGroups.isEmpty()){
+      return null;
+    }
+
+    String[] names = new String[calendarGroups.size()];
+    int i = 0;
+    for(String calendar : calendarGroups.keySet()){
+      names[i++] = calendar;
+    }
+    return names;
   }
 
 

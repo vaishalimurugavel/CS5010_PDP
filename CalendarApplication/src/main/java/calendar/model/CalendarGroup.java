@@ -63,4 +63,6 @@ public interface CalendarGroup {
    * @return The `Calendars` object representing the calendar.
    */
   Calendars getCurrentCalendar();
+
+  String[] getCalendarNames();
 }

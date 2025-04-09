@@ -1,17 +1,28 @@
 package calendar.view.gui;
 
-import java.awt.*;
-
-import javax.swing.*;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
 
 import calendar.controller.CalendarFactory;
 import calendar.model.CalendarGroupManager;
 import calendar.model.CalenderEventManager;
 
+/**
+ * CalendarUIManager extends JFrame, displays the main backbone of the GUI view.
+ */
 public class CalendarUIManager extends JFrame {
   private JFrame frame;
   private JButton addButton, editButton, selectButton;
 
+  /**
+   * Constructor initializes the CalendarApplication.
+   */
   public CalendarUIManager() {
     CalendarFactory.setModel(new CalenderEventManager());
     CalendarFactory.setGroup(new CalendarGroupManager());
@@ -86,10 +97,6 @@ public class CalendarUIManager extends JFrame {
   private void showSelectCalendarDialog(JFrame parentFrame) {
     CalendarGUIInterface event = new CalendarEventDisplay();
     event.showDisplay(parentFrame);
-  }
-
-  public static void main(String[] args) {
-    new CalendarUIManager();
   }
 
 }

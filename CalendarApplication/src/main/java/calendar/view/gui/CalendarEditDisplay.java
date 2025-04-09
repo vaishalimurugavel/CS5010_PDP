@@ -1,6 +1,6 @@
 package calendar.view.gui;
 
-import java.awt.*;
+import java.awt.GridLayout;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,10 +13,10 @@ import calendar.controller.CalendarFactory;
 import calendar.model.EventKeys;
 
 /**
- * Created at 05-04-2025
- * Author Vaishali
+ * <p>
+ *   CalendarEditDisplay displays the options to edit existing calendar.
+ * </p>
  **/
-
 public class CalendarEditDisplay implements CalendarGUIInterface {
   CalendarGUIManager calendarGUIManager = new CalendarGUIManager();
 

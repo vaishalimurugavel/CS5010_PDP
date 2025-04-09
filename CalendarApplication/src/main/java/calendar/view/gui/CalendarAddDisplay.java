@@ -1,7 +1,7 @@
 package calendar.view.gui;
 
 
-import java.awt.*;
+import java.awt.GridLayout;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.stream.Stream;
@@ -9,12 +9,13 @@ import java.util.stream.Stream;
 import javax.swing.*;
 
 /**
- * Created at 05-04-2025
- * Author Vaishali
+ * <p>
+ *   CalendarAddDisplay class displays the operation to add a new calendar to the Calendar application.
+ * </p>
  **/
-
 public class CalendarAddDisplay implements CalendarGUIInterface {
   CalendarGUIManager calendarGUIManager = new CalendarGUIManager();
+
   @Override
   public void showDisplay(JFrame parentFrame) {
     JDialog dialog = new JDialog(parentFrame, "Add Calendar", true);
@@ -45,7 +46,7 @@ public class CalendarAddDisplay implements CalendarGUIInterface {
                 "Calendar Created: " + calendarName + " (" + timezone + ")",
                 "Success", JOptionPane.INFORMATION_MESSAGE);
         dialog.dispose();
-        calendarGUIManager.addCalendar(calendarName,timezone);
+        calendarGUIManager.addCalendar(calendarName, timezone);
       } else {
         JOptionPane.showMessageDialog(dialog,
                 "Please enter both fields.",

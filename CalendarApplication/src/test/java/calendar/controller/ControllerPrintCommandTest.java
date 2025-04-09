@@ -93,7 +93,7 @@ public class ControllerPrintCommandTest {
     String invalidCommand = "print events on 26-03-2025";
 
     Exception exception = assertThrows(RuntimeException.class,
-        () -> command.execute(invalidCommand));
+            () -> command.execute(invalidCommand));
     assertEquals("Invalid print command format. Please use one of the " +
             "following formats: 'print events on YYYY-MM-DD' or 'print events " +
             "from YYYY-MM-DD HH:MM to YYYY-MM-DD HH:MM'." , exception.getMessage());
@@ -105,7 +105,7 @@ public class ControllerPrintCommandTest {
     String invalidCommand = "print events from 2025/03/26 10:00 to 2025/03/26 12:00";
 
     Exception exception = assertThrows(RuntimeException.class,
-        () -> command.execute(invalidCommand));
+            () -> command.execute(invalidCommand));
 
     assertTrue(exception.getMessage().contains("Invalid print command format"));
   }
@@ -116,7 +116,7 @@ public class ControllerPrintCommandTest {
     String invalidCommand = "show events on 2025-03-26"; // Wrong keyword
 
     Exception exception = assertThrows(IllegalArgumentException.class,
-        () -> command.execute(invalidCommand));
+            () -> command.execute(invalidCommand));
 
     assertTrue(exception.getMessage().contains("Invalid print command format"));
   }

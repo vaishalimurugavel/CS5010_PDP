@@ -445,7 +445,7 @@ public class CalendarEventTest {
     eventManager.addEvent(event4);
 
     List<Map<String, Object>> events = eventManager.getEventForDisplay(LocalDateTime.parse(
-            "2025-03-27T13:00:00"),
+                    "2025-03-27T13:00:00"),
             LocalDateTime.parse("2025-03-27T15:00:00"));
     assertEquals(1, events.size());
   }

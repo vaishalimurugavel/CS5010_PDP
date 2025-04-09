@@ -1,15 +1,12 @@
 package calendar.view.gui;
 
 import java.awt.*;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 
 import javax.swing.*;
 
 import calendar.controller.CalendarFactory;
 import calendar.model.CalendarGroupManager;
 import calendar.model.CalenderEventManager;
-import calendar.view.CalendarExport;
 
 public class CalendarUIManager extends JFrame {
   private JFrame frame;
@@ -18,11 +15,6 @@ public class CalendarUIManager extends JFrame {
   public CalendarUIManager() {
     CalendarFactory.setModel(new CalenderEventManager());
     CalendarFactory.setGroup(new CalendarGroupManager());
-    try {
-      CalendarFactory.setExport(new CalendarExport(new FileOutputStream("tester.csv")));
-    } catch (FileNotFoundException e) {
-      throw new RuntimeException(e);
-    }
     init();
   }
 
@@ -42,6 +34,8 @@ public class CalendarUIManager extends JFrame {
     gbc.insets = new Insets(5, 5, 5, 5);
     gbc.anchor = GridBagConstraints.CENTER;
 
+    JLabel title = new JLabel("WELCOME TO CALENDAR APPLICATION!");
+    JLabel opt = new JLabel("Please select the option you would like to use:");
     addButton = new JButton("Add calendar");
     editButton = new JButton("Edit calendar");
     selectButton = new JButton("Select calendar");
@@ -52,6 +46,10 @@ public class CalendarUIManager extends JFrame {
     buttonPanel.add(editButton);
     buttonPanel.add(selectButton);
 
+    panel.add(title, gbc);
+    gbc.gridy = 3;
+    panel.add(opt, gbc);
+    gbc.gridy = 4;
     panel.add(buttonPanel, gbc);
 
     frame.add(panel, BorderLayout.NORTH);

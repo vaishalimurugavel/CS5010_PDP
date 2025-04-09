@@ -13,6 +13,5 @@ public interface CalendarFeatures {
   void editCalendar(Map<String, String> properties);
   void addEvent(Map<String, String> properties);
   void editEvent(Map<String, String> properties);
-  void removeEvent(String name);
   void exportCalendar(String name) throws IOException;
 }

@@ -101,13 +101,26 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     addEventButton.addActionListener(e -> addEvents());
     editEventButton.addActionListener(e -> editEvents());
     exportButton.addActionListener(e -> {
+      JFileChooser folderChooser = new JFileChooser();
+      folderChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+      int result = folderChooser.showOpenDialog(null);
+
+      if (result == JFileChooser.APPROVE_OPTION) {
+        File selectedFolder = folderChooser.getSelectedFile();
+        String folderPath = selectedFolder.getAbsolutePath();
+
+        String fileName = JOptionPane.showInputDialog(null,
+                "Enter file name (e.g. data.csv):");
+        if (fileName != null && !fileName.trim().isEmpty()) {
+          fileName = folderPath + File.separator + fileName;
+        }
       try {
-        calendarGUIManager.exportCalendar(selectedCalendar);
+        calendarGUIManager.exportCalendar(fileName);
       } catch (IOException ex) {
         JOptionPane.showMessageDialog(selectFrame, "Error in exporting CSV file",
                 "CSV Export Error", JOptionPane.ERROR_MESSAGE);
       }
-    });
+    }});
     importButton.addActionListener(e -> {
       JFileChooser fileChooser = new JFileChooser();
       int result = fileChooser.showOpenDialog(selectFrame);
@@ -208,10 +221,10 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
         String type = (String) event.get(EventKeys.EVENT_TYPE);
 
         sb.append("Subject: ").append(subject).append("\n")
-                .append("Start Date: ").append(eventDate).append("\n")
+                .append("Start Date: ").append(eventDate.toLocalDate()).append("\n")
                 .append("Start Time: ").append(time).append("\n")
-                .append("End Date: ").append(eventDate).append("\n")
-                .append("End Time: ").append(time).append("\n")
+                .append("End Date: ").append(endDate.toLocalDate()).append("\n")
+                .append("End Time: ").append(endtime).append("\n")
                 .append("Type: ").append(type).append("\n\n");
       }
 
@@ -407,13 +420,16 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     JLabel nameLabel = new JLabel("Event Name:");
     JTextField nameField = new JTextField(20);
 
-    JLabel locationLabel = new JLabel("Location:");
+    JLabel newNameLabel = new JLabel("New event Name:");
+    JTextField newNameField = new JTextField(20);
+
+    JLabel locationLabel = new JLabel("New Location:");
     JTextField locField = new JTextField(20);
 
-    JLabel descLabel = new JLabel("Description:");
+    JLabel descLabel = new JLabel("New Description:");
     JTextField descField = new JTextField(20);
 
-    JLabel privateLabel = new JLabel("Is Private?:");
+    JLabel privateLabel = new JLabel("Change Is Private?:");
     JRadioButton yesButton = new JRadioButton("Yes");
     JRadioButton noButton = new JRadioButton("No");
     ButtonGroup privateGroup = new ButtonGroup();
@@ -423,7 +439,7 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     privatePanel.add(yesButton);
     privatePanel.add(noButton);
 
-    JLabel isAllDayLabel = new JLabel("Is AllDay?:");
+    JLabel isAllDayLabel = new JLabel("Change +Is AllDay?:");
     JComboBox<String> isAllDayBox = new JComboBox<>(new String[]{"No", "Single AllDay",
             "Recurring AllDay"});
 
@@ -466,9 +482,18 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     gbc.weightx = 1.0;
 
     int row = 0;
+    gbc.gridy = row;
+    gbc.gridx = 0;
+    frame.add(nameLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(nameField, gbc);
+
+    gbc.gridx = 1;
+    gbc.gridy = ++row;
+    frame.add(new JLabel("OR"), gbc);
 
     gbc.gridx = 0;
-    gbc.gridy = row;
+    gbc.gridy = ++row;
     frame.add(onDateLabel, gbc);
     gbc.gridx = 1;
     frame.add(onDateField, gbc);
@@ -498,9 +523,9 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
 
     gbc.gridy = ++row;
     gbc.gridx = 0;
-    frame.add(nameLabel, gbc);
+    frame.add(newNameLabel, gbc);
     gbc.gridx = 1;
-    frame.add(nameField, gbc);
+    frame.add(newNameField, gbc);
 
     gbc.gridy = ++row;
     gbc.gridx = 0;
@@ -553,9 +578,18 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
       DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
       try {
-        LocalDate onDate = LocalDate.parse(onDateField.getText(), dateFormatter);
-        LocalDateTime startDate = LocalDateTime.parse(startDateField.getText(), formatter);
-        LocalDateTime endDateTime = LocalDateTime.parse(endDateField.getText(), formatter);
+        LocalDate onDate = null;
+        LocalDateTime startDate = null;
+        LocalDateTime endDateTime = null;
+        if(!onDateField.getText().equalsIgnoreCase("")) {
+          onDate = LocalDate.parse(onDateField.getText(), dateFormatter);
+        }
+        if(!startDateField.getText().equalsIgnoreCase("")) {
+          startDate = LocalDateTime.parse(startDateField.getText(), formatter);
+        }
+        if(!endDateField.getText().equalsIgnoreCase("")) {
+          endDateTime = LocalDateTime.parse(endDateField.getText(), formatter);
+        }
 
         details.put(EventKeys.SUBJECT, nameField.getText());
         details.put(EventKeys.LOCATION, locField.getText());

@@ -1,10 +1,15 @@
 package calendar.view.gui;
 
 import java.awt.*;
-import java.text.SimpleDateFormat;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +23,6 @@ import calendar.model.EventKeys;
  * Created at 05-04-2025
  * Author Vaishali
  **/
-
 public class CalendarEventDisplay implements CalendarGUIInterface {
   CalendarGUIManager calendarGUIManager = new CalendarGUIManager();
   JPanel calendarPanel;
@@ -30,11 +34,52 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     HashMap<LocalDate, List<String>> events = new HashMap<>();
     currentMonth = YearMonth.now();
 
+    String[] options = CalendarFactory.getGroup().getCalendarNames();
+    JComboBox<String> dropdown = new JComboBox<>(options);
+
+    JPanel panels = new JPanel();
+    JLabel label = new JLabel("Select a calendar:");
+    panels.add(label);
+    panels.add(dropdown);
+
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.gridx = 0;
+    gbc.gridy = 0;
+    gbc.insets = new Insets(5, 5, 5, 5);
+    gbc.anchor = GridBagConstraints.CENTER;
+
+
+    JButton okButton = new JButton("Ok");
+    JButton cancelButton = new JButton("Cancel");
+    gbc.gridy = 3;
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.add(okButton);
+    buttonPanel.add(cancelButton);
+
+
+    panels.add(buttonPanel, gbc);
+    parentFrame.add(panels, BorderLayout.NORTH);
+
+    parentFrame.setVisible(true);
+    cancelButton.addActionListener(e -> {parentFrame.dispose();});
+    okButton.addActionListener(e -> {
+      String calendar = (String) dropdown.getSelectedItem();
+      showSelectDisplay(calendar);});
+
+  }
+
+  private void showSelectDisplay(String selectedCalendar) {
+    JFrame selectFrame = new JFrame("Calendar: " + selectedCalendar);
+    selectFrame.setSize(800, 600);
+    selectFrame.setLayout(new BorderLayout());
+
     JPanel topPanel = new JPanel(new FlowLayout());
     JButton addEventButton = new JButton("Add Event");
     JButton editEventButton = new JButton("Edit Event");
     JButton prevMonthButton = new JButton("Previous");
     JButton nextMonthButton = new JButton("Next");
+    JButton exportButton = new JButton("Export calendar");
+    JButton importButton = new JButton("Import calendar");
     monthLabel = new JLabel("", SwingConstants.CENTER);
 
     topPanel.add(addEventButton);
@@ -42,20 +87,67 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     topPanel.add(prevMonthButton);
     topPanel.add(monthLabel);
     topPanel.add(nextMonthButton);
+    topPanel.add(exportButton);
+    topPanel.add(importButton);
 
     calendarPanel = new JPanel(new GridLayout(0, 7));
     updateCalendar();
 
-    parentFrame.add(topPanel, BorderLayout.NORTH);
-    parentFrame.add(calendarPanel, BorderLayout.CENTER);
+    selectFrame.add(topPanel, BorderLayout.NORTH);
+    selectFrame.add(calendarPanel, BorderLayout.CENTER);
 
     prevMonthButton.addActionListener(e -> changeMonth(-1));
     nextMonthButton.addActionListener(e -> changeMonth(1));
-    addEventButton.addActionListener(e -> {
-      addEvents();
+    addEventButton.addActionListener(e -> addEvents());
+    editEventButton.addActionListener(e -> editEvents());
+    exportButton.addActionListener(e -> {
+      try {
+        calendarGUIManager.exportCalendar(selectedCalendar);
+      } catch (IOException ex) {
+        JOptionPane.showMessageDialog(selectFrame, "Error in exporting CSV file",
+                "CSV Export Error", JOptionPane.ERROR_MESSAGE);
+      }
+    });
+    importButton.addActionListener(e -> {
+      JFileChooser fileChooser = new JFileChooser();
+      int result = fileChooser.showOpenDialog(selectFrame);
+
+      if (result == JFileChooser.APPROVE_OPTION) {
+        File selectedFile = fileChooser.getSelectedFile();
+        parseCSV(selectFrame, selectedFile);
+      }
     });
 
-    parentFrame.setVisible(true);
+    selectFrame.setVisible(true);
+  }
+
+  private void parseCSV(JFrame selectFrame, File file) {
+    Map<String, Object> importedData = new HashMap<>();
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        String[] values = line.split(",");
+        importedData.put(EventKeys.SUBJECT, values[0]);
+        LocalDateTime dateTime = LocalDateTime.parse(values[1] + "T" + values[2] ,
+                DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm"));
+        importedData.put(EventKeys.START_DATETIME, dateTime);
+        dateTime = LocalDateTime.parse(values[3] + "T" + values[4] ,
+                DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm"));
+        importedData.put(EventKeys.END_DATETIME, dateTime);
+        String str = values[5];
+        if(str.equalsIgnoreCase("true")) {
+          importedData.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
+        }
+        else {
+          importedData.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+        }
+        importedData.put(EventKeys.DESCRIPTION, values[6]);
+        importedData.put(EventKeys.LOCATION, values[7]);
+      }
+    } catch (IOException ex) {
+      JOptionPane.showMessageDialog(selectFrame, "Error in importing CSV file", "CSV Import Error",
+              JOptionPane.ERROR_MESSAGE);
+    }
   }
 
 
@@ -108,14 +200,18 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     if (events != null && !events.isEmpty()) {
 
       for (Map<String, Object> event : events) {
-        String subject = (String) event.get("subject");
-        LocalDate eventDate = (LocalDate) event.get("startDateTime");
-        String time = event.get("startDateTime").toString().split("T")[1];
-        String type = (String) event.get("eventType");
+        String subject = (String) event.get(EventKeys.SUBJECT);
+        LocalDateTime eventDate = (LocalDateTime) event.get(EventKeys.START_DATETIME);
+        String time = eventDate.toString().split("T")[1];
+        LocalDateTime endDate = (LocalDateTime) event.get(EventKeys.END_DATETIME);
+        String endtime = endDate.toString().split("T")[1];
+        String type = (String) event.get(EventKeys.EVENT_TYPE);
 
         sb.append("Subject: ").append(subject).append("\n")
-                .append("Date: ").append(eventDate).append("\n")
-                .append("Time: ").append(time).append("\n")
+                .append("Start Date: ").append(eventDate).append("\n")
+                .append("Start Time: ").append(time).append("\n")
+                .append("End Date: ").append(eventDate).append("\n")
+                .append("End Time: ").append(time).append("\n")
                 .append("Type: ").append(type).append("\n\n");
       }
 
@@ -178,16 +274,9 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
 
 
     JLabel startDateLabel = new JLabel("Start DateTime:");
-    SpinnerDateModel model = new SpinnerDateModel();
-    JSpinner dateTimeSpinner = new JSpinner(model);
-    JSpinner.DateEditor editor = new JSpinner.DateEditor(dateTimeSpinner, "yyyy-MM-dd HH:mm");
-    dateTimeSpinner.setEditor(editor);
-
+    JTextField startDateField = new JTextField(20);
     JLabel endDate = new JLabel("End DateTime:");
-    SpinnerDateModel endModel = new SpinnerDateModel();
-    JSpinner endSpinner = new JSpinner(endModel);
-    JSpinner.DateEditor endEditor = new JSpinner.DateEditor(endSpinner, "yyyy-MM-dd HH:mm");
-    endSpinner.setEditor(endEditor);
+    JTextField endDateField = new JTextField(20);
 
     JButton saveButton = new JButton("Save");
     JButton cancelButton = new JButton("Cancel");
@@ -223,13 +312,13 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
     gbc.gridy = 3;
     frame.add(startDateLabel, gbc);
     gbc.gridx = 1;
-    frame.add(dateTimeSpinner, gbc);
+    frame.add(startDateField, gbc);
 
     gbc.gridx = 0;
     gbc.gridy = 4;
     frame.add(endDate, gbc);
     gbc.gridx = 1;
-    frame.add(endSpinner, gbc);
+    frame.add(endDateField, gbc);
 
     gbc.gridx = 0;
     gbc.gridy = 5;
@@ -261,72 +350,253 @@ public class CalendarEventDisplay implements CalendarGUIInterface {
 
     Map<String, String> details = new HashMap<>();
     saveButton.addActionListener(e -> {
-      details.put(EventKeys.SUBJECT, nameField.getText());
-      details.put(EventKeys.LOCATION, locField.getText());
-      details.put(EventKeys.DESCRIPTION, descField.getText());
-      details.put(EventKeys.PRIVATE,privateLabel.getText());
-      String  isAll = isAllDayBox.getSelectedItem().toString();
-      if (!isAll.equals("No")) {
-       if (isAll.equals("Single AllDay")) {
-         LocalDateTime selectedDate = (LocalDateTime) dateTimeSpinner.getValue();
-         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-ddTHH:mm");
-         String formattedDate = formatter.format(selectedDate);
-         details.put(EventKeys.START_DATETIME, formattedDate);
-       }
-       else{
-         LocalDateTime selectedDate = (LocalDateTime) dateTimeSpinner.getValue();
-         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-ddTHH:mm");
-         String formattedDate = formatter.format(selectedDate);
-         details.put(EventKeys.START_DATETIME, formattedDate);
+      DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+      try {
+        // Validate both fields before proceeding
+        LocalDateTime startDate = LocalDateTime.parse(startDateField.getText(), formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(endDateField.getText(), formatter);
 
-         LocalDateTime end = (LocalDateTime) dateTimeSpinner.getValue();
-         formattedDate = formatter.format(end);
-         details.put(EventKeys.REPEAT_DATETIME, formattedDate);
+        details.put(EventKeys.SUBJECT, nameField.getText());
+        details.put(EventKeys.LOCATION, locField.getText());
+        details.put(EventKeys.DESCRIPTION, descField.getText());
+        details.put(EventKeys.PRIVATE, privateLabel.getText());
+        String isAll = isAllDayBox.getSelectedItem().toString();
 
-         StringBuilder selectedDays = new StringBuilder("");
+        if (!isAll.equals("No")) {
+          if (isAll.equals("Single AllDay")) {
+            details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+          } else {
+            details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+            details.put(EventKeys.REPEAT_DATETIME, formatter.format(endDateTime));
 
-         if (mon.isSelected()) {
-           selectedDays.append("M");
-         }
-         if (tue.isSelected()) {
-           selectedDays.append("T");
-         }
-         if (wed.isSelected()) {
-           selectedDays.append("W");
-         }
-         if (thu.isSelected()) {
-           selectedDays.append("R");
-         }
-         if (fri.isSelected()) {
-           selectedDays.append("F");
-         }
-         if (sat.isSelected()) {
-           selectedDays.append("S");
-         }
-         if (sun.isSelected()) {
-           selectedDays.append("U");
-         }
-         if(selectedDays.length()>0){
-           details.put(EventKeys.OCCURRENCES, selectedDays.toString());
-         }
+            StringBuilder selectedDays = new StringBuilder();
+            if (mon.isSelected()) selectedDays.append("M");
+            if (tue.isSelected()) selectedDays.append("T");
+            if (wed.isSelected()) selectedDays.append("W");
+            if (thu.isSelected()) selectedDays.append("R");
+            if (fri.isSelected()) selectedDays.append("F");
+            if (sat.isSelected()) selectedDays.append("S");
+            if (sun.isSelected()) selectedDays.append("U");
 
-       }
+            if (selectedDays.length() > 0) {
+              details.put(EventKeys.OCCURRENCES, selectedDays.toString());
+            }
+          }
+        } else {
+          details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+          details.put(EventKeys.END_DATETIME, formatter.format(endDateTime));
+        }
+        details.put(EventKeys.EVENT_TYPE, isAll);
+        calendarGUIManager.addEvent(details);
+        frame.dispose();
+
+      } catch (DateTimeParseException ex) {
+        JOptionPane.showMessageDialog(frame,
+                "Please enter date and time in format: yyyy-MM-ddTHH:mm (e.g., 2025-04-07T14:30)",
+                "Invalid DateTime Format",
+                JOptionPane.ERROR_MESSAGE);
       }
-      else {
-        LocalDateTime selectedDate = (LocalDateTime) dateTimeSpinner.getValue();
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-ddTHH:mm");
-        String formattedDate = formatter.format(selectedDate);
-        details.put(EventKeys.START_DATETIME, formattedDate);
-
-        LocalDateTime end = (LocalDateTime) dateTimeSpinner.getValue();
-        formattedDate = formatter.format(end);
-        details.put(EventKeys.END_DATETIME, formattedDate);
-      }
-      calendarGUIManager.addEvent(details);
     });
     cancelButton.addActionListener(e -> frame.dispose());
 
     frame.setLocationRelativeTo(null);
     frame.setVisible(true);
+  }
+
+  private void editEvents() {
+    JLabel nameLabel = new JLabel("Event Name:");
+    JTextField nameField = new JTextField(20);
+
+    JLabel locationLabel = new JLabel("Location:");
+    JTextField locField = new JTextField(20);
+
+    JLabel descLabel = new JLabel("Description:");
+    JTextField descField = new JTextField(20);
+
+    JLabel privateLabel = new JLabel("Is Private?:");
+    JRadioButton yesButton = new JRadioButton("Yes");
+    JRadioButton noButton = new JRadioButton("No");
+    ButtonGroup privateGroup = new ButtonGroup();
+    privateGroup.add(yesButton);
+    privateGroup.add(noButton);
+    JPanel privatePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    privatePanel.add(yesButton);
+    privatePanel.add(noButton);
+
+    JLabel isAllDayLabel = new JLabel("Is AllDay?:");
+    JComboBox<String> isAllDayBox = new JComboBox<>(new String[]{"No", "Single AllDay",
+            "Recurring AllDay"});
+
+    JLabel recurring = new JLabel("Recurring Days:");
+
+    JCheckBox mon = new JCheckBox("M");
+    JCheckBox tue = new JCheckBox("T");
+    JCheckBox wed = new JCheckBox("W");
+    JCheckBox thu = new JCheckBox("R");
+    JCheckBox fri = new JCheckBox("F");
+    JCheckBox sat = new JCheckBox("S");
+    JCheckBox sun = new JCheckBox("U");
+
+    JPanel checkboxPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+    checkboxPanel.add(mon);
+    checkboxPanel.add(tue);
+    checkboxPanel.add(wed);
+    checkboxPanel.add(thu);
+    checkboxPanel.add(fri);
+    checkboxPanel.add(sat);
+    checkboxPanel.add(sun);
+
+
+    JLabel onDateLabel = new JLabel("On Date(yyyy-MM-dd):");
+    JTextField onDateField = new JTextField(20);
+    JLabel startDateLabel = new JLabel("from DateTime:");
+    JTextField startDateField = new JTextField(20);
+    JLabel endDate = new JLabel("to DateTime:");
+    JTextField endDateField = new JTextField(20);
+
+    JButton saveButton = new JButton("Save");
+    JButton cancelButton = new JButton("Cancel");
+
+    JFrame frame = new JFrame("Edit Event");
+    frame.setLayout(new GridBagLayout());
+    GridBagConstraints gbc = new GridBagConstraints();
+    gbc.insets = new Insets(10, 10, 10, 10);
+    gbc.anchor = GridBagConstraints.WEST;
+    gbc.fill = GridBagConstraints.HORIZONTAL;
+    gbc.weightx = 1.0;
+
+    int row = 0;
+
+    gbc.gridx = 0;
+    gbc.gridy = row;
+    frame.add(onDateLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(onDateField, gbc);
+
+    gbc.gridx = 1;
+    gbc.gridy = ++row;
+    frame.add(new JLabel("OR"), gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(new JLabel("Please enter in format: yyyy-MM-ddTHH:mm"), gbc);
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(startDateLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(startDateField, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(endDate, gbc);
+    gbc.gridx = 1;
+    frame.add(endDateField, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(new JLabel("Editing properties:"), gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(nameLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(nameField, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(locationLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(locField, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(descLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(descField, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(privateLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(privatePanel, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(isAllDayLabel, gbc);
+    gbc.gridx = 1;
+    frame.add(isAllDayBox, gbc);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    frame.add(recurring, gbc);
+    gbc.gridx = 1;
+    frame.add(checkboxPanel, gbc);
+
+    JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+    buttonPanel.add(saveButton);
+    buttonPanel.add(cancelButton);
+
+    gbc.gridy = ++row;
+    gbc.gridx = 0;
+    gbc.gridwidth = 2; // Span both columns
+    gbc.anchor = GridBagConstraints.CENTER;
+    frame.add(buttonPanel, gbc);
+
+    frame.pack();
+    frame.setLocationRelativeTo(null);
+    frame.setVisible(true);
+
+    cancelButton.addActionListener(e -> frame.dispose());
+    Map<String, String> details = new HashMap<>();
+    saveButton.addActionListener(e -> {
+      DateTimeFormatter formatter =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+      DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+      try {
+        LocalDate onDate = LocalDate.parse(onDateField.getText(), dateFormatter);
+        LocalDateTime startDate = LocalDateTime.parse(startDateField.getText(), formatter);
+        LocalDateTime endDateTime = LocalDateTime.parse(endDateField.getText(), formatter);
+
+        details.put(EventKeys.SUBJECT, nameField.getText());
+        details.put(EventKeys.LOCATION, locField.getText());
+        details.put(EventKeys.DESCRIPTION, descField.getText());
+        details.put(EventKeys.PRIVATE, privateLabel.getText());
+        String isAll = isAllDayBox.getSelectedItem().toString();
+
+        if (!isAll.equals("No")) {
+          if (isAll.equals("Single AllDay")) {
+            details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+          } else {
+            details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+            details.put(EventKeys.REPEAT_DATETIME, formatter.format(endDateTime));
+
+            StringBuilder selectedDays = new StringBuilder();
+            if (mon.isSelected()) selectedDays.append("M");
+            if (tue.isSelected()) selectedDays.append("T");
+            if (wed.isSelected()) selectedDays.append("W");
+            if (thu.isSelected()) selectedDays.append("R");
+            if (fri.isSelected()) selectedDays.append("F");
+            if (sat.isSelected()) selectedDays.append("S");
+            if (sun.isSelected()) selectedDays.append("U");
+
+            if (selectedDays.length() > 0) {
+              details.put(EventKeys.OCCURRENCES, selectedDays.toString());
+            }
+          }
+        } else {
+          details.put(EventKeys.START_DATETIME, formatter.format(startDate));
+          details.put(EventKeys.END_DATETIME, formatter.format(endDateTime));
+        }
+        details.put(EventKeys.EVENT_TYPE, isAll);
+        calendarGUIManager.addEvent(details);
+        frame.dispose();
+
+      } catch (DateTimeParseException ex) {
+        JOptionPane.showMessageDialog(frame,
+                "Wrong Date format. yyyy-MM-ddTHH:mm (e.g., 2025-04-07T14:30)",
+                "Invalid DateTime Format",
+                JOptionPane.ERROR_MESSAGE);
+      }
+    });
   }
 }

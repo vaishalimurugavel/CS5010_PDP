@@ -1,29 +1,32 @@
 package calendar.view.gui;
 
 import java.awt.*;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 
 import calendar.controller.CalendarFactory;
 import calendar.model.CalendarGroupManager;
 import calendar.model.CalenderEventManager;
-import calendar.model.EventKeys;
+import calendar.view.CalendarExport;
 
 public class CalendarUIManager extends JFrame {
-  static CalendarGUIManager calendarGUIManager = new CalendarGUIManager();
   private JFrame frame;
-  private JTable eventTable;
-  private DefaultTableModel tableModel;
-  private JTextArea eventDetails;
-  private JButton addButton, editButton, selectButton, exportButton, importButton;
+  private JButton addButton, editButton, selectButton;
 
   public CalendarUIManager() {
     CalendarFactory.setModel(new CalenderEventManager());
     CalendarFactory.setGroup(new CalendarGroupManager());
+    try {
+      CalendarFactory.setExport(new CalendarExport(new FileOutputStream("tester.csv")));
+    } catch (FileNotFoundException e) {
+      throw new RuntimeException(e);
+    }
+    init();
+  }
+
+  private void init(){
     frame = new JFrame("Calendar Application");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(800, 600);
@@ -39,15 +42,9 @@ public class CalendarUIManager extends JFrame {
     gbc.insets = new Insets(5, 5, 5, 5);
     gbc.anchor = GridBagConstraints.CENTER;
 
-    String[] options = CalendarFactory.getGroup().getCalendarNames();
-    JComboBox<String> dropdown = new JComboBox<>(options);
-    panel.add(dropdown, gbc);
-
     addButton = new JButton("Add calendar");
     editButton = new JButton("Edit calendar");
     selectButton = new JButton("Select calendar");
-    exportButton = new JButton("Export calendar");
-    importButton = new JButton("Import calendar");
 
     gbc.gridy = 1;
     JPanel buttonPanel = new JPanel();
@@ -75,8 +72,6 @@ public class CalendarUIManager extends JFrame {
       showSelectCalendarDialog(selectFrame);
       selectFrame.setVisible(true);
     });
-    exportButton.addActionListener(e -> {});
-    importButton.addActionListener(e -> {});
 
   }
 
@@ -93,18 +88,6 @@ public class CalendarUIManager extends JFrame {
   private void showSelectCalendarDialog(JFrame parentFrame) {
     CalendarGUIInterface event = new CalendarEventDisplay();
     event.showDisplay(parentFrame);
-  }
-
-
-  public void updateEventTable(List<Map<String, Object>> eventList) {
-    tableModel.setRowCount(0);
-    for (Map<String, Object> event : eventList) {
-      LocalDate date = (LocalDate) event.get(EventKeys.START_DATETIME);
-      String time = event.get(EventKeys.START_DATETIME).toString().split("T")[1];
-      String subject = (String) event.get(EventKeys.SUBJECT);
-      String type = (String) event.get(EventKeys.EVENT_TYPE);
-      tableModel.addRow(new Object[]{date, time, subject, type});
-    }
   }
 
   public static void main(String[] args) {

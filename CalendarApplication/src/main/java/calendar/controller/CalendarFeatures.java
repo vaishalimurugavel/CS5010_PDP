@@ -1,5 +1,6 @@
 package calendar.controller;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -13,4 +14,5 @@ public interface CalendarFeatures {
   void addEvent(Map<String, String> properties);
   void editEvent(Map<String, String> properties);
   void removeEvent(String name);
+  void exportCalendar(String name) throws IOException;
 }

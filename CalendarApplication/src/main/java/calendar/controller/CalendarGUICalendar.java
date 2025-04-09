@@ -1,8 +1,12 @@
 package calendar.controller;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+import calendar.model.Event;
 import calendar.model.EventKeys;
 
 /**
@@ -26,12 +30,28 @@ public class CalendarGUICalendar implements CalendarFeatures {
 
   @Override
   public void addEvent(Map<String, String> properties) {
-
     Map<String, Object> details = new HashMap<String, Object>();
     details.put(EventKeys.SUBJECT, properties.get(EventKeys.SUBJECT));
-    details.put(EventKeys.LOCATION, properties.getOrDefault(EventKeys.LOCATION,null));
-    details.put(EventKeys.DESCRIPTION, properties.getOrDefault(EventKeys.NEW_VALUE,null));
-    details.put(EventKeys.START_DATETIME, properties.getOrDefault(EventKeys.START_DATETIME,null));
+    details.put(EventKeys.LOCATION, properties.getOrDefault(EventKeys.LOCATION, null));
+    details.put(EventKeys.DESCRIPTION, properties.getOrDefault(EventKeys.DESCRIPTION, null));
+    details.put(EventKeys.START_DATETIME, LocalDateTime.parse( properties.getOrDefault(EventKeys.START_DATETIME, null)));
+    details.put(EventKeys.END_DATETIME, LocalDateTime.parse(properties.getOrDefault(EventKeys.END_DATETIME, null)));
+    if(properties.containsKey(EventKeys.EVENT_TYPE)){
+      String type = properties.getOrDefault(EventKeys.EVENT_TYPE, null);
+      switch (type) {
+        case "Single AllDay":
+          details.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY);
+          break;
+        case "Recurring AllDay":
+          details.put(EventKeys.EVENT_TYPE, EventKeys.EventType.ALL_DAY_RECURRING);
+          if(properties.containsKey(EventKeys.OCCURRENCES)){
+            details.put(EventKeys.OCCURRENCES , properties.get(EventKeys.OCCURRENCES));
+          }
+          break;
+        default:
+          details.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+      }
+    }
     CalendarFactory.getModel().addEvent(details);
   }
 
@@ -45,5 +65,16 @@ public class CalendarGUICalendar implements CalendarFeatures {
   public void removeEvent(String name) {
 
 
+  }
+
+  @Override
+  public void exportCalendar(String name) throws IOException {
+    CalendarFactory.setModel(CalendarFactory.getGroup().getCalendar(name)
+            .getCalendarEventEvents());
+    try {
+      CalendarFactory.getExport().displayOutput(CalendarFactory.getModel().getEventsForDisplay());
+    } catch (IOException e) {
+      throw new IOException(e);
+    }
   }
 }

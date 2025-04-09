@@ -1,5 +1,6 @@
 package calendar.view.gui;
 
+import java.io.IOException;
 import java.util.Map;
 
 import calendar.controller.CalendarFeatures;
@@ -30,5 +31,10 @@ public class CalendarGUIManager implements CalendarFeatures {
   @Override
   public void removeEvent(String name) {
     calendarFeatures.removeEvent(name);
+  }
+
+  @Override
+  public void exportCalendar(String name) throws IOException {
+    calendarFeatures.exportCalendar(name);
   }
 }

@@ -44,13 +44,6 @@ public class CalendarAppTest {
   }
 
   @Test
-  public void testMain_InvalidArgs() {
-    CalendarApp.main(new String[]{});
-    String output = errContent.toString();
-    assertTrue(output.contains("Usage:"));
-  }
-
-  @Test
   public void testMain_InvalidMode() {
     CalendarApp.main(new String[]{"--mode", "invalid"});
     String output = errContent.toString();

@@ -78,3 +78,8 @@ NOTE: \<dateStringTtimeString\> is of the format: yyyy-MM-ddTHH:mm
 ### C. Team Members contribution:
 Vaishali - Event addition and editing module. Designed the overall design of the application. Redesigned the entire application
 Aishwarya - Printing event, showing and export, Testing
+
+
+### UPDATED FEATURES:
+
+GUI included. USEME.md file added for reference.

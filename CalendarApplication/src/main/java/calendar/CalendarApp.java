@@ -7,6 +7,7 @@ import java.util.Locale;
 import java.util.Scanner;
 
 import calendar.controller.CalendarController;
+import calendar.gui.CalendarUIManager;
 
 
 /**
@@ -28,38 +29,40 @@ public class CalendarApp {
    * @param args  Arguments passed from the command line.
    */
   public static void main(String[] args) {
-    if (args.length < 2 || !args[0].equalsIgnoreCase("--mode")) {
+    if (args.length == 0) {
+      new CalendarUIManager();
+    } else if (args.length < 2 || !args[0].equalsIgnoreCase("--mode")) {
       System.err.println("Usage: \n java CalendarApp --mode interactive " +
               "\n java CalendarApp --mode headless <filename>");
       return;
-    }
+    } else {
+      String mode = args[1].toLowerCase(Locale.ROOT);
+      Readable reader;
 
-    String mode = args[1].toLowerCase(Locale.ROOT);
-    Readable reader;
-
-    switch (mode) {
-      case "interactive":
-        System.out.println("Entering interactive mode. Type 'exit' to quit.\nEnter command:");
-        reader = new InputStreamReader(System.in);
-        break;
-      case "headless":
-        if (args.length < 3) {
-          System.err.println("Error: Missing filename for headless mode.");
+      switch (mode) {
+        case "interactive":
+          System.out.println("Entering interactive mode. Type 'exit' to quit.\nEnter command:");
+          reader = new InputStreamReader(System.in);
+          break;
+        case "headless":
+          if (args.length < 3) {
+            System.err.println("Error: Missing filename for headless mode.");
+            return;
+          }
+          try {
+            reader = new FileReader(args[2]);
+          } catch (FileNotFoundException e) {
+            System.err.println("Error: File not found " + args[2]);
+            return;
+          }
+          break;
+        default:
+          System.err.println("Invalid mode. Use 'interactive' or 'headless'.");
           return;
-        }
-        try {
-          reader = new FileReader(args[2]);
-        } catch (FileNotFoundException e) {
-          System.err.println("Error: File not found " + args[2]);
-          return;
-        }
-        break;
-      default:
-        System.err.println("Invalid mode. Use 'interactive' or 'headless'.");
-        return;
+      }
+      CalendarController controller = new CalendarController();
+      processInput(reader, controller);
     }
-    CalendarController controller = new CalendarController();
-    processInput(reader,controller);
   }
 
   /**

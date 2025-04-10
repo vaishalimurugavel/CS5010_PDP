@@ -1,6 +1,8 @@
 package calendar.model;
 
 import java.time.ZoneId;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -18,8 +20,8 @@ public class Calendars {
   /**
    * Constructor to initialize a calendar group with its title, timezone, and timezone name.
    *
-   * @param title The title or name of the calendar group.
-   * @param zoneId The timezone associated with the calendar group.
+   * @param title    The title or name of the calendar group.
+   * @param zoneId   The timezone associated with the calendar group.
    * @param zoneName The name of the timezone.
    */
   public Calendars(String title, ZoneId zoneId, String zoneName) {
@@ -37,6 +39,13 @@ public class Calendars {
    */
   public String getTitle() {
     return title;
+  }
+
+  /**
+   * Sets the title of the calendar group.
+   */
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   /**
@@ -68,17 +77,19 @@ public class Calendars {
   }
 
   /**
-   * Sets the title of the calendar group.
-   */
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  /**
    * Sets the name of the timezone associated with the calendar group.
    */
   public void setZoneName(String zoneName) {
     this.zoneName = zoneName;
     this.zoneId = ZoneId.of(zoneName);
   }
+
+  public List<Map<String, Object>> getEventsForDisplay() {
+    return calendarEvents.getEventsForDisplay();
+  }
+
+  public Map<String, Object>[] getEvents() {
+    return new Map[0];
+  }
+
 }

@@ -310,4 +310,5 @@ public class Event {
   public LocalDate getRepeatDate() {
     return repeatDate;
   }
+
 }

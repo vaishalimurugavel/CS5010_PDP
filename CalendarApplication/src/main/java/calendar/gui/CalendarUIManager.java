@@ -1,24 +1,45 @@
-package calendar.view.gui;
+package calendar.gui;
 
-import java.awt.*;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
 
 import calendar.controller.CalendarFactory;
 import calendar.model.CalendarGroupManager;
 import calendar.model.CalenderEventManager;
 
+/**
+ * CalendarUIManager extends JFrame, displays the main backbone of the GUI view.
+ */
 public class CalendarUIManager extends JFrame {
   private JFrame frame;
-  private JButton addButton, editButton, selectButton;
 
+  /**
+   * Constructor initializes the CalendarApplication.
+   */
   public CalendarUIManager() {
     CalendarFactory.setModel(new CalenderEventManager());
     CalendarFactory.setGroup(new CalendarGroupManager());
     init();
   }
 
-  private void init(){
+  private static void showAddCalendarDialog(JFrame parentFrame) {
+    CalendarAddDisplay calendarAddDisplay = new CalendarAddDisplay();
+    calendarAddDisplay.showDisplay(parentFrame);
+  }
+
+  private static void showEditCalendarDialog(JFrame parentFrame) {
+    CalendarGUIInterface edit = new CalendarEditDisplay();
+    edit.showDisplay(parentFrame);
+  }
+
+  private void init() {
     frame = new JFrame("Calendar Application");
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     frame.setSize(800, 600);
@@ -36,9 +57,9 @@ public class CalendarUIManager extends JFrame {
 
     JLabel title = new JLabel("WELCOME TO CALENDAR APPLICATION!");
     JLabel opt = new JLabel("Please select the option you would like to use:");
-    addButton = new JButton("Add calendar");
-    editButton = new JButton("Edit calendar");
-    selectButton = new JButton("Select calendar");
+    JButton addButton = new JButton("Add calendar");
+    JButton editButton = new JButton("Edit calendar");
+    JButton selectButton = new JButton("Select calendar");
 
     gbc.gridy = 1;
     JPanel buttonPanel = new JPanel();
@@ -54,8 +75,12 @@ public class CalendarUIManager extends JFrame {
 
     frame.add(panel, BorderLayout.NORTH);
     frame.setVisible(true);
-    addButton.addActionListener(e -> {showAddCalendarDialog(frame);});
-    editButton.addActionListener(e -> {showEditCalendarDialog(frame);});
+    addButton.addActionListener(e -> {
+      showAddCalendarDialog(frame);
+    });
+    editButton.addActionListener(e -> {
+      showEditCalendarDialog(frame);
+    });
     selectButton.addActionListener(e -> {
       JFrame selectFrame = new JFrame("Select Calendar");
       selectFrame.setSize(600, 500);
@@ -73,23 +98,9 @@ public class CalendarUIManager extends JFrame {
 
   }
 
-  private static void showAddCalendarDialog(JFrame parentFrame) {
-    CalendarAddDisplay calendarAddDisplay = new CalendarAddDisplay();
-    calendarAddDisplay.showDisplay(parentFrame);
-  }
-
-  private static void showEditCalendarDialog(JFrame parentFrame) {
-    CalendarGUIInterface edit = new CalendarEditDisplay();
-    edit.showDisplay(parentFrame);
-  }
-
   private void showSelectCalendarDialog(JFrame parentFrame) {
     CalendarGUIInterface event = new CalendarEventDisplay();
     event.showDisplay(parentFrame);
-  }
-
-  public static void main(String[] args) {
-    new CalendarUIManager();
   }
 
 }

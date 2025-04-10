@@ -31,22 +31,23 @@ public class CalendarController {
 
   /**
    * Process the CalendarApp8 commands one by one.
+   *
    * @param command String command
    * @throws IllegalArgumentException Exception thrown in case of invalid command.
    */
   public void processCommand(String command) throws IllegalArgumentException {
     String[] tokens = command.split(" ");
     try {
-      if ( (tokens[0].equals("create") && tokens[1].equals("calendar") ) || tokens[0].equals("use")
+      if ((tokens[0].equals("create") && tokens[1].equals("calendar")) || tokens[0].equals("use")
               || tokens[0].equals("copy") || tokens[0].equals("edit")
-              && tokens[1].equals("calendar") ) {
+              && tokens[1].equals("calendar")) {
         mapper.get("copy").execute(command);
         return;
       }
       if (!mapper.containsKey(tokens[0])) {
         throw new IllegalArgumentException("Unknown command: " + command);
       }
-      if(CalendarFactory.getGroup().getCurrentCalendar() == null){
+      if (CalendarFactory.getGroup().getCurrentCalendar() == null) {
         throw new IllegalArgumentException("No calendar is active");
       }
       mapper.get(tokens[0]).execute(command);

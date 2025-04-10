@@ -83,18 +83,19 @@ public class ControllerGroupCommand implements ControllerCommand {
 
       List<Map<String, Object>> events = CalendarFactory.getModel().getEventForDisplay(eventName);
       events = events.stream().filter(
+
         (e) -> {
           ZonedDateTime eventStart = ((LocalDateTime) e.get(EventKeys.START_DATETIME))
-                  .atZone(sourceZone).withZoneSameInstant(targetZone);
+                .atZone(sourceZone).withZoneSameInstant(targetZone);
           ZonedDateTime eventEnd = e.get(EventKeys.END_DATETIME) != null
-                        ? ((LocalDateTime) e.get(EventKeys.END_DATETIME)).atZone(sourceZone)
-                        .withZoneSameInstant(targetZone) : null;
+                ? ((LocalDateTime) e.get(EventKeys.END_DATETIME)).atZone(sourceZone)
+                .withZoneSameInstant(targetZone) : null;
           return eventStart.toLocalDateTime().isEqual(onZoned.toLocalDateTime())
-                        || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
-                        && eventEnd != null
-                        && eventEnd.toLocalDateTime().isAfter(onZoned.toLocalDateTime()))
-                        || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
-                        && eventStart.toLocalDateTime().isAfter(onZoned.toLocalDateTime()));
+                || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
+                && eventEnd != null
+                && eventEnd.toLocalDateTime().isAfter(onZoned.toLocalDateTime()))
+                || (eventStart.toLocalDateTime().isBefore(toZoned.toLocalDateTime())
+                && eventStart.toLocalDateTime().isAfter(onZoned.toLocalDateTime()));
         }).collect(Collectors.toList());
 
       for (Map<String, Object> event : events) {
@@ -233,9 +234,7 @@ public class ControllerGroupCommand implements ControllerCommand {
       edit.put(EventKeys.NEW_VALUE, newValue);
 
       CalendarFactory.getGroup().updateCalendar(edit);
-    }
-
-    else {
+    } else {
       throw new IllegalArgumentException("Invalid command: " + command);
     }
   }

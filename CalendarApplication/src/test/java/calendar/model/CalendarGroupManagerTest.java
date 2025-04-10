@@ -2,7 +2,9 @@ package calendar.model;
 
 import org.junit.Test;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -35,8 +37,8 @@ public class CalendarGroupManagerTest {
 
     calendarGroupManager.addCalendar("Group19", "America/New_York");
 
-    assertThrows(IllegalArgumentException.class,
-        () -> calendarGroupManager.addCalendar("Group19", "America/Los_Angeles"));
+    assertThrows(IllegalArgumentException.class, () ->
+            calendarGroupManager.addCalendar("Group19", "America/Los_Angeles"));
 
   }
 
@@ -99,8 +101,7 @@ public class CalendarGroupManagerTest {
 
     calendarGroupManager.addCalendar("Group1", "America/New_York");
 
-    assertTrue("Calendar group should exist",
-            calendarGroupManager.checkForDuplicates("Group1"));
+    assertTrue("Calendar group should exist", calendarGroupManager.checkForDuplicates("Group1"));
     assertFalse("Calendar group should not exist",
             calendarGroupManager.checkForDuplicates("NonExistingGroup"));
   }
@@ -119,7 +120,7 @@ public class CalendarGroupManagerTest {
     calendarGroupManager.updateCalendar(updateProps);
 
     Calendars updatedGroup = calendarGroupManager.getCalendar("UpdatedGroup");
-    assertNotNull("Updated calendar should exist", updatedGroup);
+    assertNotNull(updatedGroup);
     assertEquals("UpdatedGroup", updatedGroup.getTitle());
   }
 
@@ -156,4 +157,88 @@ public class CalendarGroupManagerTest {
       assertEquals("No Calendar available with the name NonExistingGroup", e.getMessage());
     }
   }
+
+  @Test
+  public void testRecurringEventConflict() {
+    CalendarGroupManager calendarGroupManager = new CalendarGroupManager();
+
+
+    calendarGroupManager.addCalendar("TestCalendar", "America/New_York");
+
+
+    Map<String, Object> existingEvent = new HashMap<>();
+    existingEvent.put(EventKeys.SUBJECT, "Existing Meeting");
+    existingEvent.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-04-10T10:00:00"));
+    existingEvent.put(EventKeys.END_DATETIME, LocalDateTime.parse("2025-04-10T11:00:00"));
+    existingEvent.put(EventKeys.DESCRIPTION, "Team meeting");
+    existingEvent.put(EventKeys.LOCATION, "Conference Room");
+    existingEvent.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+
+    calendarGroupManager.getCalendarEvent("TestCalendar").addEvent(existingEvent);
+
+
+    Map<String, Object> recurringEvent = new HashMap<>();
+    recurringEvent.put(EventKeys.SUBJECT, "Recurring Workshop");
+    recurringEvent.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-04-10T10:30:00"));
+    recurringEvent.put(EventKeys.END_DATETIME, LocalDateTime.parse("2025-04-10T12:00:00"));
+    recurringEvent.put(EventKeys.DESCRIPTION, "Technical workshop");
+    recurringEvent.put(EventKeys.LOCATION, "Room B");
+    recurringEvent.put(EventKeys.EVENT_TYPE, EventKeys.EventType.RECURRING);
+    recurringEvent.put(EventKeys.WEEKDAYS, "MTWRF");
+    recurringEvent.put(EventKeys.OCCURRENCES, 5);
+
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      calendarGroupManager.getCalendarEvent("TestCalendar").addEvent(recurringEvent);
+    });
+  }
+
+  @Test
+  public void testAutoDeclineFlagBehavior() {
+    CalendarGroupManager calendarGroupManager = new CalendarGroupManager();
+
+
+    calendarGroupManager.addCalendar("TestCalendar12", "America/New_York");
+
+
+    Map<String, Object> existingEvent = new HashMap<>();
+    existingEvent.put(EventKeys.SUBJECT, "Existing Meeting");
+    existingEvent.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-04-10T10:00:00"));
+    existingEvent.put(EventKeys.END_DATETIME, LocalDateTime.parse("2025-04-10T11:00:00"));
+    existingEvent.put(EventKeys.DESCRIPTION, "Team meeting");
+    existingEvent.put(EventKeys.LOCATION, "Conference Room");
+    existingEvent.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+    calendarGroupManager.getCalendarEvent("TestCalendar12").addEvent(existingEvent);
+
+
+    Map<String, Object> conflictingEvent = new HashMap<>();
+    conflictingEvent.put(EventKeys.SUBJECT, "Conflicting Meeting");
+    conflictingEvent.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-04-10T10:30:00"));
+    conflictingEvent.put(EventKeys.END_DATETIME, LocalDateTime.parse("2025-04-10T12:00:00"));
+    conflictingEvent.put(EventKeys.DESCRIPTION, "Another meeting");
+    conflictingEvent.put(EventKeys.LOCATION, "Room B");
+    conflictingEvent.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+    conflictingEvent.put(EventKeys.AUTO_DECLINE, true);
+
+
+    assertThrows(IllegalArgumentException.class, () -> {
+      calendarGroupManager.getCalendarEvent("TestCalendar12").addEvent(conflictingEvent);
+    });
+
+    Map<String, Object> nonConflictingEvent = new HashMap<>();
+    nonConflictingEvent.put(EventKeys.SUBJECT, "Non-conflicting Meeting");
+    nonConflictingEvent.put(EventKeys.START_DATETIME, LocalDateTime.parse("2025-04-10T12:30:00"));
+    nonConflictingEvent.put(EventKeys.END_DATETIME, LocalDateTime.parse("2025-04-10T13:30:00"));
+    nonConflictingEvent.put(EventKeys.DESCRIPTION, "Team discussion");
+    nonConflictingEvent.put(EventKeys.LOCATION, "Room C");
+    nonConflictingEvent.put(EventKeys.EVENT_TYPE, EventKeys.EventType.SINGLE);
+    nonConflictingEvent.put(EventKeys.AUTO_DECLINE, true);
+    calendarGroupManager.getCalendarEvent("TestCalendar12").addEvent(nonConflictingEvent);
+
+
+    List<Map<String, Object>> events = calendarGroupManager.getCalendarEvent("TestCalendar12")
+                    .getEventsForDisplay();
+    assertEquals(2, events.size());
+  }
+
 }

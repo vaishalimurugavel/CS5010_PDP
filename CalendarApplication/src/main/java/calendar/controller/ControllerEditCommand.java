@@ -33,12 +33,12 @@ import calendar.model.EventKeys;
  **/
 public class ControllerEditCommand implements ControllerCommand {
 
-  
+
   @Override
   public void execute(String command) {
-    String pattern1 = "edit event (\\w+) (.+?) from " + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})" 
+    String pattern1 = "edit event (\\w+) (.+?) from " + "(\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2})"
             + " to (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) with (.+)";
-    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) " 
+    String pattern2 = "edit events (\\w+) (.+?) from (\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}) "
             + "with (.+)";
     String pattern3 = "edit events (\\w+) (.+?) (.+)";
 

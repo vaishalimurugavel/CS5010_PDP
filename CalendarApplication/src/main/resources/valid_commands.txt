@@ -12,9 +12,6 @@ edit event subject Event2 from 2025-03-27T10:00 to 2025-03-28T10:00 with Event2E
 edit events subject Event3 from 2025-03-28T10:00 with Event3Edited
 edit events subject Event5 Event5Edited
 export cal Edited.csv
-print events on 2025-03-20
-print events from 2025-03-28T10:10 to 2025-03-29T10:00
-show status on 2025-03-28T10:10
 create calendar --name HomeCalendar --timezone America/New_York
 use calendar --name WorkCalendar
 copy event Event3 on 2025-03-28T10:10 --target HomeCalendar to 2025-03-25T12:00

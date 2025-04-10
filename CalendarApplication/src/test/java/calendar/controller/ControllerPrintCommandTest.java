@@ -96,7 +96,7 @@ public class ControllerPrintCommandTest {
         () -> command.execute(invalidCommand));
     assertEquals("Invalid print command format. Please use one of the " +
             "following formats: 'print events on YYYY-MM-DD' or 'print events " +
-            "from YYYY-MM-DD HH:MM to YYYY-MM-DD HH:MM'." , exception.getMessage());
+            "from YYYY-MM-DD HH:MM to YYYY-MM-DD HH:MM'.", exception.getMessage());
   }
 
   @Test

@@ -28,7 +28,7 @@ public class CalendarFactoryTest {
   @Before
   public void setUp() {
     calendarView = new MockView("Monthly View");
-    calendarGroup = new MockGroup("Work Group");
+    calendarGroup = new MockGroup();
 
     CalendarFactory.setModel(null);
     CalendarFactory.setView(null);

@@ -21,7 +21,7 @@ public interface CalendarGroup {
   /**
    * Adds a new calendar to the group with the specified name and timezone.
    *
-   * @param name The name of the calendar to be added.
+   * @param name     The name of the calendar to be added.
    * @param timezone The timezone of the calendar to be added.
    */
   void addCalendar(String name, String timezone);
@@ -65,4 +65,5 @@ public interface CalendarGroup {
   Calendars getCurrentCalendar();
 
   String[] getCalendarNames();
+
 }

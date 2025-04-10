@@ -74,11 +74,11 @@ public class ControllerGroupCommandTest {
     createCommand = "use calendar --name WorkCalendar";
     controllerGroupCommand.execute(createCommand);
 
-    String eventCommand = "create event Meeting from 2025-03-24T12:00 to 2025-03-25T12:00";
+    String eventCommand = "create event Meeting from 2025-04-12T12:00 to 2025-04-15T12:00";
     controllerCreateCommand.execute(eventCommand);
 
-    String command = "copy event Meeting on 2025-03-24T12:00 --target PersonalCalendar " +
-            "to 2025-03-25T12:00";
+    String command = "copy event Meeting on 2025-04-12T12:00 --target PersonalCalendar " +
+            "to 2025-04-15T12:00";
     controllerGroupCommand.execute(command);
 
     assertNotNull(CalendarFactory.getGroup().getCalendarEvent("PersonalCalendar"));
@@ -153,7 +153,7 @@ public class ControllerGroupCommandTest {
     String eventCommand = "create event Meeting from 2025-03-24T12:00 to 2025-03-25T12:00";
     controllerCreateCommand.execute(eventCommand);
 
-    String command = "copy events between 2025-03-24 and 2025-03-23 --target PersonalCalendar21" +
+    String command = "copy events between 2025-03-23 and 2025-03-24 --target PersonalCalendar21" +
             " to 2025-03-26" ;
     controllerGroupCommand.execute(command);
 

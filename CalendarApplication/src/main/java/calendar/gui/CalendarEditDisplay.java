@@ -1,22 +1,29 @@
-package calendar.view.gui;
+package calendar.gui;
 
-import java.awt.*;
+import java.awt.GridLayout;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import javax.swing.*;
 
 import calendar.controller.CalendarFactory;
 import calendar.model.EventKeys;
 
-/**
- * Created at 05-04-2025
- * Author Vaishali
- **/
+import javax.swing.JFrame;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
 
+/**
+ * <p>
+ *   CalendarEditDisplay displays the options to edit existing calendar.
+ * </p>
+ **/
 public class CalendarEditDisplay implements CalendarGUIInterface {
   CalendarGUIManager calendarGUIManager = new CalendarGUIManager();
 
@@ -58,9 +65,9 @@ public class CalendarEditDisplay implements CalendarGUIInterface {
                 "Calendar " + calendarName + "Updated : (" + timezone + ")" ,
                 "Success" , JOptionPane.INFORMATION_MESSAGE);
         dialog.dispose();
-        if(!calendarName.isEmpty()) {
-            edit.put(EventKeys.PROPERTY, EventKeys.CALENDAR_NAME);
-            edit.put(EventKeys.NEW_VALUE, calendarName);
+        if (!calendarName.isEmpty()) {
+          edit.put(EventKeys.PROPERTY, EventKeys.CALENDAR_NAME);
+          edit.put(EventKeys.NEW_VALUE, calendarName);
         }
         else {
           edit.put(EventKeys.PROPERTY, EventKeys.TIMEZONE);

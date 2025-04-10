@@ -3,7 +3,6 @@ package calendar.controller;
 import calendar.model.CalendarEvent;
 import calendar.model.CalendarGroup;
 import calendar.model.CalendarGroupManager;
-import calendar.model.CalendarViewModel;
 import calendar.view.CalendarView;
 
 /**
@@ -24,8 +23,6 @@ public class CalendarFactory {
   private static CalendarView view;
   private static CalendarView export;
   private static CalendarGroup group = new CalendarGroupManager();
-  private static CalendarViewModel viewModel;
-
 
   /**
    * Returns CalendarEvent object.
@@ -60,14 +57,6 @@ public class CalendarFactory {
   }
 
   /**
-   * Returns CalendarViewModel Object.
-   * @return CalendarViewModel
-   */
-  public static CalendarViewModel getViewModel() {
-    return viewModel;
-  }
-
-  /**
    * Sets a new CalendarEvent for singleCalender.
    * @param calendarEvent CalendarEvent
    */
@@ -99,12 +88,5 @@ public class CalendarFactory {
     group = cgroup;
   }
 
-  /**
-   * Sets a new CalendarViewModel object.
-   * @param cViewModel CalendarViewModel
-   */
-  public static void setViewModel(CalendarViewModel cViewModel) {
-    viewModel = cViewModel;
-  }
 
 }

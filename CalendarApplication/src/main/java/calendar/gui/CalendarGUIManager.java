@@ -1,4 +1,4 @@
-package calendar.view.gui;
+package calendar.gui;
 
 import java.io.IOException;
 import java.util.Map;
@@ -6,8 +6,12 @@ import java.util.Map;
 import calendar.controller.CalendarFeatures;
 import calendar.controller.CalendarGUICalendar;
 
+/**
+ * CalendarGUIManager is a concrete class of CalendarFeatures. Manages GUI operations.
+ */
 public class CalendarGUIManager implements CalendarFeatures {
   CalendarFeatures calendarFeatures = new CalendarGUICalendar();
+
   @Override
   public void addCalendar(String name, String timeZone) {
     calendarFeatures.addCalendar(name, timeZone);
@@ -20,7 +24,12 @@ public class CalendarGUIManager implements CalendarFeatures {
 
   @Override
   public void addEvent(Map<String, String> details) {
-    calendarFeatures.addEvent(details);
+    try {
+      calendarFeatures.addEvent(details);
+    }
+    catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 
   @Override
@@ -31,5 +40,15 @@ public class CalendarGUIManager implements CalendarFeatures {
   @Override
   public void exportCalendar(String name) throws IOException {
     calendarFeatures.exportCalendar(name);
+  }
+
+  @Override
+  public void setCalendar(String name) {
+    calendarFeatures.setCalendar(name);
+  }
+
+  @Override
+  public void importCalendar(Map<String, Object> properties) {
+    calendarFeatures.importCalendar(properties);
   }
 }

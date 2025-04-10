@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * retrieving events for display.
  * </p>
  **/
-public class CalenderEventManager implements CalendarEvent, CalendarViewModel{
+public class CalenderEventManager implements CalendarEvent {
   List<Event> events = new ArrayList<Event>();
 
   private void addEvents(Map<String, Object> event, Event.EventBuilder eventBuilder) {
@@ -340,28 +340,35 @@ public class CalenderEventManager implements CalendarEvent, CalendarViewModel{
 
     List<Event> filteredEvents = events.stream()
             .filter(e -> {
-              if (e.getAllDate() == null && e.getStartDateTime() == null
-                      && e.getEndDateTime() == null) {
+              if (e.getAllDate() == null && e.getStartDateTime() == null &&
+                      e.getEndDateTime() == null) {
                 return false;
               }
-              LocalDate eventEndDate = null;
+
               LocalDate eventStartDate = null;
+              LocalDate eventEndDate = null;
+
               if (e.getStartDateTime() != null) {
                 eventStartDate = e.getStartDateTime().toLocalDate();
               } else if (e.getAllDate() != null) {
                 eventStartDate = e.getAllDate();
               }
+
               if (e.getEndDateTime() != null) {
                 eventEndDate = e.getEndDateTime().toLocalDate();
+              } else {
+                eventEndDate = eventStartDate;
               }
 
-              LocalDate eventRepeatDate = (e.getRepeatDateTime() != null) ?
-                      e.getRepeatDateTime().toLocalDate() : null;
-
-              return (eventStartDate != null && eventStartDate.equals(startDate)
-                      || (endDate != null && (eventEndDate != null
-                      && (eventEndDate.equals(endDate)
-                      || (eventRepeatDate != null && eventRepeatDate.equals(startDate))))));
+              // Check if the event overlaps with the start-end date range
+              if (startDate != null && endDate != null) {
+                return (eventStartDate != null && !eventStartDate.isAfter(endDate)
+                        && !eventEndDate.isBefore(startDate));
+              } else {
+                // Only startDate is provided
+                return (eventStartDate != null && !eventStartDate.isAfter(startDate)
+                        && !eventEndDate.isBefore(startDate));
+              }
             })
             .collect(Collectors.toList());
 
@@ -419,9 +426,5 @@ public class CalenderEventManager implements CalendarEvent, CalendarViewModel{
     return eventList;
   }
 
-  @Override
-  public List<String> getGroups() {
-    return null;
-  }
 
 }

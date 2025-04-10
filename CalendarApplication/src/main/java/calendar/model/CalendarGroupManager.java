@@ -1,6 +1,8 @@
 package calendar.model;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,8 +39,9 @@ public class CalendarGroupManager implements CalendarGroup {
   public Calendars getCalendar(String name) {
     if (calendarGroups.containsKey(name)) {
       return calendarGroups.get(name);
+    } else {
+      throw new IllegalArgumentException("No Calendar available with the name " + name);
     }
-    return null;
   }
 
   @Override
@@ -57,13 +60,13 @@ public class CalendarGroupManager implements CalendarGroup {
 
   @Override
   public String[] getCalendarNames() {
-    if(calendarGroups.isEmpty()){
+    if (calendarGroups.isEmpty()) {
       return null;
     }
 
     String[] names = new String[calendarGroups.size()];
     int i = 0;
-    for(String calendar : calendarGroups.keySet()){
+    for (String calendar : calendarGroups.keySet()) {
       names[i++] = calendar;
     }
     return names;
@@ -84,23 +87,46 @@ public class CalendarGroupManager implements CalendarGroup {
     calendarGroups.put(groupName, calendars);
   }
 
-  @Override
-  public void updateCalendar(Map<String, Object> prop) {
-    String groupName = (String) prop.get(EventKeys.CALENDAR_NAME);
-    Calendars calendars = calendarGroups.get(groupName);
-    if (calendars != null) {
-      String propertyName = (String) prop.get(EventKeys.PROPERTY);
-      String newValue = (String) prop.get(EventKeys.NEW_VALUE);
-      if (propertyName.equals(EventKeys.CALENDAR_NAME)) {
-        calendars.setTitle(newValue);
-        calendarGroups.remove(groupName);
-        calendarGroups.put(newValue, calendars);
-      } else if (propertyName.equals(EventKeys.TIMEZONE)) {
-        calendars.setZoneName(newValue);
-      }
+  /**
+   * Update Calendar Property.
+   *
+   * @param updateProps A map containing the properties to update (e.g., name, timezone).
+   */
+  public void updateCalendar(Map<String, Object> updateProps) {
+    String calendarName = (String) updateProps.get(EventKeys.CALENDAR_NAME);
+    String property = (String) updateProps.get(EventKeys.PROPERTY);
+    String newValue = (String) updateProps.get(EventKeys.NEW_VALUE);
 
-    } else {
-      throw new IllegalArgumentException("No Calendar available with the name " + groupName);
+    Calendars calendar = getCalendar(calendarName);
+    if (property.equals(EventKeys.TIMEZONE)) {
+      String oldTimezone = calendar.getZoneName();
+      calendar.setZoneName(newValue);
+
+      // Adjust all event times
+      ZoneId oldZoneId = ZoneId.of(oldTimezone);
+      ZoneId newZoneId = ZoneId.of(newValue);
+
+      for (Map<String, Object> event : calendar.getEvents()) {
+        LocalDateTime oldStart = (LocalDateTime) event.get(EventKeys.START_DATETIME);
+        LocalDateTime oldEnd = (LocalDateTime) event.get(EventKeys.END_DATETIME);
+
+        if (oldStart != null && oldEnd != null) {
+          ZonedDateTime zonedStart = oldStart.atZone(oldZoneId);
+          ZonedDateTime zonedEnd = oldEnd.atZone(oldZoneId);
+
+          event.put(EventKeys.START_DATETIME, zonedStart.withZoneSameInstant(newZoneId)
+                  .toLocalDateTime());
+          event.put(EventKeys.END_DATETIME, zonedEnd.withZoneSameInstant(newZoneId)
+                  .toLocalDateTime());
+        }
+      }
+    } else if (property.equals(EventKeys.CALENDAR_NAME)) {
+      calendar.setTitle(newValue);
+      calendarGroups.put(newValue, getCalendar(calendarName));
+      calendarGroups.remove(calendarName);
+
     }
+
   }
+
 }

@@ -20,7 +20,6 @@ import calendar.model.EventKeys;
  **/
 public class CalendarExport extends CalendarView {
 
-
   /**
    * Constructor for CalendarExport that initializes the output stream.
    *

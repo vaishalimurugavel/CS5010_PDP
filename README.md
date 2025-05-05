@@ -15,7 +15,7 @@ Created a basic calendar application that supports CLI, file-based commands and 
 # Getting Started
 
 ### Executing program
-- Run main java file : CalendarApp java'
+- Run main java file : CalendarApp.java
 
 For GUI:
   ```
